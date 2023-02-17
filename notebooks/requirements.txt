@@ -1,0 +1,5 @@
+datasets
+transformers
+evaluate
+termcolor
+git+https://github.com/IndoNLP/nusa-crowd.git@release_exp
