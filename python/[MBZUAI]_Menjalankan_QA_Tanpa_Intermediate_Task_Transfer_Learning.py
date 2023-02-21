@@ -5,7 +5,7 @@
 
 # # Import semua module
 
-# In[1]:
+# In[19]:
 
 
 #!pip install datasets
@@ -15,20 +15,20 @@
 #!pip install git+https://github.com/IndoNLP/nusa-crowd.git@release_exp
 
 
-# In[2]:
+# In[20]:
 
 
 get_ipython().system('pip install -r requirements.txt')
 
 
-# In[3]:
+# In[21]:
 
 
 # Melihat GPU yang tersedia dan penggunaannya.
 get_ipython().system('nvidia-smi')
 
 
-# In[4]:
+# In[22]:
 
 
 # Memilih GPU yang akan digunakan (contohnya: GPU #7)
@@ -36,7 +36,7 @@ import os
 os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 
-# In[5]:
+# In[54]:
 
 
 import transformers
@@ -56,6 +56,9 @@ from multiprocessing import cpu_count
 from evaluate import load
 from nusacrowd import NusantaraConfigHelper
 from torch.utils.data import DataLoader
+from datetime import datetime
+from huggingface_hub import notebook_login
+
 from datasets import (
     load_dataset, 
     load_from_disk,
@@ -82,7 +85,7 @@ from transformers import (
 
 # # Definisikan hyperparameter
 
-# In[6]:
+# In[24]:
 
 
 MODEL_NAME = "indolem/indobert-base-uncased"
@@ -104,7 +107,7 @@ SAMPLE = 10
 
 # # Import data SQUAD-ID
 
-# In[7]:
+# In[25]:
 
 
 conhelps = NusantaraConfigHelper()
@@ -112,7 +115,7 @@ data_squad_id = conhelps.filtered(lambda x: 'squad_id' in x.dataset_name)[0].loa
 data_squad_id
 
 
-# In[8]:
+# In[26]:
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -120,7 +123,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # # Definisikan tokenizer
 
-# In[9]:
+# In[27]:
 
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -128,7 +131,7 @@ tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
 # # Definisikan fungsi pre-processnya
 
-# In[55]:
+# In[28]:
 
 
 def rindex(lst, value, operator=operator):
@@ -147,7 +150,7 @@ def preprocess_function_qa(examples, tokenizer, MAX_LENGTH=MAX_LENGTH, STRIDE=ST
         return_overflowing_tokens=True,
         return_offsets_mapping=True,
         padding="max_length",
-        return_tensors='pt'
+        return_tensors='np'
     )
 
     tokenized_examples['start_positions'] = []
@@ -197,12 +200,12 @@ def preprocess_function_qa(examples, tokenizer, MAX_LENGTH=MAX_LENGTH, STRIDE=ST
 
 # # Mulai tokenisasi dan pre-process
 
-# In[58]:
+# In[29]:
 
 
 tokenized_data_squad_id = data_squad_id.map(
     preprocess_function_qa,
-    batched=False,
+    batched=True,
     remove_columns=data_squad_id["train"].column_names,
     num_proc=2,
     #fn_kwargs={'tokenizer': tokenizer, 'MAX_LENGTH': MAX_LENGTH, 'STRIDE': STRIDE, 'rindex': rindex, 'operator': operator}
@@ -210,11 +213,23 @@ tokenized_data_squad_id = data_squad_id.map(
 )
 
 
-# In[28]:
+# In[30]:
 
 
 tokenized_data_squad_id = tokenized_data_squad_id.remove_columns(["offset_mapping", 
                                           "overflow_to_sample_mapping"])
+
+
+# In[31]:
+
+
+tokenized_data_squad_id
+
+
+# In[32]:
+
+
+tokenized_data_squad_id.set_format("torch", columns=["input_ids", "token_type_ids"], output_all_columns=True, device=device)
 
 
 # In[34]:
@@ -226,16 +241,12 @@ tokenized_data_squad_validation = Dataset.from_dict(tokenized_data_squad_id["val
 
 # # Mendefinisikan argumen (dataops) untuk training nanti
 
-# In[ ]:
+# In[97]:
 
 
 TIME_NOW = str(datetime.now()).replace(":", "-").replace(" ", "_").replace(".", "_")
-CACHE_DIR = './dataset-qa'
-QA = 'mBERT-without-intermediate'
-DS_TRAIN_DIR = './dataset/qa_train'
-DS_VAL_DIR = './dataset/qa_val'
-CHECKPOINT_DIR = f'./checkpoint-{QA}'
-TENSORBOARD_DIR = './tensorboard-qa'
+QA = './results/mBERT-without-intermediate'
+CHECKPOINT_DIR = f'{QA}-{TIME_NOW}/checkpoint/'
 MODEL_DIR = f'{QA}-{TIME_NOW}/model/'
 OUTPUT_DIR = f'{QA}-{TIME_NOW}/output/'
 ACCURACY_DIR = f'{QA}-{TIME_NOW}/accuracy/'
@@ -243,7 +254,7 @@ ACCURACY_DIR = f'{QA}-{TIME_NOW}/accuracy/'
 
 # # Mendefinisikan Training Arguments untuk train
 
-# In[ ]:
+# In[98]:
 
 
 training_args_qa = TrainingArguments(
@@ -255,7 +266,6 @@ training_args_qa = TrainingArguments(
     
     # Log
     report_to='tensorboard',
-    logging_dir=TENSORBOARD_DIR,
     logging_strategy='steps',
     logging_first_step=True,
     logging_steps=LOGGING_STEPS,
@@ -278,13 +288,13 @@ training_args_qa = TrainingArguments(
 
 # # Pendefinisian model Question Answering
 
-# In[ ]:
+# In[99]:
 
 
 model_qa = BertForQuestionAnswering.from_pretrained(MODEL_NAME)
 
 
-# In[ ]:
+# In[100]:
 
 
 model_qa = model_qa.to(device)
@@ -292,7 +302,7 @@ model_qa = model_qa.to(device)
 
 # # Melakukan pengumpulan data dengan padding
 
-# In[ ]:
+# In[101]:
 
 
 data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
@@ -300,19 +310,7 @@ data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
 # # Mulai training untuk fine-tune SQUAD diatas IndoBERT
 
-# In[ ]:
-
-
-get_ipython().system('pip install tensorboard')
-
-
-# In[ ]:
-
-
-model_qa = model_qa.to(device)
-
-
-# In[ ]:
+# In[102]:
 
 
 trainer_qa = Trainer(
@@ -325,26 +323,7 @@ trainer_qa = Trainer(
 )
 
 
-# In[ ]:
-
-
-torch.cuda.empty_cache()
-
-
-# In[ ]:
-
-
-import os
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
-
-
-# In[ ]:
-
-
-get_ipython().system('nvidia-smi')
-
-
-# In[ ]:
+# In[103]:
 
 
 trainer_qa.train()
@@ -352,23 +331,32 @@ trainer_qa.train()
 
 # # Menyimpan model Question Answering
 
-# In[ ]:
+# In[104]:
 
 
-trainer_qa.save_model(QA_MODEL)
+trainer_qa.save_model(MODEL_DIR)
 
 
 # # Melakukan prediksi dari model
 
-# In[ ]:
+# In[105]:
 
 
 predict_result = trainer_qa.predict(tokenized_data_squad_validation)
 
 
+# In[106]:
+
+
+os.makedirs(os.path.dirname(OUTPUT_DIR), exist_ok=True)
+with open(f'{OUTPUT_DIR}/output.txt', "w") as f:
+  f.write(str(predict_result))
+  f.close()
+
+
 # # Melakukan evaluasi dari prediksi
 
-# In[ ]:
+# In[107]:
 
 
 def compute_accuracy(predict_result):
@@ -387,30 +375,36 @@ def compute_accuracy(predict_result):
     return accuracy
 
 
-# In[ ]:
+# In[108]:
 
 
 accuracy_result = compute_accuracy(predict_result)
 
 
-# In[ ]:
+# In[109]:
 
 
 os.makedirs(os.path.dirname(ACCURACY_DIR), exist_ok=True)
-  with open(f'{ACCURACY_DIR}/accuracy.txt', "w") as f:
-      f.write(str(accuracy_result))
-      f.close()
+with open(f'{ACCURACY_DIR}/accuracy.txt', "w") as f:
+  f.write(str(accuracy_result))
+  f.close()
 
 
 # ## Push Trainer ke HuggingFace
 
-# In[ ]:
+# In[110]:
 
 
 notebook_login()
 
 
-# In[ ]:
+# In[111]:
+
+
+get_ipython().system('pip install git-lfs')
+
+
+# In[115]:
 
 
 trainer_qa.push_to_hub()
