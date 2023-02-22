@@ -7,20 +7,20 @@ if __name__ == '__main__':
   # In[1]:
 
 
-  get_ipython().system('pip install -r requirements.txt')
+  #get_ipython().system('pip install -r requirements.txt')
 
 
   # In[2]:
 
 
-  get_ipython().system('nvidia-smi')
+  #get_ipython().system('nvidia-smi')
 
 
   # In[3]:
 
 
   import os
-  os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+  #os.environ['CUDA_VISIBLE_DEVICES'] = '1'
   os.environ["TOKENIZERS_PARALLELISM"] = "false"
   os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
 
