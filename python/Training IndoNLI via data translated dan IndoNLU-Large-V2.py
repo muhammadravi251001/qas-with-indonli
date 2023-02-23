@@ -2,12 +2,20 @@ if __name__ == '__main__':
     #!/usr/bin/env python
     # coding: utf-8
 
+    # In[1]:
+
+
+    # Uncomment this code if you don't have dev.jsonl & train.jsonl
+    #!wget https://huggingface.co/datasets/muhammadravi251001/translated-indo-nli/raw/main/dev.jsonl
+    #!wget https://huggingface.co/datasets/muhammadravi251001/translated-indo-nli/resolve/main/train.jsonl
+
+
     # ## Mendefinisikan hyperparameter
 
-    # In[32]:
+    # In[2]:
     import sys
 
-    MODEL_NAME = "indolem/indobert-base-uncased"
+    MODEL_NAME = "indobenchmark/indobert-large-p2"
     # EPOCH = 1
     # SAMPLE = 25
     EPOCH = 16
@@ -26,30 +34,30 @@ if __name__ == '__main__':
 
     # ## Instalasi setiap module yang digunakan
 
-    # In[33]:
+    # In[3]:
 
 
     #get_ipython().system('pip install -r requirements.txt')
 
 
-    # In[34]:
+    # In[4]:
 
 
     #get_ipython().system('nvidia-smi')
 
 
-    # In[35]:
+    # In[5]:
 
 
     import os
-    #os.environ['CUDA_VISIBLE_DEVICES'] = '2'
+    #os.environ['CUDA_VISIBLE_DEVICES'] = '1'
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
     os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
 
 
     # ## Import setiap library yang digunakan
 
-    # In[36]:
+    # In[6]:
 
 
     import transformers
@@ -75,7 +83,8 @@ if __name__ == '__main__':
     from datasets import (
     load_dataset, 
     load_from_disk,
-    Dataset
+    Dataset,
+    DatasetDict
     )
     from transformers import (
     BigBirdTokenizerFast,
@@ -96,7 +105,7 @@ if __name__ == '__main__':
     )
 
 
-    # In[37]:
+    # In[7]:
 
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -104,7 +113,7 @@ if __name__ == '__main__':
 
     # ## Gunakan tokenizer yang sudah pre-trained
 
-    # In[38]:
+    # In[8]:
 
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -112,15 +121,55 @@ if __name__ == '__main__':
 
     # ## Import dataset IndoNLI
 
-    # In[39]:
+    # In[9]:
 
 
-    data_indonli = load_dataset("indonli")
+    data_train = pd.read_json(path_or_buf='train.jsonl', lines=True)
+    data_train = data_train[['sentence1', 'sentence2', 'gold_label']]
+    data_train = data_train.rename(columns={'sentence1': 'premise', 'sentence2': 'hypothesis', 'gold_label': 'label'})
+
+    data_train['label'] = data_train['label'].replace(['entailment'], 0)
+    data_train['label'] = data_train['label'].replace(['contradiction'], 1)
+    data_train['label'] = data_train['label'].replace(['neutral'], 2)
+
+    data_train
+
+
+    # In[10]:
+
+
+    data_validation = pd.read_json(path_or_buf='dev.jsonl', lines=True)
+    data_validation = data_validation[['sentence1', 'sentence2', 'gold_label']]
+    data_validation = data_validation.rename(columns={'sentence1': 'premise', 'sentence2': 'hypothesis', 'gold_label': 'label'})
+
+    data_validation['label'] = data_validation['label'].replace(['entailment'], 0)
+    data_validation['label'] = data_validation['label'].replace(['contradiction'], 1)
+    data_validation['label'] = data_validation['label'].replace(['neutral'], 2)
+
+    data_validation
+
+
+    # In[11]:
+
+
+    data_train = data_train[data_train.label != '-']
+    data_validation = data_validation[data_validation.label != '-']
+
+    train_dataset = Dataset.from_dict(data_train)
+    validation_dataset = Dataset.from_dict(data_validation)
+
+    data_indonli_translated = DatasetDict({"train": train_dataset, "validation": validation_dataset})
+
+
+    # In[12]:
+
+
+    data_indonli = data_indonli_translated
 
 
     # ## Fungsi utilitas untuk pre-process data IndoNLI
 
-    # In[40]:
+    # In[13]:
 
 
     def preprocess_function_indonli(examples, tokenizer, MAX_LENGTH):
@@ -133,7 +182,7 @@ if __name__ == '__main__':
 
     # ## Melakukan tokenisasi data IndoNLI
 
-    # In[41]:
+    # In[14]:
 
 
     tokenized_data_indonli = data_indonli.map(
@@ -146,26 +195,24 @@ if __name__ == '__main__':
     )
 
 
-    # In[42]:
+    # In[15]:
 
 
     tokenized_data_indonli.set_format("torch", columns=["input_ids", "token_type_ids"], output_all_columns=True, device=device)
 
 
-    # In[43]:
+    # In[16]:
 
 
     tokenized_data_indonli_train = Dataset.from_dict(tokenized_data_indonli["train"][:SAMPLE])
     tokenized_data_indonli_validation = Dataset.from_dict(tokenized_data_indonli["validation"][:SAMPLE])
-    tokenized_data_indonli_test_lay = Dataset.from_dict(tokenized_data_indonli["test_lay"][:SAMPLE])
-    tokenized_data_indonli_test_expert = Dataset.from_dict(tokenized_data_indonli["test_expert"][:SAMPLE])
 
 
     # # Tahapan fine-tune IndoNLI diatas IndoBERT
 
     # ## Fungsi utilitas untuk komputasi metrik
 
-    # In[44]:
+    # In[17]:
 
 
     def compute_metrics(eval_pred):
@@ -177,7 +224,7 @@ if __name__ == '__main__':
 
     # ## Dictionary untuk mapping label
 
-    # In[45]:
+    # In[18]:
 
 
     id2label = {0: 'entailment', 1: 'neutral', 
@@ -189,7 +236,7 @@ if __name__ == '__main__':
 
     # ## Gunakan model Sequence Classification yang sudah pre-trained
 
-    # In[46]:
+    # In[19]:
 
 
     model_sc = BertForSequenceClassification.from_pretrained(
@@ -197,7 +244,7 @@ if __name__ == '__main__':
         id2label=id2label, label2id=label2id)
 
 
-    # In[47]:
+    # In[20]:
 
 
     model_sc = model_sc.to(device)
@@ -205,7 +252,7 @@ if __name__ == '__main__':
 
     # ## Melakukan pengumpulan data dengan padding
 
-    # In[48]:
+    # In[21]:
 
 
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
@@ -213,11 +260,11 @@ if __name__ == '__main__':
 
     # ## Mendefinisikan argumen (dataops) untuk training nanti
 
-    # In[58]:
+    # In[22]:
 
 
     TIME_NOW = str(datetime.now()).replace(":", "-").replace(" ", "_").replace(".", "_")
-    NAME = 'IndoNLI-data_train-with_IndoLEM'
+    NAME = 'IndoNLI-data_translated-with_IndoNLU-Large-V2'
     SC = f'./results/{NAME}-{TIME_NOW}'
 
     CHECKPOINT_DIR = f'{SC}/checkpoint/'
@@ -228,7 +275,7 @@ if __name__ == '__main__':
     REPO_NAME = f'fine-tuned-{NAME}'
 
 
-    # In[59]:
+    # In[23]:
 
 
     training_args_sc = TrainingArguments(
@@ -265,7 +312,7 @@ if __name__ == '__main__':
 
     # ## Mulai training untuk fine-tune IndoNLI diatas IndoBERT
 
-    # In[60]:
+    # In[24]:
 
 
     trainer_sc = Trainer(
@@ -279,7 +326,7 @@ if __name__ == '__main__':
     )
 
 
-    # In[61]:
+    # In[25]:
 
 
     trainer_sc.train()
@@ -287,7 +334,7 @@ if __name__ == '__main__':
 
     # ## Simpan model Sequence Classification
 
-    # In[62]:
+    # In[26]:
 
 
     trainer_sc.save_model(MODEL_DIR)
@@ -295,13 +342,13 @@ if __name__ == '__main__':
 
     # # Melakukan prediksi dari model
 
-    # In[54]:
+    # In[27]:
 
 
     predict_result = trainer_sc.predict(tokenized_data_indonli_validation)
 
 
-    # In[65]:
+    # In[28]:
 
 
     os.makedirs(os.path.dirname(OUTPUT_DIR), exist_ok=True)
@@ -312,7 +359,7 @@ if __name__ == '__main__':
 
     # # Melakukan evaluasi dari prediksi
 
-    # In[56]:
+    # In[29]:
 
 
     def compute_accuracy(eval_pred):
@@ -323,13 +370,13 @@ if __name__ == '__main__':
             predictions=predictions, references=labels)
 
 
-    # In[57]:
+    # In[30]:
 
 
     accuracy_result = compute_accuracy(predict_result)
 
 
-    # In[64]:
+    # In[31]:
 
 
     os.makedirs(os.path.dirname(ACCURACY_DIR), exist_ok=True)

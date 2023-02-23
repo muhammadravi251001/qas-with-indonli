@@ -1,61 +1,83 @@
-if __name__ == '__main__':  
-  #!/usr/bin/env python
-  # coding: utf-8
+if __name__ == '__main__':
+    #!/usr/bin/env python
+    # coding: utf-8
 
-  # ## Instalasi setiap module yang digunakan
+    # ## Mendefinisikan hyperparameter
 
-  # In[1]:
+    # In[1]:
+    import sys
 
+    MODEL_NAME = "xlm-roberta-base"
+    # EPOCH = 1
+    # SAMPLE = 25
+    EPOCH = 16
+    SAMPLE = sys.maxsize
 
-  #get_ipython().system('pip install -r requirements.txt')
-
-
-  # In[2]:
-
-
-  #get_ipython().system('nvidia-smi')
-
-
-  # In[3]:
-
-
-  import os
-  #os.environ['CUDA_VISIBLE_DEVICES'] = '1'
-  os.environ["TOKENIZERS_PARALLELISM"] = "false"
-  os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
-
-
-  # ## Import setiap library yang digunakan
-
-  # In[4]:
+    SEED = 42
+    BATCH_SIZE = 16
+    GRADIENT_ACCUMULATION = 4
+    LEARNING_RATE = 1e-5
+    MAX_LENGTH = 400
+    STRIDE = 100
+    LOGGING_STEPS = 50
+    WARMUP_RATIO = 0.06
+    WEIGHT_DECAY = 0.01
 
 
-  import transformers
-  import evaluate
-  import torch
-  import operator
-  import ast
-  import json
-  import re
-  import sys
+    # ## Instalasi setiap module yang digunakan
 
-  import numpy as np
-  import pandas as pd
-  import torch.nn as nn
+    # In[2]:
 
-  from multiprocessing import cpu_count
-  from evaluate import load
-  from nusacrowd import NusantaraConfigHelper
-  from torch.utils.data import DataLoader
-  from datetime import datetime
-  from huggingface_hub import notebook_login
 
-  from datasets import (
+    #get_ipython().system('pip install -r requirements.txt')
+
+
+    # In[3]:
+
+
+    #get_ipython().system('nvidia-smi')
+
+
+    # In[4]:
+
+
+    import os
+    #os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+    os.environ["TOKENIZERS_PARALLELISM"] = "false"
+    os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
+
+
+    # ## Import setiap library yang digunakan
+
+    # In[5]:
+
+
+    import transformers
+    import evaluate
+    import torch
+    import operator
+    import ast
+    import json
+    import re
+    import sys
+
+    import numpy as np
+    import pandas as pd
+    import torch.nn as nn
+
+    from multiprocessing import cpu_count
+    from evaluate import load
+    from nusacrowd import NusantaraConfigHelper
+    from torch.utils.data import DataLoader
+    from datetime import datetime
+    from huggingface_hub import notebook_login
+
+    from datasets import (
     load_dataset, 
     load_from_disk,
     Dataset
-  )
-  from transformers import (
+    )
+    from transformers import (
     BigBirdTokenizerFast,
     BigBirdForSequenceClassification,
     DataCollatorWithPadding,
@@ -71,288 +93,247 @@ if __name__ == '__main__':
     BertForPreTraining,
     AutoModelForSequenceClassification,
     AutoModelForQuestionAnswering
-  )
+    )
 
 
-  # ## Mendefinisikan hyperparameter
+    # In[6]:
 
-  # In[5]:
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-  MODEL_NAME = "xlm-roberta-base"
-  SEED = 42
-  EPOCH = 1
-  BATCH_SIZE = 16
-  GRADIENT_ACCUMULATION = 4
-  LEARNING_RATE = 1e-5
-  MAX_LENGTH = 400
-  STRIDE = 100
-  LOGGING_STEPS = 50
-  WARMUP_RATIO = 0.06
-  WEIGHT_DECAY = 0.01
-  # Untuk mempercepat training, saya ubah SAMPLE menjadi 100.
-  # Bila mau menggunakan keseluruhan data, gunakan: 
-  SAMPLE = sys.maxsize
-  # SAMPLE = 100
 
+    # ## Gunakan tokenizer yang sudah pre-trained
 
-  # In[6]:
+    # In[7]:
 
 
-  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
 
-  # ## Gunakan tokenizer yang sudah pre-trained
+    # ## Import dataset IndoNLI
 
-  # In[7]:
+    # In[8]:
 
 
-  tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+    data_indonli = load_dataset("indonli")
 
 
-  # ## Import dataset IndoNLI
+    # ## Fungsi utilitas untuk pre-process data IndoNLI
 
-  # In[8]:
+    # In[9]:
 
 
-  data_indonli = load_dataset("indonli")
+    def preprocess_function_indonli(examples, tokenizer, MAX_LENGTH):
+        return tokenizer(
+            examples['premise'], examples['hypothesis'],
+            truncation=True, return_token_type_ids=True,
+            max_length=MAX_LENGTH
+        )
 
 
-  # ## Fungsi utilitas untuk pre-process data IndoNLI
+    # ## Melakukan tokenisasi data IndoNLI
 
-  # In[9]:
+    # In[10]:
 
 
-  def preprocess_function_indonli(examples, tokenizer):
-      return tokenizer(
-          examples['premise'], examples['hypothesis'],
-          truncation=True, return_token_type_ids=True
-      )
+    tokenized_data_indonli = data_indonli.map(
+        preprocess_function_indonli,
+        batched=True,
+        load_from_cache_file=True,
+        num_proc=1,
+        remove_columns=['premise', 'hypothesis'],
+        fn_kwargs={'tokenizer': tokenizer, 'MAX_LENGTH': MAX_LENGTH}
+    )
 
 
-  # ## Melakukan tokenisasi data IndoNLI
+    # In[11]:
 
-  # In[10]:
 
+    tokenized_data_indonli.set_format("torch", columns=["input_ids", "token_type_ids"], output_all_columns=True, device=device)
 
-  tokenized_data_indonli = data_indonli.map(
-      preprocess_function_indonli,
-      batched=True,
-      load_from_cache_file=True,
-      num_proc=1,
-      remove_columns=['premise', 'hypothesis'],
-      fn_kwargs={'tokenizer': tokenizer}
-  )
 
+    # In[12]:
 
-  # In[11]:
 
+    tokenized_data_indonli_train = Dataset.from_dict(tokenized_data_indonli["train"][:SAMPLE])
+    tokenized_data_indonli_validation = Dataset.from_dict(tokenized_data_indonli["validation"][:SAMPLE])
+    tokenized_data_indonli_test_lay = Dataset.from_dict(tokenized_data_indonli["test_lay"][:SAMPLE])
+    tokenized_data_indonli_test_expert = Dataset.from_dict(tokenized_data_indonli["test_expert"][:SAMPLE])
 
-  tokenized_data_indonli.set_format("torch", columns=["input_ids", "token_type_ids"], output_all_columns=True, device=device)
 
+    # # Tahapan fine-tune IndoNLI diatas IndoBERT
 
-  # In[12]:
+    # ## Fungsi utilitas untuk komputasi metrik
 
+    # In[13]:
 
-  tokenized_data_indonli_train = Dataset.from_dict(tokenized_data_indonli["train"][:SAMPLE])
-  tokenized_data_indonli_validation = Dataset.from_dict(tokenized_data_indonli["validation"][:SAMPLE])
-  tokenized_data_indonli_test_lay = Dataset.from_dict(tokenized_data_indonli["test_lay"][:SAMPLE])
-  tokenized_data_indonli_test_expert = Dataset.from_dict(tokenized_data_indonli["test_expert"][:SAMPLE])
 
+    def compute_metrics(eval_pred):
+        predictions, labels = eval_pred
+        predictions = np.argmax(predictions, axis=1)
+        return accuracy.compute(
+            predictions=predictions, references=labels)
 
-  # # Tahapan fine-tune IndoNLI diatas IndoBERT
 
-  # ## Fungsi utilitas untuk komputasi metrik
+    # ## Dictionary untuk mapping label
 
-  # In[13]:
+    # In[14]:
 
 
-  def compute_metrics(eval_pred):
-      predictions, labels = eval_pred
-      predictions = np.argmax(predictions, axis=1)
-      return accuracy.compute(
-          predictions=predictions, references=labels)
+    id2label = {0: 'entailment', 1: 'neutral', 
+                2: 'contradiction'}
+    label2id = {'entailment': 0, 'neutral': 
+                1, 'contradiction': 2}
+    accuracy = evaluate.load('accuracy')
 
 
-  # ## Dictionary untuk mapping label
+    # ## Gunakan model Sequence Classification yang sudah pre-trained
 
-  # In[14]:
+    # In[15]:
 
 
-  id2label = {0: 'entailment', 1: 'neutral', 
-              2: 'contradiction'}
-  label2id = {'entailment': 0, 'neutral': 
-              1, 'contradiction': 2}
-  accuracy = evaluate.load('accuracy')
+    model_sc = BertForSequenceClassification.from_pretrained(
+        MODEL_NAME, num_labels=3, 
+        id2label=id2label, label2id=label2id)
 
 
-  # ## Gunakan model Sequence Classification yang sudah pre-trained
+    # In[16]:
 
-  # In[15]:
 
+    model_sc = model_sc.to(device)
 
-  model_sc = BertForSequenceClassification.from_pretrained(
-      MODEL_NAME, num_labels=3, 
-      id2label=id2label, label2id=label2id)
 
+    # ## Melakukan pengumpulan data dengan padding
 
-  # In[16]:
+    # In[17]:
 
 
-  model_sc = model_sc.to(device)
+    data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
 
-  # ## Melakukan pengumpulan data dengan padding
+    # ## Mendefinisikan argumen (dataops) untuk training nanti
 
-  # In[17]:
+    # In[18]:
 
 
-  data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+    TIME_NOW = str(datetime.now()).replace(":", "-").replace(" ", "_").replace(".", "_")
+    NAME = 'IndoNLI-data_train-with_XLMR'
+    SC = f'./results/{NAME}-{TIME_NOW}'
 
+    CHECKPOINT_DIR = f'{SC}/checkpoint/'
+    MODEL_DIR = f'{SC}/model/'
+    OUTPUT_DIR = f'{SC}/output/'
+    ACCURACY_DIR = f'{SC}/accuracy/'
 
-  # ## Mendefinisikan argumen (dataops) untuk training nanti
+    REPO_NAME = f'fine-tuned-{NAME}'
 
-  # In[18]:
 
+    # In[19]:
 
-  TIME_NOW = str(datetime.now()).replace(":", "-").replace(" ", "_").replace(".", "_")
-  NAME = 'IndoNLI-data_train-with_XLMR'
-  SC = f'./results/{NAME}/'
-  CHECKPOINT_DIR = f'{SC}-{TIME_NOW}/checkpoint/'
-  MODEL_DIR = f'{SC}-{TIME_NOW}/model/'
-  OUTPUT_DIR = f'{SC}-{TIME_NOW}/output/'
-  ACCURACY_DIR = f'{SC}-{TIME_NOW}/accuracy/'
-  REPO_NAME = f'fine-tuned-{NAME}'
 
+    training_args_sc = TrainingArguments(
+        
+        # Checkpoint
+        output_dir=CHECKPOINT_DIR,
+        overwrite_output_dir=True,
+        save_strategy='epoch',
+        save_total_limit=EPOCH,
+        
+        # Log
+        report_to='tensorboard',
+        logging_strategy='steps',
+        logging_first_step=True,
+        logging_steps=LOGGING_STEPS,
+        
+        # Train
+        num_train_epochs=EPOCH,
+        weight_decay=WEIGHT_DECAY,
+        per_device_train_batch_size=BATCH_SIZE,
+        gradient_accumulation_steps=GRADIENT_ACCUMULATION,
+        learning_rate=LEARNING_RATE,
+        warmup_ratio=WARMUP_RATIO,
+        bf16=False,
+        dataloader_num_workers=cpu_count(),
+        
+        # Miscellaneous
+        evaluation_strategy='epoch',
+        seed=SEED,
+        push_to_hub=True,
+        hub_model_id=REPO_NAME
+    )
 
-  # In[19]:
 
+    # ## Mulai training untuk fine-tune IndoNLI diatas IndoBERT
 
-  training_args_sc = TrainingArguments(
-      
-      # Checkpoint
-      output_dir=CHECKPOINT_DIR,
-      overwrite_output_dir=True,
-      save_strategy='epoch',
-      save_total_limit=EPOCH,
-      
-      # Log
-      report_to='tensorboard',
-      logging_strategy='steps',
-      logging_first_step=True,
-      logging_steps=LOGGING_STEPS,
-      
-      # Train
-      num_train_epochs=EPOCH,
-      weight_decay=WEIGHT_DECAY,
-      per_device_train_batch_size=BATCH_SIZE,
-      gradient_accumulation_steps=GRADIENT_ACCUMULATION,
-      learning_rate=LEARNING_RATE,
-      warmup_ratio=WARMUP_RATIO,
-      bf16=False,
-      dataloader_num_workers=cpu_count(),
-      
-      # Miscellaneous
-      evaluation_strategy='epoch',
-      seed=SEED,
-      push_to_hub=True,
-      hub_model_id=REPO_NAME
-  )
+    # In[20]:
 
 
-  # ## Mulai training untuk fine-tune IndoNLI diatas IndoBERT
+    trainer_sc = Trainer(
+        model=model_sc,
+        args=training_args_sc,
+        train_dataset=tokenized_data_indonli_train,
+        eval_dataset=tokenized_data_indonli_validation,
+        tokenizer=tokenizer,
+        data_collator=data_collator,
+        compute_metrics=compute_metrics,
+    )
 
-  # In[20]:
 
+    # In[21]:
 
-  trainer_sc = Trainer(
-      model=model_sc,
-      args=training_args_sc,
-      train_dataset=tokenized_data_indonli_train,
-      eval_dataset=tokenized_data_indonli_validation,
-      tokenizer=tokenizer,
-      data_collator=data_collator,
-      compute_metrics=compute_metrics,
-  )
 
+    trainer_sc.train()
 
-  # In[21]:
 
+    # ## Simpan model Sequence Classification
 
-  trainer_sc.train()
+    # In[22]:
 
 
-  # ## Simpan model Sequence Classification
+    trainer_sc.save_model(MODEL_DIR)
 
-  # In[22]:
 
+    # # Melakukan prediksi dari model
 
-  trainer_sc.save_model(MODEL_DIR)
+    # In[23]:
 
 
-  # # Melakukan prediksi dari model
+    predict_result = trainer_sc.predict(tokenized_data_indonli_validation)
 
-  # In[23]:
 
+    # In[24]:
 
-  predict_result = trainer_sc.predict(tokenized_data_indonli_validation)
 
+    os.makedirs(os.path.dirname(OUTPUT_DIR), exist_ok=True)
+    with open(f'{OUTPUT_DIR}/output.txt', "w") as f:
+        f.write(str(predict_result))
+        f.close()
 
-  # In[24]:
 
+    # # Melakukan evaluasi dari prediksi
 
-  os.makedirs(os.path.dirname(OUTPUT_DIR), exist_ok=True)
-  with open(f'{OUTPUT_DIR}/output.txt', "w") as f:
-    f.write(str(predict_result))
-    f.close()
+    # In[25]:
 
 
-  # # Melakukan evaluasi dari prediksi
+    def compute_accuracy(eval_pred):
+        predictions = eval_pred.predictions
+        labels = eval_pred.label_ids
+        predictions = np.argmax(predictions, axis=1)
+        return accuracy.compute(
+            predictions=predictions, references=labels)
 
-  # In[25]:
 
+    # In[26]:
 
-  def compute_accuracy(eval_pred):
-      predictions = eval_pred.predictions
-      labels = eval_pred.label_ids
-      predictions = np.argmax(predictions, axis=1)
-      return accuracy.compute(
-          predictions=predictions, references=labels)
 
+    accuracy_result = compute_accuracy(predict_result)
 
-  # In[26]:
 
+    # In[27]:
 
-  accuracy_result = compute_accuracy(predict_result)
 
-
-  # In[27]:
-
-
-  os.makedirs(os.path.dirname(ACCURACY_DIR), exist_ok=True)
-  with open(f'{ACCURACY_DIR}/accuracy.txt', "w") as f:
-    f.write(str(accuracy_result))
-    f.close()
-
-
-  # ## Push Trainer ke HuggingFace
-
-  # In[28]:
-
-
-  #notebook_login()
-
-
-  # In[29]:
-
-
-  #!curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
-  #!apt-get install git-lfs
-
-
-  # In[30]:
-
-
-  #REPO_NAME = 'muhammadravi251001/finetuned-SC-indobert-on-indonli_basic-train'
-  #trainer_sc.push_to_hub(repo_id=REPO_NAME)
+    os.makedirs(os.path.dirname(ACCURACY_DIR), exist_ok=True)
+    with open(f'{ACCURACY_DIR}/accuracy.txt', "w") as f:
+        f.write(str(accuracy_result))
+        f.close()
 
