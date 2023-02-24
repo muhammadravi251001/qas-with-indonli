@@ -5,9 +5,28 @@ if __name__ == '__main__':
     # In[1]:
 
 
-    # Uncomment this code if you don't have dev.jsonl & train.jsonl
-    #!wget https://huggingface.co/datasets/muhammadravi251001/translated-indo-nli/raw/main/dev.jsonl
-    #!wget https://huggingface.co/datasets/muhammadravi251001/translated-indo-nli/resolve/main/train.jsonl
+    import os.path
+    import wget
+
+    if (os.path.exists('./dev.jsonl') == False):
+        wget.download("https://huggingface.co/datasets/muhammadravi251001/translated-indo-nli/raw/main/dev.jsonl")
+        print(" Selesai download dev.jsonl")
+    else: print("File dev.jsonl sudah ada")
+
+    if (os.path.exists('./train.jsonl') == False):
+        wget.download("https://huggingface.co/datasets/muhammadravi251001/translated-indo-nli/resolve/main/train.jsonl")
+        print(" Selesai download train.jsonl")
+    else: print("File train.jsonl sudah ada")
+
+    if (os.path.exists('./dev_augmented.jsonl') == False):
+        wget.download("https://huggingface.co/datasets/muhammadravi251001/augmented-indo-nli/raw/main/dev_augmented.jsonl")
+        print(" Selesai download dev_augmented.jsonl")
+    else: print("File dev_augmented.jsonl sudah ada")
+
+    if (os.path.exists('./train_augmented.jsonl') == False):
+        wget.download("https://huggingface.co/datasets/muhammadravi251001/augmented-indo-nli/resolve/main/train_augmented.jsonl")
+        print(" Selesai download train_augmented.jsonl")
+    else: print("File train_augmented.jsonl sudah ada")
 
 
     # ## Mendefinisikan hyperparameter
