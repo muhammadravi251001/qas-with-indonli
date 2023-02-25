@@ -2,13 +2,13 @@ import argparse
 import sys
 
 parser = argparse.ArgumentParser(description="Program untuk training IndoNLI")
-parser.add_argument('-m', '--model_name', type=str, metavar='', required=True, help="Nama model Anda")
-parser.add_argument('-d', '--data_name', type=str, metavar='', required=True, help="Nama dataset Anda")
-parser.add_argument('-e', '--epoch', type=int, metavar='', required=True, help="Jumlah epoch Anda")
-parser.add_argument('-sa', '--sample', type=str, metavar='', required=True, help="Jumlah sampling data Anda")
-parser.add_argument('-l', '--learn_rate', type=float, metavar='', required=False, help="Jumlah learning rate Anda", default=1e-5)
-parser.add_argument('-se', '--seed', type=int, metavar='', required=False, help="Jumlah seed Anda", default=42)
-parser.add_argument('-t', '--token', type=str, metavar='', required=False, help="Token Hugging Face Anda", default="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")
+parser.add_argument('-m', '--model_name', type=str, metavar='', required=True, help="Nama model Anda; String")
+parser.add_argument('-d', '--data_name', type=str, metavar='', required=True, help="Nama dataset Anda; String")
+parser.add_argument('-e', '--epoch', type=int, metavar='', required=True, help="Jumlah epoch Anda; Integer")
+parser.add_argument('-sa', '--sample', type=str, metavar='', required=True, help="Jumlah sampling data Anda; Integer (namun bisa juga \"max\")")
+parser.add_argument('-l', '--learn_rate', type=float, metavar='', required=False, help="Jumlah learning rate Anda; Float", default=1e-5)
+parser.add_argument('-se', '--seed', type=int, metavar='', required=False, help="Jumlah seed Anda; Integer", default=42)
+parser.add_argument('-t', '--token', type=str, metavar='', required=False, help="Token Hugging Face Anda; String", default="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")
 args = parser.parse_args()
 
 if __name__ == "__main__":
