@@ -59,6 +59,7 @@ if __name__ == "__main__":
         print(" Selesai download train_augmented.jsonl")
     else: print("File train_augmented.jsonl sudah ada")
 
+    print("Program training IndoNLI mulai...")
     print(f"Mulai training IndoNLI dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED} dan token: {HUB_TOKEN}")
 
     # ## Mendefinisikan hyperparameter
@@ -113,7 +114,6 @@ if __name__ == "__main__":
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
     # ## Import dataset IndoNLI
-
     if (DATA_NAME == "Basic"):
         data_indonli = load_dataset("indonli")
 
@@ -284,3 +284,5 @@ if __name__ == "__main__":
     with open(f'{ACCURACY_DIR}/accuracy.txt', "w") as f:
         f.write(str(accuracy_result))
         f.close()
+
+    print("Program training IndoNLI selesai!")
