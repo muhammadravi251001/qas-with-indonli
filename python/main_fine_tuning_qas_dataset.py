@@ -75,6 +75,7 @@ if __name__ == "__main__":
     from nusacrowd import NusantaraConfigHelper
     from datetime import datetime
     from huggingface_hub import notebook_login
+    from tqdm import tqdm
 
     from datasets import (
         load_dataset, 
@@ -100,6 +101,36 @@ if __name__ == "__main__":
         conhelps = NusantaraConfigHelper()
         data_qas_id = conhelps.filtered(lambda x: 'squad_id' in x.dataset_name)[0].load_dataset()
 
+        df_train = pd.DataFrame(data_qas_id['train'])
+        df_validation = pd.DataFrame(data_qas_id['validation'])
+
+        cols = ['context', 'question', 'answer']
+        new_df_val = pd.DataFrame(columns=cols)
+
+        for i in tqdm(range(len(df_validation['context']))):
+            new_df_val = new_df_val.append({'context': df_validation["context"][i], 
+                                            'question': df_validation["question"][i], 
+                                            'answer': {"text": eval(df_validation["answer"][i][0])['text'], 
+                                            "answer_start": eval(df_validation["answer"][i][0])['answer_start'], 
+                                            "answer_end": eval(df_validation["answer"][i][0])['answer_end']}}, 
+                                        ignore_index=True)
+            
+        cols = ['context', 'question', 'answer']
+        new_df_train = pd.DataFrame(columns=cols)
+
+        for i in tqdm(range(len(df_train['context']))):
+            new_df_train = new_df_train.append({'context': df_train["context"][i], 
+                                            'question': df_train["question"][i], 
+                                            'answer': {"text": eval(df_train["answer"][i][0])['text'], 
+                                            "answer_start": eval(df_train["answer"][i][0])['answer_start'], 
+                                            "answer_end": eval(df_train["answer"][i][0])['answer_end']}}, 
+                                        ignore_index=True)
+
+        train_dataset = Dataset.from_dict(new_df_train)
+        validation_dataset = Dataset.from_dict(new_df_val)
+
+        data_qas_id = DatasetDict({"train": train_dataset, "validation": validation_dataset})
+
     elif (DATA_NAME == "IDK-MRC"):
         conhelps = NusantaraConfigHelper()
         data_qas_id = conhelps.filtered(lambda x: 'idk_mrc' in x.dataset_name)[0].load_dataset()
@@ -110,7 +141,7 @@ if __name__ == "__main__":
         cols = ['context', 'question', 'answer']
         new_df_val = pd.DataFrame(columns=cols)
 
-        for i in range(len(df_validation['context'])):
+        for i in tqdm(range(len(df_validation['context']))):
             for j in df_validation["qas"][i]:
                 if len(j['answers']) != 0:
                     new_df_val = new_df_val.append({'context': df_validation["context"][i], 
@@ -130,7 +161,7 @@ if __name__ == "__main__":
         cols = ['context', 'question', 'answer']
         new_df_train = pd.DataFrame(columns=cols)
 
-        for i in range(len(df_train['context'])):
+        for i in tqdm(range(len(df_train['context']))):
             for j in df_train["qas"][i]:
                 if len(j['answers']) != 0:
                     new_df_train = new_df_train.append({'context': df_train["context"][i], 
@@ -161,7 +192,7 @@ if __name__ == "__main__":
         cols = ['context', 'question', 'answer']
         new_df_val = pd.DataFrame(columns=cols)
 
-        for i in range(len(df_validation['context'])):
+        for i in tqdm(range(len(df_validation['context']))):
             new_df_val = new_df_val.append({'context': df_validation["context"][i], 
                                             'question': df_validation["question"][i], 
                                             'answer': {"text": df_validation["answers"][i]['text'][0], 
@@ -172,7 +203,7 @@ if __name__ == "__main__":
         cols = ['context', 'question', 'answer']
         new_df_train = pd.DataFrame(columns=cols)
 
-        for i in range(len(df_train['context'])):
+        for i in tqdm(range(len(df_train['context']))):
             new_df_train = new_df_train.append({'context': df_train["context"][i], 
                                             'question': df_train["question"][i], 
                                             'answer': {"text": df_train["answers"][i]['text'][0], 
@@ -244,84 +275,17 @@ if __name__ == "__main__":
             tokenized_examples['start_positions'].append(s)
             tokenized_examples['end_positions'].append(e)
         return tokenized_examples
-    
-    def preprocess_function_qa_squad(examples, tokenizer, MAX_LENGTH=MAX_LENGTH, STRIDE=STRIDE, rindex=rindex, operator=operator):
-        examples["question"] = [q.lstrip() for q in examples["question"]]
-        examples["context"] = [c.lstrip() for c in examples["context"]]
-        
-        tokenized_examples = tokenizer(
-            examples['question'],
-            examples['context'],
-            truncation=True,
-            max_length = MAX_LENGTH,
-            stride=STRIDE,
-            return_overflowing_tokens=True,
-            return_offsets_mapping=True,
-            padding="max_length",
-            return_tensors='np'
-        )
-
-        tokenized_examples['start_positions'] = []
-        tokenized_examples['end_positions'] = []
-
-        for seq_idx in range(len(tokenized_examples['input_ids'])):
-            seq_ids = tokenized_examples.sequence_ids(seq_idx)
-            offset_mappings = tokenized_examples['offset_mapping'][seq_idx]
-
-            cur_example_idx = tokenized_examples['overflow_to_sample_mapping'][seq_idx]
-            answer = examples['answer'][cur_example_idx][0]
-            answer = eval(answer)
-            answer_start = answer['answer_start']
-            answer_end = answer['answer_end']
-
-            context_pos_start = seq_ids.index(1)
-            context_pos_end = rindex(seq_ids, 1, operator)
-
-            s = e = 0
-            if (offset_mappings[context_pos_start][0] <= answer_start and
-                offset_mappings[context_pos_end][1] >= answer_end):
-                i = context_pos_start
-                while offset_mappings[i][0] < answer_start:
-                    i += 1
-                if offset_mappings[i][0] == answer_start:
-                    s = i
-                else:
-                    s = i - 1
-
-                j = context_pos_end
-                while offset_mappings[j][1] > answer_end:
-                    j -= 1      
-                if offset_mappings[j][1] == answer_end:
-                    e = j
-                else:
-                    e = j + 1
-
-            tokenized_examples['start_positions'].append(s)
-            tokenized_examples['end_positions'].append(e)
-        return tokenized_examples
 
     # ## Melakukan tokenisasi data IndoNLI
-    if DATA_NAME == 'TYDI-QA' or DATA_NAME == 'IDK-MRC':
-        tokenized_data_qas_id = data_qas_id.map(
-            preprocess_function_qa,
-            batched=True,
-            load_from_cache_file=True,
-            num_proc=1,
-            remove_columns=data_qas_id['train'].column_names,
-            fn_kwargs={'tokenizer': tokenizer, 'MAX_LENGTH': MAX_LENGTH, 
-                    'STRIDE': STRIDE, 'rindex': rindex, 'operator': operator}
-        )
-    
-    elif DATA_NAME == 'Squad-ID':
-        tokenized_data_qas_id = data_qas_id.map(
-            preprocess_function_qa_squad,
-            batched=True,
-            load_from_cache_file=True,
-            num_proc=1,
-            remove_columns=data_qas_id['train'].column_names,
-            fn_kwargs={'tokenizer': tokenizer, 'MAX_LENGTH': MAX_LENGTH, 
-                    'STRIDE': STRIDE, 'rindex': rindex, 'operator': operator}
-        )
+    tokenized_data_qas_id = data_qas_id.map(
+        preprocess_function_qa,
+        batched=True,
+        load_from_cache_file=True,
+        num_proc=1,
+        remove_columns=data_qas_id['train'].column_names,
+        fn_kwargs={'tokenizer': tokenizer, 'MAX_LENGTH': MAX_LENGTH, 
+                'STRIDE': STRIDE, 'rindex': rindex, 'operator': operator}
+    )
 
     tokenized_data_qas_id = tokenized_data_qas_id.remove_columns(["offset_mapping", 
                                             "overflow_to_sample_mapping"])
