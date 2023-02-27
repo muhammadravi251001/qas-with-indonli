@@ -172,7 +172,7 @@ if __name__ == "__main__":
         cols = ['context', 'question', 'answer']
         new_df_train = pd.DataFrame(columns=cols)
 
-        for i in range(len(df_validation['context'])):
+        for i in range(len(df_train['context'])):
             new_df_train = new_df_train.append({'context': df_train["context"][i], 
                                             'question': df_train["question"][i], 
                                             'answer': {"text": df_train["answers"][i]['text'][0], 
