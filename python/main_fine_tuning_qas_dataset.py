@@ -37,7 +37,7 @@ if __name__ == "__main__":
     HUB_TOKEN = str(args.token)
 
     print("Program fine-tuning dataset QA mulai...")
-    print(f"Mulai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED} dan token: {HUB_TOKEN}")
+    print(f"Mulai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, dan token: {HUB_TOKEN}")
 
     # ## Mendefinisikan hyperparameter
     MODEL_NAME = MODEL_NAME
@@ -244,17 +244,84 @@ if __name__ == "__main__":
             tokenized_examples['start_positions'].append(s)
             tokenized_examples['end_positions'].append(e)
         return tokenized_examples
+    
+    def preprocess_function_qa_squad(examples, tokenizer, MAX_LENGTH=MAX_LENGTH, STRIDE=STRIDE, rindex=rindex, operator=operator):
+        examples["question"] = [q.lstrip() for q in examples["question"]]
+        examples["context"] = [c.lstrip() for c in examples["context"]]
+        
+        tokenized_examples = tokenizer(
+            examples['question'],
+            examples['context'],
+            truncation=True,
+            max_length = MAX_LENGTH,
+            stride=STRIDE,
+            return_overflowing_tokens=True,
+            return_offsets_mapping=True,
+            padding="max_length",
+            return_tensors='np'
+        )
+
+        tokenized_examples['start_positions'] = []
+        tokenized_examples['end_positions'] = []
+
+        for seq_idx in range(len(tokenized_examples['input_ids'])):
+            seq_ids = tokenized_examples.sequence_ids(seq_idx)
+            offset_mappings = tokenized_examples['offset_mapping'][seq_idx]
+
+            cur_example_idx = tokenized_examples['overflow_to_sample_mapping'][seq_idx]
+            answer = examples['answer'][cur_example_idx][0]
+            answer = eval(answer)
+            answer_start = answer['answer_start']
+            answer_end = answer['answer_end']
+
+            context_pos_start = seq_ids.index(1)
+            context_pos_end = rindex(seq_ids, 1, operator)
+
+            s = e = 0
+            if (offset_mappings[context_pos_start][0] <= answer_start and
+                offset_mappings[context_pos_end][1] >= answer_end):
+                i = context_pos_start
+                while offset_mappings[i][0] < answer_start:
+                    i += 1
+                if offset_mappings[i][0] == answer_start:
+                    s = i
+                else:
+                    s = i - 1
+
+                j = context_pos_end
+                while offset_mappings[j][1] > answer_end:
+                    j -= 1      
+                if offset_mappings[j][1] == answer_end:
+                    e = j
+                else:
+                    e = j + 1
+
+            tokenized_examples['start_positions'].append(s)
+            tokenized_examples['end_positions'].append(e)
+        return tokenized_examples
 
     # ## Melakukan tokenisasi data IndoNLI
-    tokenized_data_qas_id = data_qas_id.map(
-        preprocess_function_qa,
-        batched=True,
-        load_from_cache_file=True,
-        num_proc=1,
-        remove_columns=data_qas_id['train'].column_names,
-        fn_kwargs={'tokenizer': tokenizer, 'MAX_LENGTH': MAX_LENGTH, 
-                   'STRIDE': STRIDE, 'rindex': rindex, 'operator': operator}
-    )
+    if DATA_NAME == 'TYDI-QA' or DATA_NAME == 'IDK-MRC':
+        tokenized_data_qas_id = data_qas_id.map(
+            preprocess_function_qa,
+            batched=True,
+            load_from_cache_file=True,
+            num_proc=1,
+            remove_columns=data_qas_id['train'].column_names,
+            fn_kwargs={'tokenizer': tokenizer, 'MAX_LENGTH': MAX_LENGTH, 
+                    'STRIDE': STRIDE, 'rindex': rindex, 'operator': operator}
+        )
+    
+    elif DATA_NAME == 'Squad-ID':
+        tokenized_data_qas_id = data_qas_id.map(
+            preprocess_function_qa_squad,
+            batched=True,
+            load_from_cache_file=True,
+            num_proc=1,
+            remove_columns=data_qas_id['train'].column_names,
+            fn_kwargs={'tokenizer': tokenizer, 'MAX_LENGTH': MAX_LENGTH, 
+                    'STRIDE': STRIDE, 'rindex': rindex, 'operator': operator}
+        )
 
     tokenized_data_qas_id = tokenized_data_qas_id.remove_columns(["offset_mapping", 
                                             "overflow_to_sample_mapping"])
@@ -270,6 +337,23 @@ if __name__ == "__main__":
     
     # ## Melakukan pengumpulan data dengan padding
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+
+    # # Melakukan evaluasi dari prediksi
+    def compute_metrics(predict_result):
+        predictions_idx = np.argmax(predict_result.predictions, axis=2)
+        total_correct = 0
+        denominator = len(predictions_idx[0])
+        label_array = np.asarray(predict_result.label_ids)
+
+        for i in range(len(predict_result.predictions[0])):
+            if predictions_idx[0][i] == label_array[0][i]:
+                if predictions_idx[1][i] == label_array[1][i]:
+                    total_correct += 1
+
+        accuracy = (total_correct / denominator)
+        print(f"Akurasi model sebesar: {accuracy} %; dengan jawaban benar sebanyak: {total_correct} dari {denominator} soal.")
+    
+        return {'accuracy': accuracy}
 
     # ## Mendefinisikan argumen (dataops) untuk training nanti
     TIME_NOW = str(datetime.now()).replace(":", "-").replace(" ", "_").replace(".", "_")
@@ -328,6 +412,7 @@ if __name__ == "__main__":
         eval_dataset=tokenized_data_qas_id_validation,
         tokenizer=tokenizer,
         data_collator=data_collator,
+        compute_metrics=compute_metrics
     )
 
     trainer_qa.train()
@@ -335,32 +420,14 @@ if __name__ == "__main__":
     # ## Simpan model Sequence Classification
     trainer_qa.save_model(MODEL_DIR)
 
-
     # # Melakukan prediksi dari model
     predict_result = trainer_qa.predict(tokenized_data_qas_id_validation)
     os.makedirs(os.path.dirname(OUTPUT_DIR), exist_ok=True)
     with open(f'{OUTPUT_DIR}/output.txt', "w") as f:
         f.write(str(predict_result))
         f.close()
-
-    # # Melakukan evaluasi dari prediksi
-    def compute_accuracy(predict_result):
-        predictions_idx = np.argmax(predict_result.predictions, axis=2)
-        total_correct = 0
-        denominator = len(predictions_idx[0])
-        label_array = np.asarray(predict_result.label_ids)
-
-        for i in range(len(predict_result.predictions[0])):
-            if predictions_idx[0][i] == label_array[0][i]:
-                if predictions_idx[1][i] == label_array[1][i]:
-                    total_correct += 1
-
-        accuracy = (total_correct / denominator)
-        print(f"Akurasi model sebesar: {accuracy} %; dengan jawaban benar sebanyak: {total_correct} dari {denominator} soal.")
     
-        return accuracy
-    
-    accuracy_result = compute_accuracy(predict_result)
+    accuracy_result = compute_metrics(predict_result)
     os.makedirs(os.path.dirname(ACCURACY_DIR), exist_ok=True)
     with open(f'{ACCURACY_DIR}/accuracy.txt', "w") as f:
         f.write(str(accuracy_result))
