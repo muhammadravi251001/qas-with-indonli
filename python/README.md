@@ -23,7 +23,7 @@ Please, check the arguments that can be passed to this code; the datatype, argum
 python .\main_training_indonli.py -h
 ```
 
-To run an experiments, you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token} if you don't want using the default value provided:
+To run this training IndoNLI experiments, you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token} if you don't want using the default value provided:
 ```
 python .\main_training_indonli.py -m indolem -d basic -e 16 -sa max
 python .\main_training_indonli.py -m indolem -d translated -e 16 -sa max
@@ -36,6 +36,21 @@ python .\main_training_indonli.py -m indonlu -d augmented -e 16 -sa max
 python .\main_training_indonli.py -m xlmr -d basic -e 16 -sa max
 python .\main_training_indonli.py -m xlmr -d translated -e 16 -sa max
 python .\main_training_indonli.py -m xlmr -d augmented -e 16 -sa max
+```
+
+Furthermore, to run this fine-tuning dataset QAS experiments, you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token} if you don't want using the default value provided:
+```
+python .\main_fine_tuning_qas_dataset.py -m indolem -d squadid -e 16 -sa max
+python .\main_fine_tuning_qas_dataset.py -m indolem -d idkmrc -e 16 -sa max
+python .\main_fine_tuning_qas_dataset.py -m indolem -d tydiqa -e 16 -sa max
+
+python .\main_fine_tuning_qas_dataset.py -m indonlu -d squadid -e 16 -sa max
+python .\main_fine_tuning_qas_dataset.py -m indonlu -d idkmrc -e 16 -sa max
+python .\main_fine_tuning_qas_dataset.py -m indonlu -d tydiqa -e 16 -sa max
+
+python .\main_fine_tuning_qas_dataset.py -m xlmr -d squadid -e 16 -sa max
+python .\main_fine_tuning_qas_dataset.py -m xlmr -d idkmrc -e 16 -sa max
+python .\main_fine_tuning_qas_dataset.py -m xlmr -d tydiqa -e 16 -sa max
 ```
 
 The predictions will be stored in `python\results\{NAME}-{TIME_NOW}`. And, then this code automatically push Trainer to `{USER_that_passed_by_TOKEN}/fine-tuned-{NAME}`.
