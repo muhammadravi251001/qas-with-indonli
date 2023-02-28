@@ -88,7 +88,9 @@ if __name__ == "__main__":
         Trainer,
         BertForSequenceClassification,
         BertForQuestionAnswering,
-        AutoTokenizer, 
+        AutoTokenizer,
+        EarlyStoppingCallback, 
+        IntervalStrategy
     )
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -353,6 +355,7 @@ if __name__ == "__main__":
         num_train_epochs=EPOCH,
         weight_decay=WEIGHT_DECAY,
         per_device_train_batch_size=BATCH_SIZE,
+        per_device_eval_batch_size=BATCH_SIZE,
         gradient_accumulation_steps=GRADIENT_ACCUMULATION,
         learning_rate=LEARNING_RATE,
         warmup_ratio=WARMUP_RATIO,
@@ -360,11 +363,14 @@ if __name__ == "__main__":
         dataloader_num_workers=cpu_count(),
         
         # Miscellaneous
-        evaluation_strategy='epoch',
+        evaluation_strategy='steps',
+        eval_steps=50,
         seed=SEED,
         hub_token=HUB_TOKEN,
         push_to_hub=True,
-        hub_model_id=REPO_NAME
+        hub_model_id=REPO_NAME,
+        load_best_model_at_end=True,
+        metric_for_best_model='accuracy',
     )
 
 
@@ -376,7 +382,8 @@ if __name__ == "__main__":
         eval_dataset=tokenized_data_qas_id_validation,
         tokenizer=tokenizer,
         data_collator=data_collator,
-        compute_metrics=compute_metrics
+        compute_metrics=compute_metrics,
+        callbacks = [EarlyStoppingCallback(early_stopping_patience=3)]
     )
 
     trainer_qa.train()
