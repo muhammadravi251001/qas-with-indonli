@@ -39,7 +39,7 @@ if __name__ == "__main__":
     BATCH_SIZE = int(args.batch_size)
 
     print("Program fine-tuning dataset QA mulai...")
-    print(f"Mulai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, dan token: {HUB_TOKEN}")
+    print(f"Mulai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, dan token: {HUB_TOKEN}")
 
     # ## Mendefinisikan hyperparameter
     MODEL_NAME = MODEL_NAME
@@ -406,4 +406,5 @@ if __name__ == "__main__":
         f.write(str(accuracy_result))
         f.close()
 
+    print(f"Selesai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, dan token: {HUB_TOKEN}")
     print("Program fine-tuning dataset QA selesai!")
