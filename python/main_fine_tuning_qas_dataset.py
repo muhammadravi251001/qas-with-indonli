@@ -8,6 +8,7 @@ parser.add_argument('-e', '--epoch', type=int, metavar='', required=True, help="
 parser.add_argument('-sa', '--sample', type=str, metavar='', required=True, help="Jumlah sampling data Anda; Integer; choice=[max, all integer]")
 parser.add_argument('-l', '--learn_rate', type=float, metavar='', required=False, help="Jumlah learning rate Anda; Float; choice=[all float]; default=1e-5", default=1e-5)
 parser.add_argument('-se', '--seed', type=int, metavar='', required=False, help="Jumlah seed Anda; Integer; choice=[all integer]; default=42", default=42)
+parser.add_argument('-bs', '--batch_size', type=int, metavar='', required=False, help="Jumlah batch-size Anda; Integer; choice=[all integer]; default=16", default=16)
 parser.add_argument('-t', '--token', type=str, metavar='', required=False, help="Token Hugging Face Anda; String; choice=[all string token]; default=(TOKEN_HF_muhammadravi251001)", default="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")
 args = parser.parse_args()
 
@@ -35,6 +36,7 @@ if __name__ == "__main__":
     LEARNING_RATE = float(args.learn_rate)
     SEED = int(args.seed)
     HUB_TOKEN = str(args.token)
+    BATCH_SIZE = int(args.batch_size)
 
     print("Program fine-tuning dataset QA mulai...")
     print(f"Mulai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, dan token: {HUB_TOKEN}")
@@ -46,8 +48,8 @@ if __name__ == "__main__":
     LEARNING_RATE = LEARNING_RATE
     HUB_TOKEN = HUB_TOKEN
     SEED = SEED
+    BATCH_SIZE = BATCH_SIZE
     
-    BATCH_SIZE = 16
     GRADIENT_ACCUMULATION = 4
     MAX_LENGTH = 400
     STRIDE = 100
