@@ -23,7 +23,7 @@ Please, check the arguments that can be passed to this code; the datatype, argum
 python main_training_indonli.py -h
 ```
 
-To run this training IndoNLI experiments, you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token} if you don't want using the default value provided:
+To run this training IndoNLI experiments, you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token, --batch_size} if you don't want using the default value provided:
 ```
 python main_training_indonli.py -m indolem -d basic -e 16 -sa max
 python main_training_indonli.py -m indolem -d translated -e 16 -sa max
@@ -45,7 +45,7 @@ Please, check the arguments that can be passed to this code; the datatype, argum
 python main_fine_tuning_qas_dataset.py -h
 ```
 
-To run this fine-tuning dataset QAS experiments, you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token} if you don't want using the default value provided:
+To run this fine-tuning dataset QAS experiments, you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token, --batch_size} if you don't want using the default value provided:
 ```
 python main_fine_tuning_qas_dataset.py -m indolem -d squadid -e 16 -sa max
 python main_fine_tuning_qas_dataset.py -m indolem -d idkmrc -e 16 -sa max
