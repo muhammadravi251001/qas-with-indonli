@@ -19,7 +19,7 @@ if __name__ == "__main__":
     elif (args.model_name) == "indonlu":
         MODEL_NAME = "indobenchmark/indobert-large-p2"
     elif (args.model_name) == "xlmr":
-        MODEL_NAME = "xlm-roberta-base"
+        MODEL_NAME = "xlm-roberta-large"
     
     if (args.data_name) == "basic":
         DATA_NAME = "Basic"
@@ -218,17 +218,19 @@ if __name__ == "__main__":
     ACCURACY_DIR = f'{SC}/accuracy/'
     REPO_NAME = f'fine-tuned-{NAME}'
 
+    # TODO if-else untuk ubah steps_eval
+
     training_args_sc = TrainingArguments(
         
         # Checkpoint
         output_dir=CHECKPOINT_DIR,
         overwrite_output_dir=True,
-        save_strategy='epoch',
+        save_strategy='steps',
         save_total_limit=EPOCH,
         
         # Log
         report_to='tensorboard',
-        logging_strategy='epoch',
+        logging_strategy='steps',
         logging_first_step=True,
         logging_steps=LOGGING_STEPS,
         
@@ -244,8 +246,8 @@ if __name__ == "__main__":
         dataloader_num_workers=cpu_count(),
         
         # Miscellaneous
-        evaluation_strategy='epoch',
-        eval_steps=50,
+        evaluation_strategy='steps',
+        eval_steps=int((data_indonli['train'].num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * 0.5),
         seed=SEED,
         hub_token=HUB_TOKEN,
         push_to_hub=True,

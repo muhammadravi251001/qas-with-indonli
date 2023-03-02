@@ -3,30 +3,40 @@ import sys
 
 parser = argparse.ArgumentParser(description="Program untuk fine-tuning dataset QA")
 parser.add_argument('-m', '--model_name', type=str, metavar='', required=True, help="Nama model Anda; String; choice=[indolem, indonlu, xlmr]")
-parser.add_argument('-d', '--data_name', type=str, metavar='', required=True, help="Nama dataset Anda; String; choice=[squadid, idkmrc, tydiqa]")
+parser.add_argument('-d', '--data_name', type=str, metavar='', required=True, help="Nama dataset Anda; String; choice=[squadid, idkmrc, tydiqaid]")
 parser.add_argument('-e', '--epoch', type=int, metavar='', required=True, help="Jumlah epoch Anda; Integer; choice=[all integer]")
 parser.add_argument('-sa', '--sample', type=str, metavar='', required=True, help="Jumlah sampling data Anda; Integer; choice=[max, all integer]")
 parser.add_argument('-l', '--learn_rate', type=float, metavar='', required=False, help="Jumlah learning rate Anda; Float; choice=[all float]; default=1e-5", default=1e-5)
 parser.add_argument('-se', '--seed', type=int, metavar='', required=False, help="Jumlah seed Anda; Integer; choice=[all integer]; default=42", default=42)
 parser.add_argument('-bs', '--batch_size', type=int, metavar='', required=False, help="Jumlah batch-size Anda; Integer; choice=[all integer]; default=16", default=16)
 parser.add_argument('-t', '--token', type=str, metavar='', required=False, help="Token Hugging Face Anda; String; choice=[all string token]; default=(TOKEN_HF_muhammadravi251001)", default="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")
+parser.add_argument('-f', '--flag', type=str, metavar='', required=True, help="Alur yang mau dipilih; String; choice=[no_ittl, with_ittl]")
 args = parser.parse_args()
 
 if __name__ == "__main__":
     
-    if (args.model_name) == "indolem":
-        MODEL_NAME = "indolem/indobert-base-uncased"
-    elif (args.model_name) == "indonlu":
-        MODEL_NAME = "indobenchmark/indobert-large-p2"
-    elif (args.model_name) == "xlmr":
-        MODEL_NAME = "xlm-roberta-base"
+    if (args.flag) == "no_ittl":
+        if (args.model_name) == "indolem":
+            MODEL_NAME = "indolem/indobert-base-uncased"
+        elif (args.model_name) == "indonlu":
+            MODEL_NAME = "indobenchmark/indobert-large-p2"
+        elif (args.model_name) == "xlmr":
+            MODEL_NAME = "xlm-roberta-large"
+    
+    elif (args.flag) == "with_ittl":
+        if (args.model_name) == "indolem":
+            MODEL_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-indobert-base-uncased"
+        elif (args.model_name) == "indonlu":
+            MODEL_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-indobert-large-p2"
+        elif (args.model_name) == "xlmr":
+            MODEL_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-xlm-roberta-base"
     
     if (args.data_name) == "squadid":
         DATA_NAME = "Squad-ID"
     elif (args.data_name) == "idkmrc":
         DATA_NAME = "IDK-MRC"
-    elif (args.data_name) == "tydiqa":
-        DATA_NAME = "TYDI-QA"
+    elif (args.data_name) == "tydiqaid":
+        DATA_NAME = "TYDI-QA-ID"
 
     if (args.sample) == "max":
         SAMPLE = sys.maxsize
@@ -68,6 +78,8 @@ if __name__ == "__main__":
     import operator
     import re
     import sys
+    import collections
+    import string
 
     import numpy as np
     import pandas as pd
@@ -187,37 +199,42 @@ if __name__ == "__main__":
         
         data_qas_id = DatasetDict({"train": train_dataset, "validation": validation_dataset})
 
-    elif (DATA_NAME == "TYDI-QA"):
-        data_qas_id = load_dataset("tydiqa", 'secondary_task')
+    elif (DATA_NAME == "TYDI-QA-ID"):
+        conhelps = NusantaraConfigHelper()
+        data_qas_id = conhelps.filtered(lambda x: 'tydiqa_id' in x.dataset_name)[0].load_dataset()
 
         df_train = pd.DataFrame(data_qas_id['train'])
         df_validation = pd.DataFrame(data_qas_id['validation'])
 
         cols = ['context', 'question', 'answer']
-        new_df_val = pd.DataFrame(columns=cols)
-
-        for i in tqdm(range(len(df_validation['context']))):
-            new_df_val = new_df_val.append({'context': df_validation["context"][i], 
-                                            'question': df_validation["question"][i], 
-                                            'answer': {"text": df_validation["answers"][i]['text'][0], 
-                                            "answer_start": df_validation["answers"][i]['answer_start'][0], 
-                                            "answer_end": df_validation["answers"][i]['answer_start'][0] + len(df_validation["answers"][i]['text'][0])}}, 
-                                        ignore_index=True)
-
-        cols = ['context', 'question', 'answer']
         new_df_train = pd.DataFrame(columns=cols)
 
-        for i in tqdm(range(len(df_train['context']))):
+        for i in range(len(df_train['context'])):
+            answer_start = df_train['context'][i].index(df_train['label'][i])
+            answer_end = answer_start + len(df_train['label'][i])
             new_df_train = new_df_train.append({'context': df_train["context"][i], 
-                                            'question': df_train["question"][i], 
-                                            'answer': {"text": df_train["answers"][i]['text'][0], 
-                                            "answer_start": df_train["answers"][i]['answer_start'][0], 
-                                            "answer_end": df_train["answers"][i]['answer_start'][0] + len(df_train["answers"][i]['text'][0])}}, 
-                                        ignore_index=True)
-    
+                                                'question': df_train["question"][i], 
+                                                'answer': {"text": df_train["label"][i], 
+                                                           "answer_start": answer_start, 
+                                                           "answer_end": answer_end}}, 
+                                                           ignore_index=True)
+
+        cols = ['context', 'question', 'answer']
+        new_df_val = pd.DataFrame(columns=cols)    
+            
+        for i in range(len(df_validation['context'])):
+            answer_start = df_validation['context'][i].index(df_validation['label'][i])
+            answer_end = answer_start + len(df_validation['label'][i])
+            new_df_val = new_df_val.append({'context': df_validation["context"][i], 
+                                            'question': df_validation["question"][i], 
+                                            'answer': {"text": df_validation["label"][i], 
+                                                       "answer_start": answer_start, 
+                                                       "answer_end": answer_end}}, 
+                                                       ignore_index=True)    
+            
         train_dataset = Dataset.from_dict(new_df_train)
         validation_dataset = Dataset.from_dict(new_df_val)
-        
+
         data_qas_id = DatasetDict({"train": train_dataset, "validation": validation_dataset})
 
     # ## Fungsi utilitas untuk pre-process dataset QAS
@@ -278,6 +295,7 @@ if __name__ == "__main__":
 
             tokenized_examples['start_positions'].append(s)
             tokenized_examples['end_positions'].append(e)
+        
         return tokenized_examples
 
     # ## Melakukan tokenisasi data IndoNLI
@@ -307,21 +325,56 @@ if __name__ == "__main__":
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
     # # Melakukan evaluasi dari prediksi
-    def compute_metrics(predict_result):
+    def normalize_text(s):
+        def remove_articles(text):
+            regex = re.compile(r"\b(a|an|the)\b", re.UNICODE)
+            return re.sub(regex, " ", text)
+        def white_space_fix(text):
+            return " ".join(text.split())
+        def remove_punc(text):
+            exclude = set(string.punctuation)
+            return "".join(ch for ch in text if ch not in exclude)
+        def lower(text):
+            return text.lower()
+        return white_space_fix(remove_articles(remove_punc(lower(s))))
+
+    def compute_f1(pred, gold):
+        pred_tokens = normalize_text(pred)
+        gold_tokens = normalize_text(gold)
+        common = collections.Counter(pred_tokens) & collections.Counter(gold_tokens)
+        num_same = sum(common.values())
+        if len(gold_tokens) == 0 or len(pred_tokens) == 0: 
+            return int(gold_tokens == pred_tokens)
+        if num_same == 0:
+            return 0
+        precision = 1.0 * num_same / len(pred_tokens)
+        recall = 1.0 * num_same / len(gold_tokens)
+        f1 = (2 * precision * recall) / (precision + recall)
+        return f1
+
+    def compute_metrics(predict_result, data=data_qas_id):
         predictions_idx = np.argmax(predict_result.predictions, axis=2)
-        total_correct = 0
         denominator = len(predictions_idx[0])
         label_array = np.asarray(predict_result.label_ids)
-
+        total_correct = 0
+        f1_array = []
         for i in range(len(predict_result.predictions[0])):
-            if predictions_idx[0][i] == label_array[0][i]:
-                if predictions_idx[1][i] == label_array[1][i]:
-                    total_correct += 1
+            start_pred_idx = predictions_idx[0][i]
+            end_pred_idx = predictions_idx[1][i] + 1
+            start_gold_idx = label_array[0][i]
+            end_gold_idx = label_array[1][i] + 1
 
-        accuracy = (total_correct / denominator)
-        print(f"Akurasi model sebesar: {accuracy} %; dengan jawaban benar sebanyak: {total_correct} dari {denominator} soal.")
-    
-        return {'accuracy': accuracy}
+            pred_text = data['validation'][i]['context'][start_pred_idx: end_pred_idx]
+            gold_text = data['validation'][i]['context'][start_gold_idx: end_gold_idx]
+
+            if pred_text == gold_text:
+                total_correct += 1
+
+            f1_array.append(compute_f1(pred=pred_text, gold=gold_text))
+
+        exact_match = ((total_correct / denominator) * 100.0)
+        final_f1 = np.mean(f1_array) * 100.0
+        return {'exact_match': exact_match, 'f1': final_f1}
 
     # ## Mendefinisikan argumen (dataops) untuk training nanti
     TIME_NOW = str(datetime.now()).replace(":", "-").replace(" ", "_").replace(".", "_")
@@ -344,12 +397,12 @@ if __name__ == "__main__":
         # Checkpoint
         output_dir=CHECKPOINT_DIR,
         overwrite_output_dir=True,
-        save_strategy='epoch',
+        save_strategy='steps',
         save_total_limit=EPOCH,
         
         # Log
         report_to='tensorboard',
-        logging_strategy='epoch',
+        logging_strategy='steps',
         logging_first_step=True,
         logging_steps=LOGGING_STEPS,
         
@@ -365,8 +418,8 @@ if __name__ == "__main__":
         dataloader_num_workers=cpu_count(),
         
         # Miscellaneous
-        evaluation_strategy='epoch',
-        eval_steps=50,
+        evaluation_strategy='steps',
+        eval_steps=int((data_qas_id['train'].num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * 0.5),
         seed=SEED,
         hub_token=HUB_TOKEN,
         push_to_hub=True,
