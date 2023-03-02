@@ -11,6 +11,7 @@ parser.add_argument('-se', '--seed', type=int, metavar='', required=False, help=
 parser.add_argument('-bs', '--batch_size', type=int, metavar='', required=False, help="Jumlah batch-size Anda; Integer; choice=[all integer]; default=16", default=16)
 parser.add_argument('-t', '--token', type=str, metavar='', required=False, help="Token Hugging Face Anda; String; choice=[all string token]; default=(TOKEN_HF_muhammadravi251001)", default="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")
 parser.add_argument('-f', '--flag', type=str, metavar='', required=True, help="Alur yang mau dipilih; String; choice=[no_ittl, with_ittl]")
+parser.add_argument('-fr', '--freeze', type=bool, metavar='', required=False, help="Dengan ITTL, apa mau freeze layer BERT?; Boolean; choice=[True, False]")
 args = parser.parse_args()
 
 if __name__ == "__main__":
@@ -57,7 +58,7 @@ if __name__ == "__main__":
     BATCH_SIZE = int(args.batch_size)
 
     print("Program fine-tuning dataset QA mulai...")
-    print(f"Mulai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, dan token: {HUB_TOKEN}")
+    print(f"Mulai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, flag: {args.flag}, freeze: {args.freeze}, dan token: {HUB_TOKEN}")
 
     # ## Mendefinisikan hyperparameter
     MODEL_NAME = MODEL_NAME
@@ -328,6 +329,13 @@ if __name__ == "__main__":
     # ## Gunakan model Sequence Classification yang sudah pre-trained
     model_qa = BertForQuestionAnswering.from_pretrained(MODEL_NAME)
     model_qa = model_qa.to(device)
+
+    # ## Freeze BERT layer (opsional)
+    if (args.flag) == "with_ittl":
+        if (args.freeze) == True:
+            for name, param in model_qa.named_parameters():
+                if 'qa_outputs' not in name:
+                    param._trainable  = False
     
     # ## Melakukan pengumpulan data dengan padding
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
@@ -385,6 +393,7 @@ if __name__ == "__main__":
         return {'exact_match': exact_match, 'f1': final_f1}
 
     # ## Mendefinisikan argumen (dataops) untuk training nanti
+    # TODO: utak-atik result name & repo name
     TIME_NOW = str(datetime.now()).replace(":", "-").replace(" ", "_").replace(".", "_")
     
     if (re.findall(r'.*/(.*)$', MODEL_NAME) == []): 
@@ -398,7 +407,11 @@ if __name__ == "__main__":
     MODEL_DIR = f'{QA}/model/'
     OUTPUT_DIR = f'{QA}/output/'
     ACCURACY_DIR = f'{QA}/accuracy/'
-    REPO_NAME = f'fine-tuned-{NAME}'
+    
+    if args.flag == "no_ittl":
+        REPO_NAME = f'fine-tuned-{NAME}-without-ITTL'
+    elif args.flag == "with_ittl":
+        REPO_NAME = f'fine-tuned-{NAME}-with-ITTL'
 
     training_args_qa = TrainingArguments(
         
@@ -467,5 +480,5 @@ if __name__ == "__main__":
         f.write(str(accuracy_result))
         f.close()
 
-    print(f"Selesai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, dan token: {HUB_TOKEN}")
+    print(f"Selesai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, flag: {args.flag}, freeze: {args.freeze}, dan token: {HUB_TOKEN}")
     print("Program fine-tuning dataset QA selesai!")
