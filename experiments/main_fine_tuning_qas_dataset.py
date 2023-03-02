@@ -11,7 +11,7 @@ parser.add_argument('-se', '--seed', type=int, metavar='', required=False, help=
 parser.add_argument('-bs', '--batch_size', type=int, metavar='', required=False, help="Jumlah batch-size Anda; Integer; choice=[all integer]; default=16", default=16)
 parser.add_argument('-t', '--token', type=str, metavar='', required=False, help="Token Hugging Face Anda; String; choice=[all string token]; default=(TOKEN_HF_muhammadravi251001)", default="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")
 parser.add_argument('-f', '--flag', type=str, metavar='', required=True, help="Alur yang mau dipilih; String; choice=[no_ittl, with_ittl]")
-parser.add_argument('-fr', '--freeze', type=bool, metavar='', required=False, help="Dengan ITTL, apa mau freeze layer BERT?; Boolean; choice=[True, False]")
+parser.add_argument('-fr', '--freeze', type=bool, metavar='', required=False, help="Dengan ITTL, apa mau freeze layer BERT?; Boolean; choice=[True, False]", default=False)
 args = parser.parse_args()
 
 if __name__ == "__main__":
