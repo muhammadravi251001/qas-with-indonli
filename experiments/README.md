@@ -12,7 +12,7 @@ git clone https://github.com/muhammadravi251001/qas-with-indonli.git
 After that, run experiment and install all the requirements under the current directory:
 ```
 cd qas-with-indonli
-cd python
+cd experiments
 pip install -r requirements.txt
 ```
 
