@@ -217,7 +217,8 @@ if __name__ == "__main__":
     MODEL_DIR = f'{SC}/model/'
     OUTPUT_DIR = f'{SC}/output/'
     ACCURACY_DIR = f'{SC}/accuracy/'
-    REPO_NAME = f'fine-tuned-{NAME}'[:96]
+    REPO_NAME = f'fine-tuned-{NAME}'[:90]
+    REPO_NAME = f'{REPO_NAME}-cont'
 
     # TODO if-else untuk ubah steps_eval
 

@@ -421,7 +421,7 @@ if __name__ == "__main__":
     OUTPUT_DIR = f'{QA}/output/'
     ACCURACY_DIR = f'{QA}/accuracy/'
 
-    REPO_NAME = f'fine-tuned-{NAME}'[:96]
+    REPO_NAME = f'fine-tuned-{NAME}'[:90]
 
     training_args_qa = TrainingArguments(
         
