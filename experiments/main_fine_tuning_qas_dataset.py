@@ -389,6 +389,7 @@ if __name__ == "__main__":
                 total_correct += 1
 
             f1, precision, recall = compute_f1_prec_rec(pred=pred_text, gold=gold_text)
+            
             f1_array.append(f1)
             precision_array.append(precision)
             recall_array.append(recall)
@@ -452,7 +453,6 @@ if __name__ == "__main__":
         hub_token=HUB_TOKEN,
         push_to_hub=True,
         hub_model_id=REPO_NAME,
-        load_best_model_at_end=True,
         metric_for_best_model='accuracy',
     )
 
