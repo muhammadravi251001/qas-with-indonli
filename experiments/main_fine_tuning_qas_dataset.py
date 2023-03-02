@@ -2,7 +2,7 @@ import argparse
 import sys
 
 parser = argparse.ArgumentParser(description="Program untuk fine-tuning dataset QA")
-parser.add_argument('-m', '--model_name', type=str, metavar='', required=True, help="Nama model Anda; String; choice=[indolem, indonlu, xlmr]")
+parser.add_argument('-m', '--model_name', type=str, metavar='', required=True, help="Nama model Anda; String; choice=[indolem, indonlu, xlmr, your model choice]")
 parser.add_argument('-d', '--data_name', type=str, metavar='', required=True, help="Nama dataset Anda; String; choice=[squadid, idkmrc, tydiqaid]")
 parser.add_argument('-e', '--epoch', type=int, metavar='', required=True, help="Jumlah epoch Anda; Integer; choice=[all integer]")
 parser.add_argument('-sa', '--sample', type=str, metavar='', required=True, help="Jumlah sampling data Anda; Integer; choice=[max, all integer]")
@@ -14,22 +14,30 @@ parser.add_argument('-f', '--flag', type=str, metavar='', required=True, help="A
 args = parser.parse_args()
 
 if __name__ == "__main__":
+
+    base_model = ["indolem", "indonlu", "xlmr"]
     
     if (args.flag) == "no_ittl":
-        if (args.model_name) == "indolem":
-            MODEL_NAME = "indolem/indobert-base-uncased"
-        elif (args.model_name) == "indonlu":
-            MODEL_NAME = "indobenchmark/indobert-large-p2"
-        elif (args.model_name) == "xlmr":
-            MODEL_NAME = "xlm-roberta-large"
+        if (args.model_name) in base_model:
+            if (args.model_name) == "indolem":
+                MODEL_NAME = "indolem/indobert-base-uncased"
+            elif (args.model_name) == "indonlu":
+                MODEL_NAME = "indobenchmark/indobert-large-p2"
+            elif (args.model_name) == "xlmr":
+                MODEL_NAME = "xlm-roberta-large"
+        else: MODEL_NAME = str(args.model_name)
     
     elif (args.flag) == "with_ittl":
-        if (args.model_name) == "indolem":
-            MODEL_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-indobert-base-uncased"
-        elif (args.model_name) == "indonlu":
-            MODEL_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-indobert-large-p2"
-        elif (args.model_name) == "xlmr":
-            MODEL_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-xlm-roberta-base"
+        if (args.model_name) in base_model:
+            
+            # Model-model dibawah dipilih karena memiliki akurasi terbaik dari eksperimen sebelumnya.
+            if (args.model_name) == "indolem":
+                MODEL_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-indobert-base-uncased"
+            elif (args.model_name) == "indonlu":
+                MODEL_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-indobert-large-p2"
+            elif (args.model_name) == "xlmr":
+                MODEL_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-xlm-roberta-base"
+        else: MODEL_NAME = str(args.model_name)
     
     if (args.data_name) == "squadid":
         DATA_NAME = "Squad-ID"
