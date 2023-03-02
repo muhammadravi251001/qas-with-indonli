@@ -82,7 +82,3 @@ With use of `with_ittl` flag, that means you doing Intermediate Task Transfer Le
 ## Location of predictions
 
 The predictions will be stored in `python\results\{NAME}-{TIME_NOW}`. And then this code automatically push Trainer to `{USER_that_passed_by_TOKEN}/fine-tuned-{NAME}`.
-
-Thanks, 
-
-Ravi.
