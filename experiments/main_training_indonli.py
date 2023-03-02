@@ -249,6 +249,7 @@ if __name__ == "__main__":
         
         # Miscellaneous
         evaluation_strategy='steps',
+        save_steps=int((data_indonli['train'].num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * 0.5),
         eval_steps=int((data_indonli['train'].num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * 0.5),
         seed=SEED,
         hub_token=HUB_TOKEN,

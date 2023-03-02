@@ -359,15 +359,16 @@ if __name__ == "__main__":
         common = collections.Counter(pred_tokens) & collections.Counter(gold_tokens)
         num_same = sum(common.values())
         if len(gold_tokens) == 0 or len(pred_tokens) == 0: 
-            return int(gold_tokens == pred_tokens)
+            var = int(gold_tokens == pred_tokens)
+            return var, var, var
         if num_same == 0:
-            return 0
+            return 0, 0, 0
         precision = 1.0 * num_same / len(pred_tokens)
         recall = 1.0 * num_same / len(gold_tokens)
         f1 = (2 * precision * recall) / (precision + recall)
-        return (f1, precision, recall)
+        return f1, precision, recall
 
-    def compute_metrics(predict_result, data=data_qas_id):
+    def compute_metrics(predict_result):
         predictions_idx = np.argmax(predict_result.predictions, axis=2)
         denominator = len(predictions_idx[0])
         label_array = np.asarray(predict_result.label_ids)
@@ -382,8 +383,8 @@ if __name__ == "__main__":
             start_gold_idx = label_array[0][i]
             end_gold_idx = label_array[1][i] + 1
 
-            pred_text = data['validation'][i]['context'][start_pred_idx: end_pred_idx]
-            gold_text = data['validation'][i]['context'][start_gold_idx: end_gold_idx]
+            pred_text = data_qas_id['validation'][i]['context'][start_pred_idx: end_pred_idx]
+            gold_text = data_qas_id['validation'][i]['context'][start_gold_idx: end_gold_idx]
 
             if pred_text == gold_text:
                 total_correct += 1
@@ -457,7 +458,7 @@ if __name__ == "__main__":
         push_to_hub=True,
         hub_model_id=REPO_NAME,
         load_best_model_at_end=True,
-        metric_for_best_model='accuracy',
+        metric_for_best_model='exact_match',
     )
 
 
