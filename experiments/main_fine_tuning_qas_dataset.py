@@ -448,11 +448,13 @@ if __name__ == "__main__":
         
         # Miscellaneous
         evaluation_strategy='steps',
+        save_steps=int((data_qas_id['train'].num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * 0.5),
         eval_steps=int((data_qas_id['train'].num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * 0.5),
         seed=SEED,
         hub_token=HUB_TOKEN,
         push_to_hub=True,
         hub_model_id=REPO_NAME,
+        load_best_model_at_end=True,
         metric_for_best_model='accuracy',
     )
 
