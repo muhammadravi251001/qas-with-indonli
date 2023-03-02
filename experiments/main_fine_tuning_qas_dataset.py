@@ -331,11 +331,10 @@ if __name__ == "__main__":
     model_qa = model_qa.to(device)
 
     # ## Freeze BERT layer (opsional)
-    if (args.flag) == "with_ittl":
-        if (args.freeze) == True:
-            for name, param in model_qa.named_parameters():
-                if 'qa_outputs' not in name:
-                    param._trainable  = False
+    if (args.freeze) == True:
+        for name, param in model_qa.named_parameters():
+            if 'qa_outputs' not in name:
+                param._trainable  = False
     
     # ## Melakukan pengumpulan data dengan padding
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
