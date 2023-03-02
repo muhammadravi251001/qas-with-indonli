@@ -77,6 +77,21 @@ python main_fine_tuning_qas_dataset.py -m xlmr -d idkmrc -e 16 -sa max -f with_i
 python main_fine_tuning_qas_dataset.py -m xlmr -d tydiqaid -e 16 -sa max -f with_ittl
 ```
 
+Or, if you want to experiment with freezing your BERT layer (the default is without freezing BERT layer). You can do this:
+```
+python main_fine_tuning_qas_dataset.py -m indolem -d squadid -e 16 -sa max -f with_ittl -fr True
+python main_fine_tuning_qas_dataset.py -m indolem -d idkmrc -e 16 -sa max -f with_ittl -fr True
+python main_fine_tuning_qas_dataset.py -m indolem -d tydiqaid -e 16 -sa max -f with_ittl -fr True
+
+python main_fine_tuning_qas_dataset.py -m indonlu -d squadid -e 16 -sa max -f with_ittl -fr True
+python main_fine_tuning_qas_dataset.py -m indonlu -d idkmrc -e 16 -sa max -f with_ittl -fr True
+python main_fine_tuning_qas_dataset.py -m indonlu -d tydiqaid -e 16 -sa max -f with_ittl -fr True
+
+python main_fine_tuning_qas_dataset.py -m xlmr -d squadid -e 16 -sa max -f with_ittl -fr True
+python main_fine_tuning_qas_dataset.py -m xlmr -d idkmrc -e 16 -sa max -f with_ittl -fr True
+python main_fine_tuning_qas_dataset.py -m xlmr -d tydiqaid -e 16 -sa max -f with_ittl -fr True
+```
+
 With use of `with_ittl` flag, that means you doing Intermediate Task Transfer Learning (ITTL). It's like you do fine-tuning twice, first with the SequenceClassification task with IndoNLI dataset and the second with the QuestionAnswering task with the QAS dataset that you have chosen yourself.
 
 ## Location of predictions
