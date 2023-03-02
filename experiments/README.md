@@ -25,17 +25,17 @@ python main_training_indonli.py -h
 
 To run this training IndoNLI experiments, you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token, --batch_size} if you don't want using the default value provided:
 ```
-python main_training_indonli.py -m indolem -d basic -e 16 -sa max
-python main_training_indonli.py -m indolem -d translated -e 16 -sa max
-python main_training_indonli.py -m indolem -d augmented -e 16 -sa max
+python main_training_indonli.py -m indolem -d basic -e 10 -sa max
+python main_training_indonli.py -m indolem -d translated -e 10 -sa max
+python main_training_indonli.py -m indolem -d augmented -e 10 -sa max
 
-python main_training_indonli.py -m indonlu -d basic -e 16 -sa max
-python main_training_indonli.py -m indonlu -d translated -e 16 -sa max
-python main_training_indonli.py -m indonlu -d augmented -e 16 -sa max
+python main_training_indonli.py -m indonlu -d basic -e 10 -sa max
+python main_training_indonli.py -m indonlu -d translated -e 10 -sa max
+python main_training_indonli.py -m indonlu -d augmented -e 10 -sa max
 
-python main_training_indonli.py -m xlmr -d basic -e 16 -sa max
-python main_training_indonli.py -m xlmr -d translated -e 16 -sa max
-python main_training_indonli.py -m xlmr -d augmented -e 16 -sa max
+python main_training_indonli.py -m xlmr -d basic -e 10 -sa max
+python main_training_indonli.py -m xlmr -d translated -e 10 -sa max
+python main_training_indonli.py -m xlmr -d augmented -e 10 -sa max
 ```
 
 ## Running experiments for fine-tuning dataset QAS
