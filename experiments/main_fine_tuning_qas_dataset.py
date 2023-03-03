@@ -436,6 +436,11 @@ if __name__ == "__main__":
         NAME = f'{NAME}-without-ITTL'
     else:
         NAME = f'{NAME}-with-ITTL'
+
+    if FREEZE == True:
+        NAME = f'{NAME}-with-freeze'
+    else:
+        NAME = f'{NAME}-without-freeze'
     
     QA = f'./results/{NAME}-{TIME_NOW}'
     CHECKPOINT_DIR = f'{QA}/checkpoint/'
