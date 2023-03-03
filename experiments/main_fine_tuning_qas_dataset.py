@@ -435,7 +435,7 @@ if __name__ == "__main__":
     if MODEL_SC_NAME == None:
         NAME = f'{NAME}-without-ITTL'
     else:
-        NAME = f'{NAME}-with-ITTL'
+        NAME = f'{NAME}-with-ITTL-{MODEL_SC_NAME[:8]}'
 
     if FREEZE == True:
         NAME = f'{NAME}-with-freeze'
