@@ -12,4 +12,4 @@ The experiment code can be found under `experiment` directory, please check the 
 
 The utilites can be found under the `utilities` directory, `utilities` consist all of the support all of the `experiment` things. Such as: Exploratory Data Analysis of various of Question Answering datasets, code to augmented basic & translated IndoNLI, etc. Pplease check the related [README](https://github.com/muhammadravi251001/qas-with-indonli/blob/main/utilities/README.md) file.
 
-All of my experiment --in my local UI campus server, there are also several runs on the MBZUAI campus server on the `@afaji` (one of my supervisor) account; not the `@muhammadravi251001` account-- is also available in Hugging Face (https://huggingface.co/muhammadravi251001).
+All of my experiment --in my local UI campus server, there are also several runs on the MBZUAI campus server on the [@afaji](https://huggingface.co/afaji) (one of my supervisor) account; not the `@muhammadravi251001` account-- is also available in Hugging Face (https://huggingface.co/muhammadravi251001).
