@@ -10,7 +10,7 @@ parser.add_argument('-l', '--learn_rate', type=float, metavar='', required=False
 parser.add_argument('-se', '--seed', type=int, metavar='', required=False, help="Jumlah seed Anda; Integer; choice=[all integer]; default=42", default=42)
 parser.add_argument('-bs', '--batch_size', type=int, metavar='', required=False, help="Jumlah batch-size Anda; Integer; choice=[all integer]; default=16", default=16)
 parser.add_argument('-t', '--token', type=str, metavar='', required=False, help="Token Hugging Face Anda; String; choice=[all string token]; default=(TOKEN_HF_muhammadravi251001)", default="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")
-parser.add_argument('-msc', '--model_sc', type=str, metavar='', required=False, help="Model SequenceClassification yang ingin dipilih; String; choice=[None, indolem, indonlu, xlmr, your model choice]; default=None", default=None)
+parser.add_argument('-wi', '--with_ittl', type=bool, metavar='', required=False, help="Dengan ITTL atau tidak?; Boolean; choice=[True, False]; default=False", default=False)
 parser.add_argument('-fr', '--freeze', type=bool, metavar='', required=False, help="Dengan ITTL, apa mau freeze layer BERT?; Boolean; choice=[True, False]; default=False", default=False)
 args = parser.parse_args()
 
@@ -45,16 +45,18 @@ if __name__ == "__main__":
     BATCH_SIZE = int(args.batch_size)
     FREEZE = bool(args.freeze)
 
-    # Model-model dibawah dipilih karena memiliki akurasi terbaik dari eksperimen sebelumnya.
-    if (args.model_sc) == None:
+    if (args.with_ittl) == False:
         MODEL_SC_NAME = None
-    elif (args.model_sc) == "indolem":
-        MODEL_SC_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-indobert-base-uncased"
-    elif (args.model_sc) == "indonlu":
-        MODEL_SC_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-indobert-large-p2"
-    elif (args.model_sc) == "xlmr":
-        MODEL_SC_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-xlm-roberta-base"
-    else: MODEL_SC_NAME = str(args.model_sc)
+    else:
+        
+    # Model-model dibawah dipilih karena memiliki akurasi terbaik dari eksperimen sebelumnya.
+        if (args.model_name) == "indolem":
+            MODEL_SC_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-indobert-base-uncased"
+        elif (args.model_name) == "indonlu":
+            MODEL_SC_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-indobert-large-p2"
+        elif (args.model_name) == "xlmr":
+            MODEL_SC_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-xlm-roberta-base"
+        else: MODEL_SC_NAME = str(args.model_name)
 
     print("Program fine-tuning dataset QA mulai...")
     print(f"Mulai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, freeze: {FREEZE}, model_sc: {MODEL_SC_NAME}, dan token: {HUB_TOKEN}")
@@ -435,7 +437,7 @@ if __name__ == "__main__":
     if MODEL_SC_NAME == None:
         NAME = f'{NAME}-without-ITTL'
     else:
-        NAME = f'{NAME}-with-ITTL-{MODEL_SC_NAME[:8]}'
+        NAME = f'{NAME}-with-ITTL'
 
     if FREEZE == True:
         NAME = f'{NAME}-with-freeze'
