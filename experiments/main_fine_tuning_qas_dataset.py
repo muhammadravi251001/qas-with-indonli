@@ -10,7 +10,7 @@ parser.add_argument('-l', '--learn_rate', type=float, metavar='', required=False
 parser.add_argument('-se', '--seed', type=int, metavar='', required=False, help="Jumlah seed Anda; Integer; choice=[all integer]; default=42", default=42)
 parser.add_argument('-bs', '--batch_size', type=int, metavar='', required=False, help="Jumlah batch-size Anda; Integer; choice=[all integer]; default=16", default=16)
 parser.add_argument('-t', '--token', type=str, metavar='', required=False, help="Token Hugging Face Anda; String; choice=[all string token]; default=(TOKEN_HF_muhammadravi251001)", default="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")
-parser.add_argument('-f', '--flag', type=str, metavar='', required=True, help="Alur yang mau dipilih; String; choice=[no_ittl, with_ittl]")
+parser.add_argument('-msc', '--model_sc', type=str, metavar='', required=False, help="Model SequenceClassification yang ingin dipilih; String; choice=[None, indolem, indonlu, xlmr, your model choice]; default=None", default=None)
 parser.add_argument('-fr', '--freeze', type=bool, metavar='', required=False, help="Dengan ITTL, apa mau freeze layer BERT?; Boolean; choice=[True, False]; default=False", default=False)
 args = parser.parse_args()
 
@@ -18,27 +18,14 @@ if __name__ == "__main__":
 
     base_model = ["indolem", "indonlu", "xlmr"]
     
-    if (args.flag) == "no_ittl":
-        if (args.model_name) in base_model:
-            if (args.model_name) == "indolem":
-                MODEL_NAME = "indolem/indobert-base-uncased"
-            elif (args.model_name) == "indonlu":
-                MODEL_NAME = "indobenchmark/indobert-large-p2"
-            elif (args.model_name) == "xlmr":
-                MODEL_NAME = "xlm-roberta-large"
-        else: MODEL_NAME = str(args.model_name)
-    
-    elif (args.flag) == "with_ittl":
-        if (args.model_name) in base_model:
-            
-            # Model-model dibawah dipilih karena memiliki akurasi terbaik dari eksperimen sebelumnya.
-            if (args.model_name) == "indolem":
-                MODEL_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-indobert-base-uncased"
-            elif (args.model_name) == "indonlu":
-                MODEL_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-indobert-large-p2"
-            elif (args.model_name) == "xlmr":
-                MODEL_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-xlm-roberta-base"
-        else: MODEL_NAME = str(args.model_name)
+    if (args.model_name) in base_model:
+        if (args.model_name) == "indolem":
+            MODEL_NAME = "indolem/indobert-base-uncased"
+        elif (args.model_name) == "indonlu":
+            MODEL_NAME = "indobenchmark/indobert-large-p2"
+        elif (args.model_name) == "xlmr":
+            MODEL_NAME = "xlm-roberta-large"
+    else: MODEL_NAME = str(args.model_name)
     
     if (args.data_name) == "squadid":
         DATA_NAME = "Squad-ID"
@@ -56,9 +43,21 @@ if __name__ == "__main__":
     SEED = int(args.seed)
     HUB_TOKEN = str(args.token)
     BATCH_SIZE = int(args.batch_size)
+    FREEZE = bool(args.freeze)
+
+    # Model-model dibawah dipilih karena memiliki akurasi terbaik dari eksperimen sebelumnya.
+    if (args.model_sc) == None:
+        MODEL_SC_NAME = None
+    elif (args.model_sc) == "indolem":
+        MODEL_SC_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-indobert-base-uncased"
+    elif (args.model_sc) == "indonlu":
+        MODEL_SC_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-indobert-large-p2"
+    elif (args.model_sc) == "xlmr":
+        MODEL_SC_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-xlm-roberta-base"
+    else: MODEL_SC_NAME = str(args.model_sc)
 
     print("Program fine-tuning dataset QA mulai...")
-    print(f"Mulai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, flag: {args.flag}, freeze: {args.freeze}, dan token: {HUB_TOKEN}")
+    print(f"Mulai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, freeze: {FREEZE}, model_sc: {MODEL_SC_NAME}, dan token: {HUB_TOKEN}")
 
     # ## Mendefinisikan hyperparameter
     MODEL_NAME = MODEL_NAME
@@ -75,6 +74,7 @@ if __name__ == "__main__":
     LOGGING_STEPS = 50
     WARMUP_RATIO = 0.06
     WEIGHT_DECAY = 0.01
+    EVAL_STEPS_RATIO = 0.5
 
     import os
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -330,11 +330,28 @@ if __name__ == "__main__":
     model_qa = BertForQuestionAnswering.from_pretrained(MODEL_NAME)
     model_qa = model_qa.to(device)
 
+    if MODEL_SC_NAME != None:
+        # ## Dictionary untuk mapping label
+        id2label = {0: 'entailment', 1: 'neutral', 
+                    2: 'contradiction'}
+        label2id = {'entailment': 0, 'neutral': 
+                    1, 'contradiction': 2}
+        accuracy = evaluate.load('accuracy')
+
+        model_sc = BertForSequenceClassification.from_pretrained(
+            MODEL_SC_NAME, num_labels=3, 
+            id2label=id2label, label2id=label2id)
+        
+        # Bagian transfer-learning-nya
+        filtered_dict = {k: v for k, v in model_sc.state_dict().items() if k in model_qa.state_dict()}
+        model_qa.state_dict().update(filtered_dict)
+        model_qa.load_state_dict(model_qa.state_dict())
+
     # ## Freeze BERT layer (opsional)
-    if (args.freeze) == True:
+    if FREEZE == True:
         for name, param in model_qa.named_parameters():
             if 'qa_outputs' not in name:
-                param._trainable  = False
+                param._trainable = False
     
     # ## Melakukan pengumpulan data dengan padding
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
@@ -455,8 +472,8 @@ if __name__ == "__main__":
         
         # Miscellaneous
         evaluation_strategy='steps',
-        save_steps=int((data_qas_id['train'].num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * 0.5),
-        eval_steps=int((data_qas_id['train'].num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * 0.5),
+        save_steps=int((data_qas_id['train'].num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * EVAL_STEPS_RATIO),
+        eval_steps=int((data_qas_id['train'].num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * EVAL_STEPS_RATIO),
         seed=SEED,
         hub_token=HUB_TOKEN,
         push_to_hub=True,
@@ -464,7 +481,6 @@ if __name__ == "__main__":
         load_best_model_at_end=True,
         metric_for_best_model='f1',
     )
-
 
     # ## Mulai training untuk fine-tune IndoNLI diatas IndoBERT
     trainer_qa = Trainer(
@@ -496,5 +512,5 @@ if __name__ == "__main__":
         f.write(str(accuracy_result))
         f.close()
 
-    print(f"Selesai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, flag: {args.flag}, freeze: {args.freeze}, dan token: {HUB_TOKEN}")
+    print(f"Selesai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, freeze: {FREEZE}, model_sc: {MODEL_SC_NAME}, dan token: {HUB_TOKEN}")
     print("Program fine-tuning dataset QA selesai!")

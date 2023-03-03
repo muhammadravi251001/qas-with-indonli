@@ -80,6 +80,7 @@ if __name__ == "__main__":
     LOGGING_STEPS = 50
     WARMUP_RATIO = 0.06
     WEIGHT_DECAY = 0.01
+    EVAL_STEPS_RATIO = 0.5
 
     import os
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -249,8 +250,8 @@ if __name__ == "__main__":
         
         # Miscellaneous
         evaluation_strategy='steps',
-        save_steps=int((data_indonli['train'].num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * 0.5),
-        eval_steps=int((data_indonli['train'].num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * 0.5),
+        save_steps=int((data_indonli['train'].num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * EVAL_STEPS_RATIO),
+        eval_steps=int((data_indonli['train'].num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * EVAL_STEPS_RATIO),
         seed=SEED,
         hub_token=HUB_TOKEN,
         push_to_hub=True,
@@ -258,7 +259,6 @@ if __name__ == "__main__":
         load_best_model_at_end=True,
         metric_for_best_model='accuracy',
     )
-
 
     # ## Mulai training untuk fine-tune IndoNLI diatas IndoBERT
     trainer_sc = Trainer(
