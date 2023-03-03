@@ -47,52 +47,52 @@ python main_fine_tuning_qas_dataset.py -h
 
 To run this fine-tuning QAS datasets experiments WITHOUT Intermediate Task Transfer Learning (ITTL), you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token, --batch_size} if you don't want using the default value provided:
 ```
-python main_fine_tuning_qas_dataset.py -m indolem -d squadid -e 16 -sa max -msc None
-python main_fine_tuning_qas_dataset.py -m indolem -d idkmrc -e 16 -sa max -msc None
-python main_fine_tuning_qas_dataset.py -m indolem -d tydiqaid -e 16 -sa max -msc None
+python main_fine_tuning_qas_dataset.py -m indolem -d squadid -e 16 -sa max -wi False
+python main_fine_tuning_qas_dataset.py -m indolem -d idkmrc -e 16 -sa max -wi False
+python main_fine_tuning_qas_dataset.py -m indolem -d tydiqaid -e 16 -sa max -wi False
 
-python main_fine_tuning_qas_dataset.py -m indonlu -d squadid -e 16 -sa max -msc None
-python main_fine_tuning_qas_dataset.py -m indonlu -d idkmrc -e 16 -sa max -msc None
-python main_fine_tuning_qas_dataset.py -m indonlu -d tydiqaid -e 16 -sa max -msc None
+python main_fine_tuning_qas_dataset.py -m indonlu -d squadid -e 16 -sa max -wi False
+python main_fine_tuning_qas_dataset.py -m indonlu -d idkmrc -e 16 -sa max -wi False
+python main_fine_tuning_qas_dataset.py -m indonlu -d tydiqaid -e 16 -sa max -wi False
 
-python main_fine_tuning_qas_dataset.py -m xlmr -d squadid -e 16 -sa max -msc None
-python main_fine_tuning_qas_dataset.py -m xlmr -d idkmrc -e 16 -sa max -msc None
-python main_fine_tuning_qas_dataset.py -m xlmr -d tydiqaid -e 16 -sa max -msc None
+python main_fine_tuning_qas_dataset.py -m xlmr -d squadid -e 16 -sa max -wi False
+python main_fine_tuning_qas_dataset.py -m xlmr -d idkmrc -e 16 -sa max -wi False
+python main_fine_tuning_qas_dataset.py -m xlmr -d tydiqaid -e 16 -sa max -wi False
 ```
 
-It should be understood that when you use the `-msc None` flag it means that you are fine-tuning the QAS dataset with the baseline flow, usually this is done as a reference whether the performance of a QAS is increasing or decreasing based on the "-msc None" baseline flow.
+It should be understood that when you use the `-wi False` flag it means that you are fine-tuning the QAS dataset with the baseline flow, usually this is done as a reference whether the performance of a QAS is increasing or decreasing based on the "-wi False" baseline flow.
 
 And then, to run this fine-tuning QAS datasets experiments WITH Intermediate Task Transfer Learning (ITTL), you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token, --batch_size} if you don't want using the default value provided:
 ```
-python main_fine_tuning_qas_dataset.py -m indolem -d squadid -e 16 -sa max -msc indolem
-python main_fine_tuning_qas_dataset.py -m indolem -d idkmrc -e 16 -sa max -msc indolem
-python main_fine_tuning_qas_dataset.py -m indolem -d tydiqaid -e 16 -sa max -msc indolem
+python main_fine_tuning_qas_dataset.py -m indolem -d squadid -e 16 -sa max -wi True
+python main_fine_tuning_qas_dataset.py -m indolem -d idkmrc -e 16 -sa max  -wi True
+python main_fine_tuning_qas_dataset.py -m indolem -d tydiqaid -e 16 -sa max -wi True
 
-python main_fine_tuning_qas_dataset.py -m indonlu -d squadid -e 16 -sa max -msc indonlu
-python main_fine_tuning_qas_dataset.py -m indonlu -d idkmrc -e 16 -sa max -msc indonlu
-python main_fine_tuning_qas_dataset.py -m indonlu -d tydiqaid -e 16 -sa max -msc indonlu
+python main_fine_tuning_qas_dataset.py -m indonlu -d squadid -e 16 -sa max -wi True
+python main_fine_tuning_qas_dataset.py -m indonlu -d idkmrc -e 16 -sa max -wi True
+python main_fine_tuning_qas_dataset.py -m indonlu -d tydiqaid -e 16 -sa max -wi True
 
-python main_fine_tuning_qas_dataset.py -m xlmr -d squadid -e 16 -sa max -msc xlmr
-python main_fine_tuning_qas_dataset.py -m xlmr -d idkmrc -e 16 -sa max -msc xlmr
-python main_fine_tuning_qas_dataset.py -m xlmr -d tydiqaid -e 16 -sa max -msc xlmr
+python main_fine_tuning_qas_dataset.py -m xlmr -d squadid -e 16 -sa max -wi True
+python main_fine_tuning_qas_dataset.py -m xlmr -d idkmrc -e 16 -sa max -wi True
+python main_fine_tuning_qas_dataset.py -m xlmr -d tydiqaid -e 16 -sa max -wi True
 ```
 
 Or, if you want to experiment with freezing your BERT layer (the default is without freezing BERT layer). You can do this:
 ```
-python main_fine_tuning_qas_dataset.py -m indolem -d squadid -e 16 -sa max -msc indolem -fr True
-python main_fine_tuning_qas_dataset.py -m indolem -d idkmrc -e 16 -sa max -msc indolem -fr True
-python main_fine_tuning_qas_dataset.py -m indolem -d tydiqaid -e 16 -sa max -msc indolem -fr True
+python main_fine_tuning_qas_dataset.py -m indolem -d squadid -e 16 -sa max -wi True -fr True
+python main_fine_tuning_qas_dataset.py -m indolem -d idkmrc -e 16 -sa max  -wi True -fr True
+python main_fine_tuning_qas_dataset.py -m indolem -d tydiqaid -e 16 -sa max -wi True -fr True
 
-python main_fine_tuning_qas_dataset.py -m indonlu -d squadid -e 16 -sa max -msc indonlu -fr True
-python main_fine_tuning_qas_dataset.py -m indonlu -d idkmrc -e 16 -sa max -msc indonlu -fr True
-python main_fine_tuning_qas_dataset.py -m indonlu -d tydiqaid -e 16 -sa max -msc indonlu -fr True
+python main_fine_tuning_qas_dataset.py -m indonlu -d squadid -e 16 -sa max -wi True -fr True
+python main_fine_tuning_qas_dataset.py -m indonlu -d idkmrc -e 16 -sa max -wi True -fr True
+python main_fine_tuning_qas_dataset.py -m indonlu -d tydiqaid -e 16 -sa max -wi True -fr True
 
-python main_fine_tuning_qas_dataset.py -m xlmr -d squadid -e 16 -sa max -msc xlmr -fr True
-python main_fine_tuning_qas_dataset.py -m xlmr -d idkmrc -e 16 -sa max -msc xlmr -fr True
-python main_fine_tuning_qas_dataset.py -m xlmr -d tydiqaid -e 16 -sa max -msc xlmr -fr True
+python main_fine_tuning_qas_dataset.py -m xlmr -d squadid -e 16 -sa max -wi True -fr True
+python main_fine_tuning_qas_dataset.py -m xlmr -d idkmrc -e 16 -sa max -wi True -fr True
+python main_fine_tuning_qas_dataset.py -m xlmr -d tydiqaid -e 16 -sa max -wi True -fr True
 ```
 
-With use of `-msc {YOUR_MODEL_CHOICE}` flag, that means you doing Intermediate Task Transfer Learning (ITTL). It's like you do fine-tuning twice, first with the Sequence Classification task with IndoNLI dataset and the second with the Question Answering task with the QAS dataset that you have chosen yourself. You can choose your intermediate task model freely without having to match the `{MODEL_NAME}` of Question Answering task that you previously chose, however, we recommend the models with the best results on the Hugging Face [@afaji](https://huggingface.co/afaji) account.
+With use of `-msc {YOUR_MODEL_CHOICE}` flag, that means you doing Intermediate Task Transfer Learning (ITTL). It's like you do fine-tuning twice, first with the Sequence Classification task with IndoNLI dataset and the second with the Question Answering task with the QAS dataset that you have chosen yourself. You can not choose your intermediate task model freely without having to match the `{MODEL_NAME}` of Question Answering task that you previously chose. You must have the same `{MODEL_NAME}` as the Question Answering task, however, we recommend the models with the best results on the Hugging Face [@afaji](https://huggingface.co/afaji) account.
 
 ## Location of predictions
 
