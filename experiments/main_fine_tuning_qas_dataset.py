@@ -432,10 +432,10 @@ if __name__ == "__main__":
         new_name = re.findall(r'.*/(.*)$', MODEL_NAME)[0]
         NAME = f'DatasetQAS-{DATA_NAME}-with-{str(new_name)}'
     
-    if args.flag == "no_ittl":
+    if MODEL_SC_NAME == None:
         NAME = f'{NAME}-without-ITTL'
-    elif args.flag == "with_ittl":
-        NAME = f'{NAME}-wit-ITTL'
+    else:
+        NAME = f'{NAME}-with-ITTL'
     
     QA = f'./results/{NAME}-{TIME_NOW}'
     CHECKPOINT_DIR = f'{QA}/checkpoint/'
@@ -443,7 +443,7 @@ if __name__ == "__main__":
     OUTPUT_DIR = f'{QA}/output/'
     ACCURACY_DIR = f'{QA}/accuracy/'
 
-    REPO_NAME = f'fine-tuned-{NAME}'[:90]
+    REPO_NAME = f'fine-tuned-{NAME}'[:96]
 
     training_args_qa = TrainingArguments(
         
