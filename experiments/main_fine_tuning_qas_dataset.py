@@ -354,18 +354,22 @@ if __name__ == "__main__":
         return white_space_fix(remove_articles(remove_punc(lower(s))))
 
     def compute_f1_prec_rec(pred, gold):
-        pred_tokens = normalize_text(pred)
-        gold_tokens = normalize_text(gold)
+        pred_tokens = normalize_text(pred).split() # True positive + False positive = Untuk precision
+        gold_tokens = normalize_text(gold).split() # True positive + False negatives = Untuk recall
         common = collections.Counter(pred_tokens) & collections.Counter(gold_tokens)
-        num_same = sum(common.values())
+        num_same = sum(common.values()) # True positive
+        
         if len(gold_tokens) == 0 or len(pred_tokens) == 0: 
             var = int(gold_tokens == pred_tokens)
             return var, var, var
+        
         if num_same == 0:
             return 0, 0, 0
+        
         precision = 1.0 * num_same / len(pred_tokens)
         recall = 1.0 * num_same / len(gold_tokens)
-        f1 = (2 * precision * recall) / (precision + recall)
+        f1 = (2.0 * precision * recall) / (precision + recall)
+        
         return f1, precision, recall
 
     def compute_metrics(predict_result):
@@ -458,7 +462,7 @@ if __name__ == "__main__":
         push_to_hub=True,
         hub_model_id=REPO_NAME,
         load_best_model_at_end=True,
-        metric_for_best_model='exact_match',
+        metric_for_best_model='f1',
     )
 
 
