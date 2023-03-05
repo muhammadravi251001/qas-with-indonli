@@ -60,7 +60,7 @@ python main_fine_tuning_qas_dataset.py -m xlmr -d idkmrc -e 16 -sa max -wi False
 python main_fine_tuning_qas_dataset.py -m xlmr -d tydiqaid -e 16 -sa max -wi False
 ```
 
-It should be understood that when you use the `-wi False` flag it means that you are fine-tuning the QAS dataset with the baseline flow, usually this is done as a reference whether the performance of a QAS is increasing or decreasing based on the "-wi False" baseline flow.
+It should be understood that when you use the `-wi False` flag it means that you are fine-tuning the QAS dataset with the baseline flow, usually this is done as a reference whether the performance of a QAS is increasing or decreasing based on the `-wi False` baseline flow. By default, if you do not config `-wi` flag, is set to be False.
 
 And then, to run this fine-tuning QAS datasets experiments WITH Intermediate Task Transfer Learning (ITTL), you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token, --batch_size} if you don't want using the default value provided:
 ```
