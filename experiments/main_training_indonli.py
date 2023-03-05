@@ -219,7 +219,7 @@ if __name__ == "__main__":
     CHECKPOINT_DIR = f'{SC}/checkpoint/'
     MODEL_DIR = f'{SC}/model/'
     OUTPUT_DIR = f'{SC}/output/'
-    ACCURACY_DIR = f'{SC}/accuracy/'
+    METRIC_RESULT_DIR = f'{SC}/metric-result/'
     REPO_NAME = f'fine-tuned-{NAME}'[:96]
 
     # TODO if-else untuk ubah steps_eval
@@ -294,10 +294,10 @@ if __name__ == "__main__":
         return accuracy.compute(
             predictions=predictions, references=labels)
     
-    accuracy_result = compute_accuracy(predict_result)
-    os.makedirs(os.path.dirname(ACCURACY_DIR), exist_ok=True)
-    with open(f'{ACCURACY_DIR}/accuracy.txt', "w") as f:
-        f.write(str(accuracy_result))
+    metric_result = compute_accuracy(predict_result)
+    os.makedirs(os.path.dirname(METRIC_RESULT_DIR), exist_ok=True)
+    with open(f'{METRIC_RESULT_DIR}/metric_result.txt', "w") as f:
+        f.write(str(metric_result))
         f.close()
 
     print(f"Selesai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, dan token: {HUB_TOKEN}")

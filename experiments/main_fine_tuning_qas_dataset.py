@@ -452,7 +452,7 @@ if __name__ == "__main__":
     CHECKPOINT_DIR = f'{QA}/checkpoint/'
     MODEL_DIR = f'{QA}/model/'
     OUTPUT_DIR = f'{QA}/output/'
-    ACCURACY_DIR = f'{QA}/accuracy/'
+    METRIC_RESULT_DIR = f'{QA}/metric-result/'
     REPO_NAME = f'fine-tuned-{NAME}'[:96]
 
     training_args_qa = TrainingArguments(
@@ -516,10 +516,10 @@ if __name__ == "__main__":
         f.write(str(predict_result))
         f.close()
     
-    accuracy_result = compute_metrics(predict_result)
-    os.makedirs(os.path.dirname(ACCURACY_DIR), exist_ok=True)
-    with open(f'{ACCURACY_DIR}/accuracy.txt', "w") as f:
-        f.write(str(accuracy_result))
+    metric_result = compute_metrics(predict_result)
+    os.makedirs(os.path.dirname(METRIC_RESULT_DIR), exist_ok=True)
+    with open(f'{METRIC_RESULT_DIR}/metric_result.txt', "w") as f:
+        f.write(str(metric_result))
         f.close()
 
     print(f"Selesai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, freeze: {FREEZE}, model_sc: {MODEL_SC_NAME}, dan token: {HUB_TOKEN}")
