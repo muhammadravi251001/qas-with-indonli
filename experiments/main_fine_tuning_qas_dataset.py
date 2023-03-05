@@ -406,8 +406,8 @@ if __name__ == "__main__":
             start_gold_idx = label_array[0][i]
             end_gold_idx = label_array[1][i] + 1
 
-            pred_text = data_qas_id['validation'][i]['context'][start_pred_idx: end_pred_idx]
-            gold_text = data_qas_id['validation'][i]['context'][start_gold_idx: end_gold_idx]
+            pred_text = tokenized_data_qas_id_validation[i]['context'][start_pred_idx: end_pred_idx]
+            gold_text = tokenized_data_qas_id_validation[i]['context'][start_gold_idx: end_gold_idx]
 
             if pred_text == gold_text:
                 total_correct += 1
@@ -479,8 +479,8 @@ if __name__ == "__main__":
         
         # Miscellaneous
         evaluation_strategy='steps',
-        save_steps=int((data_qas_id['train'].num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * EVAL_STEPS_RATIO),
-        eval_steps=int((data_qas_id['train'].num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * EVAL_STEPS_RATIO),
+        save_steps=int((tokenized_data_qas_id_train.num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * EVAL_STEPS_RATIO),
+        eval_steps=int((tokenized_data_qas_id_train.num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * EVAL_STEPS_RATIO),
         seed=SEED,
         hub_token=HUB_TOKEN,
         push_to_hub=True,
