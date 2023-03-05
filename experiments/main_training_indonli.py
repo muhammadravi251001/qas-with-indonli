@@ -181,20 +181,22 @@ if __name__ == "__main__":
     tokenized_data_indonli_train = Dataset.from_dict(tokenized_data_indonli["train"][:SAMPLE])
     tokenized_data_indonli_validation = Dataset.from_dict(tokenized_data_indonli["validation"][:SAMPLE])
 
-    # # Tahapan fine-tune IndoNLI diatas IndoBERT
-    # ## Fungsi utilitas untuk komputasi metrik
-    def compute_metrics(eval_pred):
-        predictions, labels = eval_pred
-        predictions = np.argmax(predictions, axis=1)
-        return accuracy.compute(
-            predictions=predictions, references=labels)
-
     # ## Dictionary untuk mapping label
     id2label = {0: 'entailment', 1: 'neutral', 
                 2: 'contradiction'}
     label2id = {'entailment': 0, 'neutral': 
                 1, 'contradiction': 2}
+    
     accuracy = evaluate.load('accuracy')
+
+    # # Tahapan fine-tune IndoNLI diatas IndoBERT
+    # ## Fungsi utilitas untuk komputasi metrik
+    def compute_metrics(eval_pred):
+        predictions = eval_pred.predictions
+        labels = eval_pred.label_ids
+        predictions = np.argmax(predictions, axis=1)
+        return accuracy.compute(
+            predictions=predictions, references=labels)
 
     # ## Gunakan model Sequence Classification yang sudah pre-trained
     model_sc = BertForSequenceClassification.from_pretrained(
@@ -285,16 +287,9 @@ if __name__ == "__main__":
     with open(f'{OUTPUT_DIR}/output.txt', "w") as f:
         f.write(str(predict_result))
         f.close()
-
-    # # Melakukan evaluasi dari prediksi
-    def compute_accuracy(eval_pred):
-        predictions = eval_pred.predictions
-        labels = eval_pred.label_ids
-        predictions = np.argmax(predictions, axis=1)
-        return accuracy.compute(
-            predictions=predictions, references=labels)
     
-    metric_result = compute_accuracy(predict_result)
+    # # Melakukan evaluasi dari prediksi
+    metric_result = compute_metrics(predict_result)
     os.makedirs(os.path.dirname(METRIC_RESULT_DIR), exist_ok=True)
     with open(f'{METRIC_RESULT_DIR}/metric_result.txt', "w") as f:
         f.write(str(metric_result))
