@@ -406,8 +406,10 @@ if __name__ == "__main__":
             start_gold_idx = label_array[0][i]
             end_gold_idx = label_array[1][i] + 1
 
-            pred_text = tokenized_data_qas_id_validation[i]['context'][start_pred_idx: end_pred_idx]
-            gold_text = tokenized_data_qas_id_validation[i]['context'][start_gold_idx: end_gold_idx]
+            pred_text = tokenizer.decode(tokenized_data_qas_id_validation[i]['input_ids']
+                                        [start_pred_idx: end_pred_idx])
+            gold_text = tokenizer.decode(tokenized_data_qas_id_validation[i]['input_ids']
+                                        [start_gold_idx: end_gold_idx])
 
             if pred_text == gold_text:
                 total_correct += 1
