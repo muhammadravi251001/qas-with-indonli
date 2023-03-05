@@ -6,7 +6,7 @@ parser.add_argument('-m', '--model_name', type=str, metavar='', required=True, h
 parser.add_argument('-d', '--data_name', type=str, metavar='', required=True, help="Nama dataset Anda; String; choice=[squadid, idkmrc, tydiqaid]")
 parser.add_argument('-e', '--epoch', type=int, metavar='', required=True, help="Jumlah epoch Anda; Integer; choice=[all integer]")
 parser.add_argument('-sa', '--sample', type=str, metavar='', required=True, help="Jumlah sampling data Anda; Integer; choice=[max, all integer]")
-parser.add_argument('-l', '--learn_rate', type=float, metavar='', required=False, help="Jumlah learning rate Anda; Float; choice=[all float]; default=1e-5", default=1e-5)
+parser.add_argument('-l', '--learn_rate', type=str, metavar='', required=False, help="Jumlah learning rate Anda; Float; choice=[all float]; default=1e-5", default=1e-5)
 parser.add_argument('-se', '--seed', type=int, metavar='', required=False, help="Jumlah seed Anda; Integer; choice=[all integer]; default=42", default=42)
 parser.add_argument('-bs', '--batch_size', type=int, metavar='', required=False, help="Jumlah batch-size Anda; Integer; choice=[all integer]; default=16", default=16)
 parser.add_argument('-t', '--token', type=str, metavar='', required=False, help="Token Hugging Face Anda; String; choice=[all string token]; default=(TOKEN_HF_muhammadravi251001)", default="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")
@@ -446,12 +446,13 @@ if __name__ == "__main__":
     else:
         NAME = f'{NAME}-without-freeze'
     
+    NAME = f'{NAME}-LR-{LEARNING_RATE}'
+    
     QA = f'./results/{NAME}-{TIME_NOW}'
     CHECKPOINT_DIR = f'{QA}/checkpoint/'
     MODEL_DIR = f'{QA}/model/'
     OUTPUT_DIR = f'{QA}/output/'
     ACCURACY_DIR = f'{QA}/accuracy/'
-
     REPO_NAME = f'fine-tuned-{NAME}'[:96]
 
     training_args_qa = TrainingArguments(
