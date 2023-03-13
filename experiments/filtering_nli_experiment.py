@@ -103,6 +103,7 @@ if __name__ == "__main__":
     from nusacrowd import NusantaraConfigHelper
     from datetime import datetime
     from tqdm import tqdm
+    import torch.nn as nn
 
     from datasets import (
         load_dataset, 
@@ -332,8 +333,9 @@ if __name__ == "__main__":
     # # Tahapan fine-tune dataset QAS diatas model
     # ## Gunakan model Sequence Classification yang sudah pre-trained
     model_qa = BertForQuestionAnswering.from_pretrained(MODEL_NAME)
-    model_qa.qa_outputs.out_features = 2
-    
+    # model_qa.qa_outputs.out_features = 2
+    model_qa.qa_outputs = nn.Linear(model_qa.qa_outputs.in_features, 2)
+
     model_qa = model_qa.to(device)
     
     # ## Melakukan pengumpulan data dengan padding
