@@ -112,11 +112,9 @@ if __name__ == "__main__":
         DataCollatorWithPadding,
         TrainingArguments,
         Trainer,
-        BertForSequenceClassification,
-        BertForQuestionAnswering,
         AutoTokenizer,
         EarlyStoppingCallback, 
-        IntervalStrategy
+        AutoModel
     )
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -331,7 +329,7 @@ if __name__ == "__main__":
 
     # # Tahapan fine-tune dataset QAS diatas model
     # ## Gunakan model Sequence Classification yang sudah pre-trained
-    model_qa = BertForQuestionAnswering.from_pretrained(MODEL_NAME)
+    model_qa = AutoModel.from_pretrained(MODEL_NAME)
     model_qa = model_qa.to(device)
 
     if MODEL_SC_NAME != None:
@@ -342,7 +340,7 @@ if __name__ == "__main__":
                     1, 'contradiction': 2}
         accuracy = evaluate.load('accuracy')
 
-        model_sc = BertForSequenceClassification.from_pretrained(
+        model_sc = AutoModel.from_pretrained(
             MODEL_SC_NAME, num_labels=3, 
             id2label=id2label, label2id=label2id)
         
