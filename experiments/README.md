@@ -94,6 +94,36 @@ python main_fine_tuning_qas_dataset.py -m xlmr -d tydiqaid -e 16 -sa max -wi Tru
 
 With use of `-msc {YOUR_MODEL_CHOICE}` flag, that means you doing Intermediate Task Transfer Learning (ITTL). It's like you do fine-tuning twice, first with the Sequence Classification task with IndoNLI dataset and the second with the Question Answering task with the QAS dataset that you have chosen yourself. You can not choose your intermediate task model freely without having to match the `{MODEL_NAME}` of Question Answering task that you previously chose. You must have the same `{MODEL_NAME}` as the Question Answering task, however, we recommend the models with the best results on the Hugging Face [@afaji](https://huggingface.co/afaji) account.
 
+## Running experiments for filtering QAS based on NLI
+
+Please, check the arguments that can be passed to this code; the datatype, arguments choice, and default value.
+```
+python main_training_indonli.py -h
+```
+
+To run this filtering QAS based on NLI experiments, you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token, --batch_size} if you don't want using the default value provided:
+```
+python filtering_nli_experiment.py -m indolem -d basic -e 10 -sa max
+python filtering_nli_experiment.py -m indolem -d translated -e 10 -sa max
+python filtering_nli_experiment.py -m indolem -d augmented -e 10 -sa max
+
+python filtering_nli_experiment.py -m indonlu -d basic -e 10 -sa max
+python filtering_nli_experiment.py -m indonlu -d translated -e 10 -sa max
+python filtering_nli_experiment.py -m indonlu -d augmented -e 10 -sa max
+
+python filtering_nli_experiment.py -m xlmr -d basic -e 10 -sa max
+python filtering_nli_experiment.py -m xlmr -d translated -e 10 -sa max
+python filtering_nli_experiment.py -m xlmr -d augmented -e 10 -sa max
+```
+
+However, you can try some of these flags for your experiments, namely: `-tq`, `-ts`, and `-msi`. 
+
+`-tq` stands for `TYPE_QAS`, in this flag, you can experimenting how should your QAS system filtering based on NLI, whether you choose `entailment only` or `entailment or neutral`. 
+
+`-ts` stands for `TYPE_SMOOTHING`, in this flag, you can experimenting how should your smoothing system, to get your hypothesis as natural as possible from your answer and question from your QAS dataset, you can choose: `replace first, replace question mark, add adalah, just concat answer and question, rule based, machine generation`. 
+
+`-msi` stands for `MAXIMUM_SEARCH_ITER`, in this flag, you can experimenting how much your QAS system search for entailment label (or neutral label, it depends on your choice in `TYPE_QAS`) from your QAS dataset, you can choose any integer to fill in this flag.
+
 ## Location of predictions
 
 The predictions will be stored in `python\results\{NAME}-{TIME_NOW}`. And then this code automatically push Trainer to `{USER_that_passed_by_TOKEN}/fine-tuned-{NAME}`.
