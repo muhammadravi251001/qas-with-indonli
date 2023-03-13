@@ -870,6 +870,8 @@ if __name__ == "__main__":
         diff_verbose_metric(prec_before, prec_after, "Precision")
         diff_verbose_metric(rec_before, rec_after, "Recall")
 
+    compare_metrics(metric_result_before_filtering, metric_result_after_filtering)
+
     os.makedirs(os.path.dirname(METRIC_RESULT_DIR), exist_ok=True)
     with open(f'{METRIC_RESULT_DIR}/metric_comparison_results.txt', "w") as f, contextlib.redirect_stdout(f):
         compare_metrics(metric_result_before_filtering, metric_result_after_filtering)
