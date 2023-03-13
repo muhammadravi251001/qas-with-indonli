@@ -6,7 +6,7 @@ This is a repository code accompanying my final thesis and soon-to-be paper `TOD
 
 - `main_training_indonli.py`: this file contains experiment regarding to Question Answering task with use two kind of experiments; without Intermediate Task Transfer Learning and with Intermediate Task Transfer Learning. You can read further by reading the `README.md` in `experiments` folder.
 
-- And so on, :grin::grin::grin:
+- `filtering_nli_experiment.py`: this file contains experiment regarding to filtering QAS system based on NLI with use three kind of experiments; QAS filtering system, smoothing type, and maximum search iteration. You can read further by reading the `README.md` in `experiments` folder.
 
 The experiment code can be found under `experiment` directory, please check the related [README](https://github.com/muhammadravi251001/qas-with-indonli/blob/main/experiments/README.md) file.
 
