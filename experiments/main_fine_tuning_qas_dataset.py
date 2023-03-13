@@ -265,6 +265,7 @@ if __name__ == "__main__":
             max_length = MAX_LENGTH,
             stride=STRIDE,
             return_overflowing_tokens=True,
+            return_token_type_ids=True,
             return_offsets_mapping=True,
             padding="max_length",
             return_tensors='np'
