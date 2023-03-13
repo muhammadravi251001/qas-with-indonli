@@ -63,6 +63,7 @@ if __name__ == "__main__":
 
     # ## Mendefinisikan hyperparameter
     MODEL_NAME = MODEL_NAME
+    MODEL_SC_NAME = MODEL_SC_NAME
     EPOCH = EPOCH
     SAMPLE = SAMPLE
     LEARNING_RATE = LEARNING_RATE
@@ -71,6 +72,7 @@ if __name__ == "__main__":
     BATCH_SIZE = BATCH_SIZE
     MAXIMUM_SEARCH_ITER =  MAXIMUM_SEARCH_ITER
     
+    MODEL_TG_NAME = "Wikidepia/IndoT5-base-paraphrase"
     GRADIENT_ACCUMULATION = 4
     MAX_LENGTH = 400
     STRIDE = 100
@@ -98,12 +100,9 @@ if __name__ == "__main__":
     import pandas as pd
 
     from multiprocessing import cpu_count
-    from evaluate import load
     from nusacrowd import NusantaraConfigHelper
     from datetime import datetime
-    from huggingface_hub import notebook_login
     from tqdm import tqdm
-    from transformers import pipeline
 
     from datasets import (
         load_dataset, 
@@ -114,11 +113,10 @@ if __name__ == "__main__":
         DataCollatorWithPadding,
         TrainingArguments,
         Trainer,
-        BertForSequenceClassification,
         BertForQuestionAnswering,
         AutoTokenizer,
         EarlyStoppingCallback, 
-        IntervalStrategy
+        pipeline
     )
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -502,6 +500,9 @@ if __name__ == "__main__":
 
     nlp_sc = pipeline(task="text-classification", model=MODEL_SC_NAME, tokenizer=MODEL_SC_NAME, 
                     device=torch.cuda.current_device(), **tokenizer_kwargs)
+
+    nlp_tg = pipeline(task="text2text-generation", model=MODEL_TG_NAME, tokenizer=MODEL_TG_NAME, 
+                  device=torch.cuda.current_device())
     
     # # Membuat kode untuk smoothing answer dan question agar menjadi hipotesis yang natural
     def smoothing(question, pred_answer, gold_answer, type, question_mark=question_mark):
@@ -623,7 +624,10 @@ if __name__ == "__main__":
                     gold_hypothesis = question.replace('?', '')
                     gold_hypothesis = f"{gold_hypothesis.lstrip()} adalah {gold_answer}"
 
-        elif type == 'machine generation': pass # TODO
+        elif type == 'machine generation':
+            pred_hypothesis, gold_hypothesis = smoothing(question, pred_answer, gold_answer, type="rule based")
+            pred_hypothesis = nlp_tg(pred_hypothesis)[0]['generated_text']
+            gold_hypothesis = nlp_tg(gold_hypothesis)[0]['generated_text']
         
         return pred_hypothesis, gold_hypothesis
     
