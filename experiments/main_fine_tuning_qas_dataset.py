@@ -25,7 +25,7 @@ if __name__ == "__main__":
         elif (args.model_name) == "indonlu":
             MODEL_NAME = "indobenchmark/indobert-large-p2"
         elif (args.model_name) == "xlmr":
-            MODEL_NAME = "xlm-roberta-base"
+            MODEL_NAME = "xlm-roberta-large"
     else: MODEL_NAME = str(args.model_name)
     
     if (args.data_name) == "squadid":
