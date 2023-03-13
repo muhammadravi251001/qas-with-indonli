@@ -108,6 +108,7 @@ if __name__ == "__main__":
     DataCollatorWithPadding,
     TrainingArguments,
     Trainer,
+    BertForSequenceClassification,
     AutoTokenizer,
     EarlyStoppingCallback, 
     AutoModel
@@ -198,7 +199,7 @@ if __name__ == "__main__":
             predictions=predictions, references=labels)
 
     # ## Gunakan model Sequence Classification yang sudah pre-trained
-    model_sc = AutoModel.from_pretrained(
+    model_sc = BertForSequenceClassification.from_pretrained(
         MODEL_NAME, num_labels=3, 
         id2label=id2label, label2id=label2id)
 
