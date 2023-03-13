@@ -45,7 +45,6 @@ if __name__ == "__main__":
     SEED = int(args.seed)
     HUB_TOKEN = str(args.token)
     BATCH_SIZE = int(args.batch_size)
-    FREEZE = bool(args.freeze)
     MAXIMUM_SEARCH_ITER = int(args.maximum_search_iter)
     TYPE_QAS = str(args.type_qas)
     TYPE_SMOOTHING = str(args.type_smoothing)
@@ -60,7 +59,7 @@ if __name__ == "__main__":
     else: MODEL_SC_NAME = str(args.model_name)
 
     print("Program fine-tuning dataset QA mulai...")
-    print(f"Mulai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, freeze: {FREEZE}, model_sc: {MODEL_SC_NAME}, tq:{TYPE_QAS}, ts:{TYPE_SMOOTHING}, msi: {MAXIMUM_SEARCH_ITER}, dan token: {HUB_TOKEN}")
+    print(f"Mulai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, model_sc: {MODEL_SC_NAME}, tq: {TYPE_QAS}, ts: {TYPE_SMOOTHING}, msi: {MAXIMUM_SEARCH_ITER}, dan token: {HUB_TOKEN}")
 
     # ## Mendefinisikan hyperparameter
     MODEL_NAME = MODEL_NAME
@@ -425,7 +424,7 @@ if __name__ == "__main__":
     MODEL_DIR = f'{QA}/model/'
     OUTPUT_DIR = f'{QA}/output/'
     METRIC_RESULT_DIR = f'{QA}/metric-result/'
-    REPO_NAME = f'fine-tuned-{NAME}'[:96]
+    #REPO_NAME = f'fine-tuned-{NAME}'[:96]
 
     training_args_qa = TrainingArguments(
         
@@ -457,9 +456,9 @@ if __name__ == "__main__":
         save_steps=int((tokenized_data_qas_id_train.num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * EVAL_STEPS_RATIO),
         eval_steps=int((tokenized_data_qas_id_train.num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * EVAL_STEPS_RATIO),
         seed=SEED,
-        hub_token=HUB_TOKEN,
-        push_to_hub=True,
-        hub_model_id=REPO_NAME,
+        #hub_token=HUB_TOKEN,
+        #push_to_hub=True,
+        #hub_model_id=REPO_NAME,
         load_best_model_at_end=True,
         metric_for_best_model='f1',
     )
@@ -477,6 +476,9 @@ if __name__ == "__main__":
     )
 
     trainer_qa.train()
+
+    # ## Simpan model
+    trainer_qa.save_model(MODEL_DIR)
 
     # # Melakukan prediksi dari model
     predict_result = trainer_qa.predict(tokenized_data_qas_id_validation)
@@ -519,6 +521,12 @@ if __name__ == "__main__":
 
                     gold_hypothesis = question.replace('?', '')
                     gold_hypothesis = gold_hypothesis.replace(i, gold_answer)
+                else:
+                    pred_hypothesis = question.replace('?', '')
+                    pred_hypothesis = f"{pred_hypothesis.lstrip()} adalah {pred_answer}"
+
+                    gold_hypothesis = question.replace('?', '')
+                    gold_hypothesis = f"{gold_hypothesis.lstrip()} adalah {gold_answer}"
         
         elif type == 'add adalah':
             pred_hypothesis = question.replace('?', '')
@@ -608,7 +616,13 @@ if __name__ == "__main__":
                         gold_hypothesis = question.replace('?', '')
                         gold_hypothesis = gold_hypothesis.replace(j, '').lstrip()
                         gold_hypothesis = f"{gold_hypothesis} adalah {gold_answer}"
-                        
+                else:
+                    pred_hypothesis = question.replace('?', '')
+                    pred_hypothesis = f"{pred_hypothesis.lstrip()} adalah {pred_answer}"
+
+                    gold_hypothesis = question.replace('?', '')
+                    gold_hypothesis = f"{gold_hypothesis.lstrip()} adalah {gold_answer}"
+
         elif type == 'machine generation': pass # TODO
         
         return pred_hypothesis, gold_hypothesis
@@ -869,6 +883,7 @@ if __name__ == "__main__":
         diff_verbose_metric(f1_before, f1_after, "F1")
         diff_verbose_metric(prec_before, prec_after, "Precision")
         diff_verbose_metric(rec_before, rec_after, "Recall")
+        print()
 
     compare_metrics(metric_result_before_filtering, metric_result_after_filtering)
 
@@ -877,5 +892,5 @@ if __name__ == "__main__":
         compare_metrics(metric_result_before_filtering, metric_result_after_filtering)
         f.close()
 
-    print(f"Selesai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, freeze: {FREEZE}, model_sc: {MODEL_SC_NAME}, tq:{TYPE_QAS}, ts:{TYPE_SMOOTHING}, msi: {MAXIMUM_SEARCH_ITER}, dan token: {HUB_TOKEN}")
+    print(f"Selesai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, model_sc: {MODEL_SC_NAME}, tq: {TYPE_QAS}, ts: {TYPE_SMOOTHING}, msi: {MAXIMUM_SEARCH_ITER}, dan token: {HUB_TOKEN}")
     print("Program fine-tuning dataset QA selesai!")
