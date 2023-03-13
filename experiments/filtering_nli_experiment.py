@@ -842,11 +842,14 @@ if __name__ == "__main__":
         return number
 
     def diff_verbose_metric(metric_result_before, metric_result_after, metric):
+
+        if metric_result_before == 0.0 and metric_result_after != 0.0:
+            print(f"Hasil metrik {metric} setelah filtering NLI mengalami KENAIKAN menjadi: {metric_result_after} dari sebelum filtering NLI yang bernilai: {metric_result_before}")
         
         percentage = round(((metric_result_after - metric_result_before) / metric_result_before) * 100, 2)
         
         if metric_result_before ==  metric_result_after:
-            print(f"Hasil metrik {metric} sebelum filtering NLI SAMA DENGAN metrik setelah filtering NLI")
+            print(f"Hasil metrik {metric} setelah filtering NLI SAMA DENGAN metrik sebelum filtering NLI")
         elif metric_result_before <  metric_result_after:
             print(f"Hasil metrik {metric} setelah filtering NLI mengalami KENAIKAN sebesar: {percentage} %")
         elif metric_result_before >  metric_result_after:
