@@ -332,6 +332,8 @@ if __name__ == "__main__":
     # # Tahapan fine-tune dataset QAS diatas model
     # ## Gunakan model Sequence Classification yang sudah pre-trained
     model_qa = BertForQuestionAnswering.from_pretrained(MODEL_NAME)
+    model_qa.qa_outputs.out_features = 2
+    
     model_qa = model_qa.to(device)
 
     if MODEL_SC_NAME != None:
