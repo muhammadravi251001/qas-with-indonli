@@ -103,17 +103,17 @@ python main_training_indonli.py -h
 
 To run this filtering QAS based on NLI experiments, you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token, --batch_size} if you don't want using the default value provided:
 ```
-python filtering_nli_experiment.py -m indolem -d basic -e 10 -sa max
-python filtering_nli_experiment.py -m indolem -d translated -e 10 -sa max
-python filtering_nli_experiment.py -m indolem -d augmented -e 10 -sa max
+python filtering_nli_experiment.py -m indolem -d squadid -e 10 -sa max
+python filtering_nli_experiment.py -m indolem -d idkmrc -e 10 -sa max
+python filtering_nli_experiment.py -m indolem -d tydiqaid -e 10 -sa max
 
-python filtering_nli_experiment.py -m indonlu -d basic -e 10 -sa max
-python filtering_nli_experiment.py -m indonlu -d translated -e 10 -sa max
-python filtering_nli_experiment.py -m indonlu -d augmented -e 10 -sa max
+python filtering_nli_experiment.py -m indonlu -d squadid -e 10 -sa max
+python filtering_nli_experiment.py -m indonlu -d idkmrc -e 10 -sa max
+python filtering_nli_experiment.py -m indonlu -d tydiqaid -e 10 -sa max
 
-python filtering_nli_experiment.py -m xlmr -d basic -e 10 -sa max
-python filtering_nli_experiment.py -m xlmr -d translated -e 10 -sa max
-python filtering_nli_experiment.py -m xlmr -d augmented -e 10 -sa max
+python filtering_nli_experiment.py -m xlmr -d squadid -e 10 -sa max
+python filtering_nli_experiment.py -m xlmr -d idkmrc -e 10 -sa max
+python filtering_nli_experiment.py -m xlmr -d tydiqaid -e 10 -sa max
 ```
 
 However, you can try some of these flags for your experiments, namely: `-tq`, `-ts`, and `-msi`. 
