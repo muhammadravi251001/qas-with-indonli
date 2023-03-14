@@ -333,7 +333,6 @@ if __name__ == "__main__":
     # # Tahapan fine-tune dataset QAS diatas model
     # ## Gunakan model Sequence Classification yang sudah pre-trained
     model_qa = BertForQuestionAnswering.from_pretrained(MODEL_NAME)
-    # model_qa.qa_outputs.out_features = 2
     
     desired_out_features = 2
     model_qa.qa_outputs = nn.Linear(model_qa.qa_outputs.in_features, desired_out_features)
@@ -481,6 +480,12 @@ if __name__ == "__main__":
     )
 
     trainer_qa.train()
+
+    # Bila akun HF Pak Aji sudah selesai semua training model baseline, un-comment kode ini
+    # Untuk IndoLEM: MODEL_NAME = afaji/fine-tuned-DatasetQAS-IDK-MRC-with-indobert-base-uncased-without-ITTL-without-freeze-LR-1e-05
+    # Untuk IndoNLU: MODEL_NAME = null
+    # Untuk XLMR: MODEL_NAME = null
+    # trainer_qa = Trainer(model=model_qa, args=training_args_qa, tokenizer=tokenizer)
 
     # ## Simpan model
     trainer_qa.save_model(MODEL_DIR)
