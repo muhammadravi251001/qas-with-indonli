@@ -686,8 +686,6 @@ if __name__ == "__main__":
                 # Bila token_type_ids-nya 1, maka itu context (sesuai dengan urutan tokenisasi)
                 else:
                     context.append(tokenized_data_qas_id_validation[i]['input_ids'][j])
-                
-            # Bagian untuk Smoothing (On-Progress, sudah dikerjakan diatas, belum "ditempel" kesini)
             
             question_decoded = tokenizer.decode(question, skip_special_tokens=True)
             context_decoded = tokenizer.decode(context, skip_special_tokens=True)
