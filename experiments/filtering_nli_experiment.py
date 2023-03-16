@@ -13,7 +13,7 @@ parser.add_argument('-bs', '--batch_size', type=int, metavar='', required=False,
 parser.add_argument('-t', '--token', type=str, metavar='', required=False, help="Token Hugging Face Anda; String; choice=[all string token]; default=(TOKEN_HF_muhammadravi251001)", default="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")
 parser.add_argument('-msi', '--maximum_search_iter', type=int, metavar='', required=False, help="Jumlah maximum search iter Anda; Integer; choice=[all integer]; default=2", default=2)
 parser.add_argument('-tq', '--type_qas', type=str, metavar='', required=False, help="Tipe filtering QAS Anda; String; choice=[entailment only, entailment or neutral]; default=entailment or neutral", default="entailment or neutral")
-parser.add_argument('-ts', '--type_smoothing', type=str, metavar='', required=False, help="Tipe smoothing hypothesis Anda; String; choice=[replace first, replace question mark, add adalah, just concat answer and question, rule based, machine generation]; default=rule based", default="rule based")
+parser.add_argument('-ts', '--type_smoothing', type=str, metavar='', required=False, help="Tipe smoothing hypothesis Anda; String; choice=[replace first, replace question mark, add adalah, just concat answer and question, rule based, machine generation with rule based, pure machine generation]; default=rule based", default="rule based")
 args = parser.parse_args()
 
 if __name__ == "__main__":
@@ -624,8 +624,15 @@ if __name__ == "__main__":
                     gold_hypothesis = question.replace('?', '')
                     gold_hypothesis = f"{gold_hypothesis.lstrip()} adalah {gold_answer}"
 
-        elif type == 'machine generation':
+        elif type == 'machine generation with rule based':
             pred_hypothesis, gold_hypothesis = smoothing(question, pred_answer, gold_answer, type="rule based")
+            pred_hypothesis = nlp_tg(pred_hypothesis)[0]['generated_text']
+            gold_hypothesis = nlp_tg(gold_hypothesis)[0]['generated_text']
+        
+        elif type == 'pure machine generation':
+            pred_hypothesis = f"{question} {pred_answer}"         
+            gold_hypothesis = f"{question} {gold_answer}"
+            
             pred_hypothesis = nlp_tg(pred_hypothesis)[0]['generated_text']
             gold_hypothesis = nlp_tg(gold_hypothesis)[0]['generated_text']
         
