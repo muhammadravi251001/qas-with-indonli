@@ -98,6 +98,7 @@ if __name__ == "__main__":
     from evaluate import load
     from datetime import datetime
     from huggingface_hub import notebook_login
+    from tqdm import tqdm
 
     from datasets import (
     load_dataset,
@@ -280,13 +281,61 @@ if __name__ == "__main__":
     # ## Simpan model Sequence Classification
     trainer_sc.save_model(MODEL_DIR)
 
+    # ## Method untuk melihat isi PredictionOutput
+    def represent_prediction_output(predict_result):
+        predictions_idx = np.argmax(predict_result.predictions, axis=1)
+        label_array = np.asarray(predict_result.label_ids)
+        
+        premise_array = []
+        hypothesis_array = []
+        
+        pred_label_array = []
+        gold_label_array = []
+        
+        for i in tqdm(range(len(predict_result.predictions))):
+            
+            premise = []
+            hypothesis = []
+            
+            for j in range(len(tokenized_data_indonli_validation[i]['token_type_ids'])):
 
+                if tokenized_data_indonli_validation[i]['token_type_ids'][j] == 0:
+                    premise.append(tokenized_data_indonli_validation[i]['input_ids'][j])
+
+                else:
+                    hypothesis.append(tokenized_data_indonli_validation[i]['input_ids'][j])
+            
+            premise_decoded = tokenizer.decode(premise, skip_special_tokens=True)
+            hypothesis_decoded = tokenizer.decode(hypothesis, skip_special_tokens=True)
+
+            premise_array.append(premise_decoded)
+            hypothesis_array.append(hypothesis_decoded)
+            
+            pred_label_array.append(predictions_idx[i])
+            gold_label_array.append(label_array[i])
+            
+        id2label = {0: 'entailment', 1: 'neutral', 2: 'contradiction'}
+        
+        nli_df = pd.DataFrame({'Premise': premise_array, 
+                                'Hypothesis': hypothesis_array,
+                            'Prediction Label': pred_label_array,
+                            'Gold Label': gold_label_array
+                                })
+        
+        nli_df["Prediction Label"] = nli_df["Prediction Label"].map(id2label)
+        nli_df["Gold Label"] = nli_df["Gold Label"].map(id2label)
+        
+        return nli_df
+    
     # # Melakukan prediksi dari model
     predict_result = trainer_sc.predict(tokenized_data_indonli_validation)
     os.makedirs(os.path.dirname(OUTPUT_DIR), exist_ok=True)
     with open(f'{OUTPUT_DIR}/output.txt', "w") as f:
         f.write(str(predict_result))
         f.close()
+
+    nli_df = represent_prediction_output(predict_result)
+    nli_df.to_csv(f'{OUTPUT_DIR}/output_df.csv')
     
     # # Melakukan evaluasi dari prediksi
     metric_result = compute_metrics(predict_result)

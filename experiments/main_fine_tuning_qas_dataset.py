@@ -526,9 +526,6 @@ if __name__ == "__main__":
 
         pred_answer_array = []
         gold_answer_array = []
-
-        pred_hypothesis_array = []
-        gold_hypothesis_array = []
         
         for i in tqdm(range(len(predict_result.predictions[0]))):
 

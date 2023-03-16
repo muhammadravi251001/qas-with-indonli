@@ -478,12 +478,69 @@ if __name__ == "__main__":
     # ## Simpan model
     trainer_qa.save_model(MODEL_DIR)
 
+    # ## Method untuk melihat isi PredictionOutput
+    def represent_prediction_output(predict_result):
+        predictions_idx = np.argmax(predict_result.predictions, axis=2)
+        label_array = np.asarray(predict_result.label_ids)
+            
+        question_array = []
+        context_array = []
+
+        pred_answer_array = []
+        gold_answer_array = []
+        
+        for i in tqdm(range(len(predict_result.predictions[0]))):
+
+            start_pred_idx = predictions_idx[0][i]
+            end_pred_idx = predictions_idx[1][i] + 1
+
+            start_gold_idx = label_array[0][i]
+            end_gold_idx = label_array[1][i] + 1
+
+            pred_answer = tokenizer.decode(tokenized_data_qas_id_validation[i]['input_ids']
+                                        [start_pred_idx: end_pred_idx], skip_special_tokens=True)
+
+            gold_answer = tokenizer.decode(tokenized_data_qas_id_validation[i]['input_ids']
+                                        [start_gold_idx: end_gold_idx], skip_special_tokens=True)
+
+            pred_answer_array.append(pred_answer)
+            gold_answer_array.append(gold_answer)
+            
+            question = []
+            context = []
+
+            for j in range(len(tokenized_data_qas_id_validation[i]['token_type_ids'])):
+
+                if tokenized_data_qas_id_validation[i]['token_type_ids'][j] == 0:
+                    question.append(tokenized_data_qas_id_validation[i]['input_ids'][j])
+
+                else:
+                    context.append(tokenized_data_qas_id_validation[i]['input_ids'][j])
+
+            question_decoded = tokenizer.decode(question, skip_special_tokens=True)
+            context_decoded = tokenizer.decode(context, skip_special_tokens=True)
+            
+            question_array.append(question_decoded)
+            context_array.append(context_decoded)
+            
+        qas_df = pd.DataFrame({'Context': context_array, 
+                                'Question': question_array, 
+                                'Prediction Answer': pred_answer_array,
+                                'Gold Answer': gold_answer_array})
+        
+        assert len(predict_result.predictions[0]) == len(qas_df), "Jumlah prediksi berbeda dengan jumlah evaluasi"
+        
+        return qas_df
+
     # # Melakukan prediksi dari model
     predict_result = trainer_qa.predict(tokenized_data_qas_id_validation)
     os.makedirs(os.path.dirname(OUTPUT_DIR), exist_ok=True)
     with open(f'{OUTPUT_DIR}/output.txt', "w") as f:
         f.write(str(predict_result))
         f.close()
+    
+    qas_df = represent_prediction_output(predict_result)
+    qas_df.to_csv(f'{OUTPUT_DIR}/output_df.csv')
     
     metric_result_before_filtering = compute_metrics(predict_result)
 
