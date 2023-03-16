@@ -20,9 +20,10 @@ if __name__ == "__main__":
 
     base_model = ["indolem", "indonlu", "xlmr"]
     
+    # Otak-atik dulu hasil HF dari Pak Aji untuk IndoNLU dan XLMR
     if (args.model_name) in base_model:
         if (args.model_name) == "indolem":
-            MODEL_NAME = "indolem/indobert-base-uncased"
+            MODEL_NAME = "afaji/fine-tuned-DatasetQAS-IDK-MRC-with-indobert-base-uncased-without-ITTL-without-freeze-LR-1e-05"
         elif (args.model_name) == "indonlu":
             MODEL_NAME = "indobenchmark/indobert-large-p2"
         elif (args.model_name) == "xlmr":
@@ -428,7 +429,7 @@ if __name__ == "__main__":
     MODEL_DIR = f'{QA}/model/'
     OUTPUT_DIR = f'{QA}/output/'
     METRIC_RESULT_DIR = f'{QA}/metric-result/'
-    #REPO_NAME = f'fine-tuned-{NAME}'[:96]
+    REPO_NAME = f'fine-tuned-{NAME}'[:96]
 
     training_args_qa = TrainingArguments(
         
@@ -471,21 +472,8 @@ if __name__ == "__main__":
     trainer_qa = Trainer(
         model=model_qa,
         args=training_args_qa,
-        train_dataset=tokenized_data_qas_id_train,
-        eval_dataset=tokenized_data_qas_id_validation,
         tokenizer=tokenizer,
-        data_collator=data_collator,
-        compute_metrics=compute_metrics,
-        callbacks = [EarlyStoppingCallback(early_stopping_patience=3)]
     )
-
-    trainer_qa.train()
-
-    # Bila akun HF Pak Aji sudah selesai semua training model baseline, un-comment kode ini
-    # Untuk IndoLEM: MODEL_NAME = afaji/fine-tuned-DatasetQAS-IDK-MRC-with-indobert-base-uncased-without-ITTL-without-freeze-LR-1e-05
-    # Untuk IndoNLU: MODEL_NAME = null
-    # Untuk XLMR: MODEL_NAME = null
-    # trainer_qa = Trainer(model=model_qa, args=training_args_qa, tokenizer=tokenizer)
 
     # ## Simpan model
     trainer_qa.save_model(MODEL_DIR)
