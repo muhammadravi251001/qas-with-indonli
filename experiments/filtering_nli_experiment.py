@@ -822,91 +822,217 @@ if __name__ == "__main__":
     filtering_result.to_csv(f'{OUTPUT_DIR}/output_df.csv')
 
     # # Membuat perhitungan metrik berdasarkan DataFrame, metrik yang digunakan sama persis dengan metrik sebelumnya (compute_metrics)
-    def compute_metrics_from_df(df):
+    def compute_metrics_from_df(df, type_qas):
     
         denominator = len(df)
         total_correct = 0
         f1_array = []
+        
+        true_positive_before_filtering = 0
+        false_positive_before_filtering = 0
+        false_negative_before_filtering = 0
+        true_negative_before_filtering = 0
+        
+        true_positive_after_filtering = 0
+        false_positive_after_filtering = 0
+        false_negative_after_filtering = 0
+        true_negative_after_filtering = 0
 
         for i in range(len(df)):
             
-            pred_text = df["Prediction Answer"][i]
+            pred_answer_before_filtering = df["Prediction Answer Before Filtering"][i]
+            pred_answer_after_filtering = df["Prediction Answer After Filtering"][i]
+            
+            pred_label_before_filtering = df["Label Before Filtering"][i]
+            pred_label_after_filtering = df["Label After Filtering"][i]
+            
             gold_text = df["Gold Answer"][i]
 
-            if pred_text == gold_text:
+            if pred_answer_after_filtering == gold_text:
                 total_correct += 1
 
-            f1 = compute_f1(pred=pred_text, gold=gold_text)
+            f1 = compute_f1(pred=pred_answer_after_filtering, gold=gold_text)
 
             f1_array.append(f1)
+            
+            # Terprediksi dengan label yang benar, dan hasil answernya benar -> True positive
+            # Terprediksi dengan label yang benar, padahal hasil answernya salah -> False positive
+            # Terprediksi dengan label yang salah, padahal hasil answernya benar -> False negative
+            # Terprediksi dengan label yang salah, dan hasil answernya salah -> True negative
+            
+            if type_qas == 'entailment only':
+            
+                if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering == 'entailment'):
+                    true_positive_after_filtering += 1
+                elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering == 'entailment'):
+                    false_positive_after_filtering += 1
+                elif (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering != 'entailment'):
+                    false_negative_after_filtering += 1
+                elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering != 'entailment'):
+                    true_negative_after_filtering += 1
+
+                if (pred_answer_before_filtering == gold_text) and (pred_label_before_filtering == 'entailment'):
+                    true_positive_before_filtering += 1
+                elif (pred_answer_before_filtering != gold_text) and (pred_label_before_filtering == 'entailment'):
+                    false_positive_before_filtering += 1
+                elif (pred_answer_before_filtering == gold_text) and (pred_label_before_filtering != 'entailment'):
+                    false_negative_before_filtering += 1
+                elif (pred_answer_before_filtering != gold_text) and (pred_label_before_filtering != 'entailment'):
+                    true_negative_before_filtering += 1
+            
+            elif type_qas == 'entailment or neutral':
+            
+                if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering == 'entailment' 
+                                                                or pred_label_after_filtering == 'neutral'):
+                    true_positive_after_filtering += 1
+                elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering == 'entailment' 
+                                                                    or pred_label_after_filtering == 'neutral'):
+                    false_positive_after_filtering += 1
+                elif (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering != 'entailment' 
+                                                                    and pred_label_after_filtering != 'neutral'):
+                    false_negative_after_filtering += 1
+                elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering != 'entailment' 
+                                                                    and pred_label_after_filtering != 'neutral'):
+                    true_negative_after_filtering += 1
+
+                if (pred_answer_before_filtering == gold_text) and (pred_label_before_filtering == 'entailment' 
+                                                                    or pred_label_after_filtering == 'neutral'):
+                    true_positive_before_filtering += 1
+                elif (pred_answer_before_filtering != gold_text) and (pred_label_before_filtering == 'entailment' 
+                                                                    or pred_label_after_filtering == 'neutral'):
+                    false_positive_before_filtering += 1
+                elif (pred_answer_before_filtering == gold_text) and (pred_label_before_filtering != 'entailment' 
+                                                                    and pred_label_after_filtering != 'neutral'):
+                    false_negative_before_filtering += 1
+                elif (pred_answer_before_filtering != gold_text) and (pred_label_before_filtering != 'entailment' 
+                                                                    and pred_label_after_filtering != 'neutral'):
+                    true_negative_before_filtering += 1
 
         exact_match = ((total_correct / denominator) * 100.0)
         final_f1 = np.mean(f1_array) * 100.0
+        after_filtering_metric_array = [true_positive_after_filtering, false_positive_after_filtering, 
+                            false_negative_after_filtering, true_negative_after_filtering]
+        before_filtering_metric_array = [true_positive_before_filtering, false_positive_before_filtering, 
+                            false_negative_before_filtering, true_negative_before_filtering]
 
-        return {'exact_match': exact_match, 'f1': final_f1}
+        return {'exact_match': exact_match, 'f1': final_f1}, after_filtering_metric_array, before_filtering_metric_array
     
-    metric_result_after_filtering = compute_metrics_from_df(filtering_result)
+    metric_result_after_filtering, after_filtering_metric_array, before_filtering_metric_array = compute_metrics_from_df(
+        filtering_result, type_qas=TYPE_QAS)
 
     # # Method-method helper untuk perhitungan metrik
     def convert_to_non_zero(number):
         if number == 0:
             number += sys.float_info.min
         return number
+    
+    def compute_f1_prec_rec_whole(metric_array):
+        accuracy = (metric_array[0] + metric_array[3]) / \
+            (metric_array[0] + metric_array[1] + 
+            metric_array[2] + metric_array[3])
+        
+        precision = (metric_array[0]) / (metric_array[0] + metric_array[1])
+        
+        recall = (metric_array[0]) / (metric_array[0] + metric_array[2])
+        
+        f1 = (2 * precision * recall) / (precision + recall)
+        
+        return accuracy, precision, recall, f1
 
     def diff_verbose_metric(metric_result_before, metric_result_after, metric):
-
-        if metric_result_before == 0.0 and metric_result_after != 0.0:
-            print(f"Hasil metrik {metric} setelah filtering NLI mengalami KENAIKAN menjadi: {metric_result_after} dari sebelum filtering NLI yang bernilai: {metric_result_before}")
-        
+    
         percentage = round(((metric_result_after - metric_result_before) / metric_result_before) * 100, 2)
         
-        if metric_result_before == metric_result_after:
-            print(f"Hasil metrik {metric} setelah filtering NLI SAMA DENGAN metrik sebelum filtering NLI")
-        elif metric_result_before < metric_result_after:
-            print(f"Hasil metrik {metric} setelah filtering NLI mengalami KENAIKAN sebesar: {percentage} %")
-        elif metric_result_before > metric_result_after:
-            print(f"Hasil metrik {metric} setelah filtering NLI mengalami PENURUNAN sebesar: {-1 * percentage} %")
+        if '&' in metric: vocab = "nilai"
+        else: vocab = "metrik"
+        
+        if metric_result_before ==  metric_result_after:
+            print(f"Hasil {vocab} {metric} sebelum filtering NLI SAMA DENGAN metrik setelah filtering NLI")
+        elif metric_result_before <  metric_result_after:
+            print(f"Hasil {vocab} {metric} setelah filtering NLI mengalami KENAIKAN sebesar: {percentage} %")
+        elif metric_result_before >  metric_result_after:
+            print(f"Hasil {vocab} {metric} setelah filtering NLI mengalami PENURUNAN sebesar: {-1 * percentage} %")
+        
+        return percentage
     
     # # Membandingkan metrik sebelum filtering NLI dan setelah filtering NLI
-    def compare_metrics(metrics_before, metrics_after):
+    def compare_metrics(metrics_before, metrics_after, 
+                    after_filtering_metric_array=after_filtering_metric_array, 
+                    before_filtering_metric_array=before_filtering_metric_array):
     
         em_before = metrics_before['exact_match']
         f1_before = metrics_before['f1']
-        prec_before = metrics_before['precision']
-        rec_before = metrics_before['recall']
-
+        
         print(f"Skor Exact Match sebelum filtering NLI: {em_before}")
         print(f"Skor F1 sebelum filtering NLI: {f1_before}")
-        print(f"Skor Precision sebelum filtering NLI: {prec_before}")
-        print(f"Skor Recall sebelum filtering NLI: {rec_before}")
         print()
-
+        
         em_after = metrics_after['exact_match']
         f1_after = metrics_after['f1']
-        prec_after = metrics_after['precision']
-        rec_after = metrics_after['recall']
-
+        
         print(f"Skor Exact Match setelah filtering NLI: {em_after}")
         print(f"Skor F1 setelah filtering NLI: {f1_after}")
-        print(f"Skor Precision setelah filtering NLI: {prec_after}")
-        print(f"Skor Recall setelah filtering NLI: {rec_after}")
         print()
-
+        
         em_before = convert_to_non_zero(em_before)
         f1_before = convert_to_non_zero(f1_before)
-        prec_before = convert_to_non_zero(prec_before)
-        rec_before = convert_to_non_zero(rec_before)
-
+        
         em_after = convert_to_non_zero(em_after)
         f1_after = convert_to_non_zero(f1_after)
-        prec_after = convert_to_non_zero(prec_after)
-        rec_after = convert_to_non_zero(rec_after)
-
+        
+        print(f"[BEFORE FILTERING] Jawaban benar & label NLI yang sesuai: {before_filtering_metric_array[0]}")
+        print(f"[BEFORE FILTERING] Jawaban TIDAK benar & label NLI yang sesuai: {before_filtering_metric_array[1]}")
+        print(f"[BEFORE FILTERING] Jawaban benar & label NLI yang TIDAK sesuai: {before_filtering_metric_array[2]}")
+        print(f"[BEFORE FILTERING] Jawaban TIDAK benar & label NLI yang TIDAK sesuai: {before_filtering_metric_array[3]}")
+        print()
+        
+        print(f"[AFTER FILTERING] Jawaban benar & label NLI yang sesuai: {after_filtering_metric_array[0]}")
+        print(f"[AFTER FILTERING] Jawaban TIDAK benar & label NLI yang sesuai: {after_filtering_metric_array[1]}")
+        print(f"[AFTER FILTERING] Jawaban benar & label NLI yang TIDAK sesuai: {after_filtering_metric_array[2]}")
+        print(f"[AFTER FILTERING] Jawaban TIDAK benar & label NLI yang TIDAK sesuai: {after_filtering_metric_array[3]}")
+        print()
+        
+        print("Metrik di atas, bisa direpresentasikan menjadi:")
+        
+        acc_before_whole, prec_before_whole, rec_before_whole, f1_before_whole = compute_f1_prec_rec_whole(
+            before_filtering_metric_array)
+        acc_after_whole, prec_after_whole, rec_after_whole, f1_after_whole = compute_f1_prec_rec_whole(
+            after_filtering_metric_array)
+        
+        print(f"[BEFORE FILTERING] Akurasi: {acc_before_whole}")
+        print(f"[BEFORE FILTERING] Precision: {prec_before_whole}")
+        print(f"[BEFORE FILTERING] Recall: {rec_before_whole}")
+        print(f"[BEFORE FILTERING] F1: {f1_before_whole}")
+        print()
+        
+        print(f"[AFTER FILTERING] Akurasi: {acc_after_whole}")
+        print(f"[AFTER FILTERING] Precision: {prec_after_whole}")
+        print(f"[AFTER FILTERING] Recall: {rec_after_whole}")
+        print(f"[AFTER FILTERING] F1: {f1_after_whole}")
+        print()
+        
         print("--- Persentase perubahan hasil metrik ---")
+        print("Metrik per token")
         diff_verbose_metric(em_before, em_after, "Exact Match")
         diff_verbose_metric(f1_before, f1_after, "F1")
-        diff_verbose_metric(prec_before, prec_after, "Precision")
-        diff_verbose_metric(rec_before, rec_after, "Recall")
+        print()
+        
+        print("Metrik keseluruhan token")
+        diff_verbose_metric(before_filtering_metric_array[0], after_filtering_metric_array[0], 
+                            "Jawaban benar & label NLI yang sesuai")
+        diff_verbose_metric(before_filtering_metric_array[1], after_filtering_metric_array[1], 
+                            "Jawaban TIDAK benar & label NLI yang sesuai")
+        diff_verbose_metric(before_filtering_metric_array[2], after_filtering_metric_array[2], 
+                            "Jawaban benar & label NLI yang TIDAK sesuai")
+        diff_verbose_metric(before_filtering_metric_array[3], after_filtering_metric_array[3], 
+                            "Jawaban TIDAK benar & label NLI yang TIDAK sesuai")
+        print()
+        
+        print("Metrik di atas, bisa direpresentasikan menjadi:")
+        diff_verbose_metric(acc_before_whole, acc_after_whole, "Akurasi")
+        diff_verbose_metric(prec_before_whole, prec_after_whole, "Precision")
+        diff_verbose_metric(rec_before_whole, rec_after_whole, "Recall")
+        diff_verbose_metric(f1_before_whole, f1_after_whole, "F1")
         print()
 
     compare_metrics(metric_result_before_filtering, metric_result_after_filtering)
