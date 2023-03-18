@@ -963,7 +963,7 @@ if __name__ == "__main__":
         em_before = metrics_before['exact_match']
         f1_before = metrics_before['f1']
         
-        print("Metrik per token")
+        print("~ METRIK PER TOKEN ~")
         print(f"Skor Exact Match sebelum filtering NLI: {em_before}")
         print(f"Skor F1 sebelum filtering NLI: {f1_before}")
         print()
@@ -981,7 +981,7 @@ if __name__ == "__main__":
         em_after = convert_to_non_zero(em_after)
         f1_after = convert_to_non_zero(f1_after)
         
-        print("Metrik dengan parameter NLI")
+        print("~ METRIK DENGAN PARAMETER NLI ~")
         print(f"[BEFORE FILTERING] Jawaban benar & label NLI yang sesuai: {before_filtering_metric_array[0]}")
         print(f"[BEFORE FILTERING] Jawaban TIDAK benar & label NLI yang sesuai: {before_filtering_metric_array[1]}")
         print(f"[BEFORE FILTERING] Jawaban benar & label NLI yang TIDAK sesuai: {before_filtering_metric_array[2]}")
@@ -1014,12 +1014,12 @@ if __name__ == "__main__":
         print()
         
         print("--- Persentase perubahan hasil metrik ---")
-        print("Metrik per token")
+        print("~ METRIK PER TOKEN ~")
         diff_verbose_metric(em_before, em_after, "Exact Match")
         diff_verbose_metric(f1_before, f1_after, "F1")
         print()
         
-        print("Metrik dengan parameter NLI")
+        print("~ METRIK DENGAN PARAMETER NLI ~")
         diff_verbose_metric(before_filtering_metric_array[0], after_filtering_metric_array[0], 
                             "Jawaban benar & label NLI yang sesuai")
         diff_verbose_metric(before_filtering_metric_array[1], after_filtering_metric_array[1], 
