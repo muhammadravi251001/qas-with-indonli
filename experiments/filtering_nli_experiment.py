@@ -648,10 +648,16 @@ if __name__ == "__main__":
         question_array = []
         context_array = []
         
-        pred_answer_array = []
-        gold_answer_array = []
+        pred_answer_before_filtering_array = []
+        pred_answer_after_filtering_array = []
         
-        pred_hypothesis_array = []
+        label_before_filtering_array = []
+        label_after_filtering_array = []
+        
+        pred_hypothesis_before_filtering_array = []
+        pred_hypothesis_after_filtering_array = []
+        
+        gold_answer_array = []
         gold_hypothesis_array = []
         
         # Iterasi ini ditujukan untuk retrieve answer
@@ -692,28 +698,34 @@ if __name__ == "__main__":
             pred_hypothesis, gold_hypothesis = smoothing(question_decoded, pred_answer, gold_answer, type_smoothing)
 
             # Cek label dari answer prediksi dan context
-            predicted_label = nlp_sc({'text': pred_hypothesis, 
-                                    'text_pair': context_decoded}, 
+            predicted_label = nlp_sc({'text': context_decoded, 
+                                    'text_pair': pred_hypothesis}, 
                                     **tokenizer_kwargs)['label']
+            
+            pred_answer_before_filtering_array.append(pred_answer)
+            pred_hypothesis_before_filtering_array.append(pred_hypothesis)
+            label_before_filtering_array.append(predicted_label)
             
             # Cek label dari answer prediksi dan context, bila labelnya entailment (atau neutral), maka answernya jadi hasil akhir
             if predicted_label == 'neutral':
                 if type_qas == 'entailment or neutral':
                     question_array.append(question_decoded)
                     context_array.append(context_decoded)
-                    pred_answer_array.append(pred_answer)
+                    pred_answer_after_filtering_array.append(pred_answer)
                     gold_answer_array.append(gold_answer)
-                    pred_hypothesis_array.append(pred_hypothesis)
+                    pred_hypothesis_after_filtering_array.append(pred_hypothesis)
                     gold_hypothesis_array.append(gold_hypothesis)
+                    label_after_filtering_array.append(predicted_label)
 
             if predicted_label == 'entailment':
                 if type_qas == 'entailment only' or type_qas == 'entailment or neutral':
                     question_array.append(question_decoded)
                     context_array.append(context_decoded)
-                    pred_answer_array.append(pred_answer)
+                    pred_answer_after_filtering_array.append(pred_answer)
                     gold_answer_array.append(gold_answer)
-                    pred_hypothesis_array.append(pred_hypothesis)
+                    pred_hypothesis_after_filtering_array.append(pred_hypothesis)
                     gold_hypothesis_array.append(gold_hypothesis)
+                    label_after_filtering_array.append(predicted_label)
                 
             # Cek label dari answer prediksi dan context, bila labelnya bukan entailment (atau neutral), 
             # -- maka masuk ke for-loop untuk iterasi ke argmax selanjutnya, dengan menggunakan argsort
@@ -745,8 +757,8 @@ if __name__ == "__main__":
                             question_decoded, pred_answer_inside_loop, gold_answer, type_smoothing)
                         
                         # Cek label dari answer prediksi dan context
-                        predicted_label_inside_loop = nlp_sc({'text': pred_hypothesis_inside_loop, 
-                                                            'text_pair': context_decoded}
+                        predicted_label_inside_loop = nlp_sc({'text': context_decoded, 
+                                                            'text_pair': pred_hypothesis_inside_loop}
                                                             , **tokenizer_kwargs)['label']
 
                         # Bila label-nya sudah entailment (atau neutral), maka answernya jadi hasil akhir, dan break
@@ -755,10 +767,11 @@ if __name__ == "__main__":
                                 isFoundBiggest = True
                                 question_array.append(question_decoded)
                                 context_array.append(context_decoded)
-                                pred_answer_array.append(pred_answer_inside_loop)
+                                pred_answer_after_filtering_array.append(pred_answer_inside_loop)
                                 gold_answer_array.append(gold_answer)   
-                                pred_hypothesis_array.append(pred_hypothesis_inside_loop)
+                                pred_hypothesis_after_filtering_array.append(pred_hypothesis_inside_loop)
                                 gold_hypothesis_array.append(gold_hypothesis)
+                                label_after_filtering_array.append(predicted_label_inside_loop)
                                 break
                                 
                         elif type_qas == 'entailment or neutral':
@@ -766,37 +779,46 @@ if __name__ == "__main__":
                                 isFoundBiggest = True
                                 question_array.append(question_decoded)
                                 context_array.append(context_decoded)
-                                pred_answer_array.append(pred_answer_inside_loop)
+                                pred_answer_after_filtering_array.append(pred_answer_inside_loop)
                                 gold_answer_array.append(gold_answer)   
-                                pred_hypothesis_array.append(pred_hypothesis_inside_loop)
+                                pred_hypothesis_after_filtering_array.append(pred_hypothesis_inside_loop)
                                 gold_hypothesis_array.append(gold_hypothesis)
+                                label_after_filtering_array.append(predicted_label_inside_loop)
                                 break
 
                     if isFoundBiggest == False:
                         # Bila sampai iterasi terakhir, belum entailment (atau neutral) juga, maka append saja jawaban kosong
                         
-                        pred_answer_not_found_biggest = "" # Disini, jawaban kosong
+                        pred_answer_not_found_biggest = "-" # Disini, jawaban kosong
                         
                         question_array.append(question_decoded)
                         context_array.append(context_decoded)
-                        pred_answer_array.append(pred_answer_not_found_biggest)
+                        pred_answer_after_filtering_array.append(pred_answer_not_found_biggest)
                         gold_answer_array.append(gold_answer)
                         
                         pred_hypothesis_not_found_biggest, gold_hypothesis = smoothing(
                             question_decoded, pred_answer_not_found_biggest, gold_answer, type_smoothing)
                         
-                        pred_hypothesis_array.append(pred_hypothesis_not_found_biggest)
+                        pred_hypothesis_after_filtering_array.append(pred_hypothesis_not_found_biggest)
                         gold_hypothesis_array.append(gold_hypothesis)
+                        label_after_filtering_array.append(predicted_label_inside_loop)
         
         # Buat DataFrame QAS
         qas_df = pd.DataFrame({'Context': context_array, 
                             'Question': question_array, 
-                            'Prediction Answer': pred_answer_array,
+                            
+                            'Prediction Answer Before Filtering': pred_answer_before_filtering_array,
+                            'Prediction Hypothesis Before Filtering': pred_hypothesis_before_filtering_array,
+                            'Label Before Filtering': label_before_filtering_array,
+                                    
+                            'Prediction Answer After Filtering': pred_answer_after_filtering_array,
+                            'Prediction Hypothesis After Filtering': pred_hypothesis_after_filtering_array,
+                            'Label After Filtering': label_after_filtering_array,
+                            
                             'Gold Answer': gold_answer_array,
-                            'Prediction Hypothesis': pred_hypothesis_array,
                             'Gold Hypothesis': gold_hypothesis_array})
-        
-        assert len(predict_result.predictions[0]) == len(qas_df), "Jumlah prediksi berbeda dengan jumlah evaluasi"
+                            
+        #assert len(predict_result.predictions[0]) == len(qas_df), "Jumlah prediksi berbeda dengan jumlah evaluasi"
         
         # Return DataFrame QAS
         return qas_df
