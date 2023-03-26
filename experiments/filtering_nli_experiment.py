@@ -1063,7 +1063,7 @@ if __name__ == "__main__":
         f.close()
 
     ## Breakdown evaluasi, melakukan evaluasi lebih dalam lagi
-    def breakdown_evaluation(df, MAXIMUM_SEARCH_ITER=MAXIMUM_SEARCH_ITER):
+    def breakdown_evaluation(df, TYPE_QAS, MAXIMUM_SEARCH_ITER=MAXIMUM_SEARCH_ITER):
     
         exist_true_answer_label_entailment = 0
         exist_true_answer_label_neutral = 0
@@ -1093,6 +1093,9 @@ if __name__ == "__main__":
                 exist_true_answer_label_entailment += 1
             elif (pred_answer_before_filtering == gold_text) and (pred_label_before_filtering == 'neutral') and (pred_answer_before_filtering != ""):
                 exist_true_answer_label_neutral += 1
+                if (TYPE_QAS == 'entailment only'):
+                    if (pred_answer_after_filtering != gold_text):
+                        filtered_in_right_answer_to_filtered_out_wrong_answer += 1
             elif (pred_answer_before_filtering == gold_text) and (pred_label_before_filtering == 'contradiction') and (pred_answer_before_filtering != ""):
                 exist_true_answer_label_contradiction += 1
                 if (pred_answer_after_filtering != gold_text):
@@ -1102,6 +1105,9 @@ if __name__ == "__main__":
                 exist_false_answer_label_entailment += 1
             elif (pred_answer_before_filtering != gold_text) and (pred_label_before_filtering == 'neutral') and (pred_answer_before_filtering != ""):
                 exist_false_answer_label_neutral += 1
+                if (TYPE_QAS == 'entailment only'):
+                    if (pred_answer_after_filtering == gold_text):
+                        filtered_out_wrong_answer_to_filtered_in_right_answer += 1
             elif (pred_answer_before_filtering != gold_text) and (pred_label_before_filtering == 'contradiction') and (pred_answer_before_filtering != ""):
                 exist_false_answer_label_contradiction += 1
                 if (pred_answer_after_filtering == gold_text):
@@ -1138,7 +1144,7 @@ if __name__ == "__main__":
                 exist_false_answer_label_entailment+exist_false_answer_label_neutral+exist_false_answer_label_contradiction+\
                 no_exist_true_answer+no_exist_false_answer
 
-    breakdown_evaluation(metric_result_before_filtering, metric_result_after_filtering)
+    breakdown_evaluation(metric_result_before_filtering, metric_result_after_filtering, TYPE_QAS=TYPE_QAS)
 
     os.makedirs(os.path.dirname(METRIC_RESULT_DIR), exist_ok=True)
     with open(f'{METRIC_RESULT_DIR}/breakdown_evaluation_results.txt', "w") as f, contextlib.redirect_stdout(f):
