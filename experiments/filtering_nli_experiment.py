@@ -634,7 +634,7 @@ if __name__ == "__main__":
     # # Membuat kode untuk filtering answer berdasarkan label NLI: entailment (atau neutral) yang bisa menjadi hasil akhir prediksi
     def filtering_based_on_nli(predict_result, type_smoothing, type_qas, MAXIMUM_SEARCH_ITER=MAXIMUM_SEARCH_ITER):
     
-        # Ekstrak dari PredictionOutput QAS
+    # Ekstrak dari PredictionOutput QAS
         predictions_idx = np.argsort(predict_result.predictions, axis=2)[:, :, 1 * -1]
         label_array = np.asarray(predict_result.label_ids)
         
@@ -652,10 +652,6 @@ if __name__ == "__main__":
         
         gold_answer_array = []
         gold_hypothesis_array = []
-        
-        pred_answer_after_filtering_array_msi_recorded = []
-        pred_hypothesis_after_filtering_array_msi_recorded = []
-        label_after_filtering_array_msi_recorded = []
         
         # Iterasi ini ditujukan untuk retrieve answer
         for i in tqdm(range(len(predict_result.predictions[0]))):
@@ -734,10 +730,17 @@ if __name__ == "__main__":
                 if MAXIMUM_SEARCH_ITER < 2: continue
 
                 # Bila MAXIMUM_SEARCH_ITER diatas 2, maka continue langsung
+                
                 else:
-
                     # Bila bukan entailment, loop sebanyak MAXIMUM_SEARCH_ITER kali.
+                    pred_answer_after_filtering_array_msi_recorded = []
+                    pred_hypothesis_after_filtering_array_msi_recorded = []
+                    label_after_filtering_array_msi_recorded = []
                     for index_largest in range(MAXIMUM_SEARCH_ITER - 1):
+                        
+                        #pred_answer_after_filtering_array_msi_recorded = []
+                        #pred_hypothesis_after_filtering_array_msi_recorded = []
+                        #label_after_filtering_array_msi_recorded = []
 
                         # Cari di index kedua, ketiga, keempat, dan seterusnya
                         predictions_idx_inside_loop = np.argsort(predict_result.predictions, 
@@ -757,7 +760,7 @@ if __name__ == "__main__":
                         predicted_label_inside_loop = nlp_sc({'text': context_decoded, 
                                                             'text_pair': pred_hypothesis_inside_loop}
                                                             , **tokenizer_kwargs)
-                                
+                        
                         pred_answer_after_filtering_array_msi_recorded.append(pred_answer_inside_loop)
                         pred_hypothesis_after_filtering_array_msi_recorded.append(pred_hypothesis_inside_loop)
                         label_after_filtering_array_msi_recorded.append(predicted_label_inside_loop)
@@ -1060,7 +1063,7 @@ if __name__ == "__main__":
         f.close()
 
     ## Breakdown evaluasi, melakukan evaluasi lebih dalam lagi
-    def breakdown_evaluation(df):
+    def breakdown_evaluation(df, MAXIMUM_SEARCH_ITER=MAXIMUM_SEARCH_ITER):
     
         exist_true_answer_label_entailment = 0
         exist_true_answer_label_neutral = 0
@@ -1073,6 +1076,9 @@ if __name__ == "__main__":
         no_exist_true_answer = 0
         no_exist_false_answer = 0
         
+        filtered_in_right_answer_to_filtered_out_wrong_answer = 0
+        filtered_out_wrong_answer_to_filtered_in_right_answer = 0
+        
         for i in range(len(df)):
             
             pred_answer_before_filtering = df["Prediction Answer Before Filtering"][i][-1]
@@ -1083,35 +1089,54 @@ if __name__ == "__main__":
             
             gold_text = df["Gold Answer"][i]
             
-            if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering == 'entailment') and (pred_answer_after_filtering != ""):
+            if (pred_answer_before_filtering == gold_text) and (pred_label_before_filtering == 'entailment') and (pred_answer_before_filtering != ""):
                 exist_true_answer_label_entailment += 1
-            elif (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering == 'neutral') and (pred_answer_after_filtering != ""):
+            elif (pred_answer_before_filtering == gold_text) and (pred_label_before_filtering == 'neutral') and (pred_answer_before_filtering != ""):
                 exist_true_answer_label_neutral += 1
-            elif (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering == 'contradiction') and (pred_answer_after_filtering != ""):
+            elif (pred_answer_before_filtering == gold_text) and (pred_label_before_filtering == 'contradiction') and (pred_answer_before_filtering != ""):
                 exist_true_answer_label_contradiction += 1
+                if (pred_answer_after_filtering != gold_text):
+                    filtered_in_right_answer_to_filtered_out_wrong_answer += 1
             
-            elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering == 'entailment') and (pred_answer_after_filtering != ""):
+            elif (pred_answer_before_filtering != gold_text) and (pred_label_before_filtering == 'entailment') and (pred_answer_before_filtering != ""):
                 exist_false_answer_label_entailment += 1
-            elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering == 'neutral') and (pred_answer_after_filtering != ""):
+            elif (pred_answer_before_filtering != gold_text) and (pred_label_before_filtering == 'neutral') and (pred_answer_before_filtering != ""):
                 exist_false_answer_label_neutral += 1
-            elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering == 'contradiction') and (pred_answer_after_filtering != ""):
+            elif (pred_answer_before_filtering != gold_text) and (pred_label_before_filtering == 'contradiction') and (pred_answer_before_filtering != ""):
                 exist_false_answer_label_contradiction += 1
+                if (pred_answer_after_filtering == gold_text):
+                    filtered_out_wrong_answer_to_filtered_in_right_answer += 1
             
-            elif (pred_answer_after_filtering == gold_text) and (pred_answer_after_filtering == ""):
+            elif (pred_answer_before_filtering == gold_text) and (pred_answer_before_filtering == ""):
                 no_exist_true_answer += 1
-            elif (pred_answer_after_filtering != gold_text) and (pred_answer_after_filtering == ""):
+            elif (pred_answer_before_filtering != gold_text) and (pred_answer_before_filtering == ""):
                 no_exist_false_answer += 1
-            
+                
+            #print(f"Pred answer before filtering: {pred_answer_before_filtering}")
+            #print(f"Pred answer after filtering: {pred_answer_after_filtering}")
+            #print(f"Gold answer: {gold_text}")
+            #print()
+        
         print(f"Jawaban benar (answer exist) entailment: {exist_true_answer_label_entailment}")
         print(f"Jawaban benar (answer exist) neutral: {exist_true_answer_label_neutral}")
         print(f"Jawaban benar (answer exist) contradiction: {exist_true_answer_label_contradiction}")
-        
-        print(f"Jawaban benar (answer exist) entailment: {exist_false_answer_label_entailment}")
-        print(f"Jawaban benar (answer exist) neutral: {exist_false_answer_label_neutral}")
-        print(f"Jawaban benar (answer exist) contradiction: {exist_false_answer_label_contradiction}")
-        
+        print()
+        print(f"Jawaban salah (answer exist) entailment: {exist_false_answer_label_entailment}")
+        print(f"Jawaban salah (answer exist) neutral: {exist_false_answer_label_neutral}")
+        print(f"Jawaban salah (answer exist) contradiction: {exist_false_answer_label_contradiction}")
+        print()
         print(f"Jawaban prediksi no-answer benar: {no_exist_true_answer}")
         print(f"Jawaban prediksi no-answer salah: {no_exist_false_answer}")
+        print()
+        print(f"Jawaban prediksi benar, tapi tidak masuk prediksi final (menjadi salah) karena label NLI yang tidak sesuai: {filtered_in_right_answer_to_filtered_out_wrong_answer}")
+        print(f"Jawaban prediksi salah, tapi masuk prediksi final (menjadi benar) karena label NLI yang sesuai: {filtered_out_wrong_answer_to_filtered_in_right_answer}")
+        print()
+        print(f"Total prediksi jawaban: {len(df)}")
+        print()
+        
+        assert len(df) == exist_true_answer_label_entailment+exist_true_answer_label_neutral+exist_true_answer_label_contradiction+\
+                exist_false_answer_label_entailment+exist_false_answer_label_neutral+exist_false_answer_label_contradiction+\
+                no_exist_true_answer+no_exist_false_answer
 
     breakdown_evaluation(metric_result_before_filtering, metric_result_after_filtering)
 
