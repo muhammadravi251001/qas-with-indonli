@@ -1079,6 +1079,9 @@ if __name__ == "__main__":
         filtered_in_right_answer_to_filtered_out_wrong_answer = 0
         filtered_out_wrong_answer_to_filtered_in_right_answer = 0
         
+        filtered_in_right_answer_to_filtered_out_wrong_answer_unanswered = 0
+        filtered_out_wrong_answer_to_filtered_in_right_answer_unanswered = 0
+        
         for i in range(len(df)):
             
             pred_answer_before_filtering = df["Prediction Answer Before Filtering"][i][-1]
@@ -1086,6 +1089,9 @@ if __name__ == "__main__":
             
             pred_label_before_filtering = df["Label Before Filtering"][i][-1]['label']
             pred_label_after_filtering = df["Label After Filtering"][i][-1]['label']
+            
+            pred_prob_dist_before_filtering = df["Label Before Filtering"][i][-1]['score']
+            pred_prob_dist_after_filtering = df["Label After Filtering"][i][-1]['score']
             
             gold_text = df["Gold Answer"][i]
             
@@ -1096,10 +1102,17 @@ if __name__ == "__main__":
                 if (TYPE_QAS == 'entailment only'):
                     if (pred_answer_after_filtering != gold_text):
                         filtered_in_right_answer_to_filtered_out_wrong_answer += 1
+                    #print(f"Prob Distribution right answer but wrong label NLI before filtering: {pred_prob_dist_before_filtering}")
+                    #print(f"Prob Distribution right answer but wrong label NLI after filtering: {pred_prob_dist_after_filtering}")
+                    #print()
+                    
             elif (pred_answer_before_filtering == gold_text) and (pred_label_before_filtering == 'contradiction') and (pred_answer_before_filtering != ""):
                 exist_true_answer_label_contradiction += 1
                 if (pred_answer_after_filtering != gold_text):
                     filtered_in_right_answer_to_filtered_out_wrong_answer += 1
+                #print(f"Prob Distribution right answer but wrong label NLI before filtering: {pred_prob_dist_before_filtering}")
+                #print(f"Prob Distribution right answer but wrong label NLI after filtering: {pred_prob_dist_after_filtering}")
+                #print()
             
             elif (pred_answer_before_filtering != gold_text) and (pred_label_before_filtering == 'entailment') and (pred_answer_before_filtering != ""):
                 exist_false_answer_label_entailment += 1
@@ -1115,8 +1128,12 @@ if __name__ == "__main__":
             
             elif (pred_answer_before_filtering == gold_text) and (pred_answer_before_filtering == ""):
                 no_exist_true_answer += 1
+                if (pred_answer_after_filtering != gold_text):
+                    filtered_in_right_answer_to_filtered_out_wrong_answer_unanswered += 1
             elif (pred_answer_before_filtering != gold_text) and (pred_answer_before_filtering == ""):
                 no_exist_false_answer += 1
+                if (pred_answer_after_filtering == gold_text):
+                    filtered_out_wrong_answer_to_filtered_in_right_answer_unanswered += 1
                 
             #print(f"Pred answer before filtering: {pred_answer_before_filtering}")
             #print(f"Pred answer after filtering: {pred_answer_after_filtering}")
@@ -1136,6 +1153,9 @@ if __name__ == "__main__":
         print()
         print(f"Jawaban prediksi benar, tapi tidak masuk prediksi final (menjadi salah) karena label NLI yang tidak sesuai: {filtered_in_right_answer_to_filtered_out_wrong_answer}")
         print(f"Jawaban prediksi salah, tapi masuk prediksi final (menjadi benar) karena label NLI yang sesuai: {filtered_out_wrong_answer_to_filtered_in_right_answer}")
+        print()
+        print(f"Jawaban prediksi benar (unanswerable), tapi tidak masuk prediksi final (menjadi salah) karena label NLI yang tidak sesuai: {filtered_in_right_answer_to_filtered_out_wrong_answer_unanswered}")
+        print(f"Jawaban prediksi salah (unanswerable), tapi masuk prediksi final (menjadi benar) karena label NLI yang sesuai: {filtered_out_wrong_answer_to_filtered_in_right_answer_unanswered}")
         print()
         print(f"Total prediksi jawaban: {len(df)}")
         print()
