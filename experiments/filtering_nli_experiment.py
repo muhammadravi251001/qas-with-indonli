@@ -653,6 +653,10 @@ if __name__ == "__main__":
         gold_answer_array = []
         gold_hypothesis_array = []
         
+        pred_answer_after_filtering_array_msi_recorded = []
+        pred_hypothesis_after_filtering_array_msi_recorded = []
+        label_after_filtering_array_msi_recorded = []
+        
         # Iterasi ini ditujukan untuk retrieve answer
         for i in tqdm(range(len(predict_result.predictions[0]))):
             
@@ -693,32 +697,32 @@ if __name__ == "__main__":
             # Cek label dari answer prediksi dan context
             predicted_label = nlp_sc({'text': context_decoded, 
                                     'text_pair': pred_hypothesis}, 
-                                    **tokenizer_kwargs)['label']
+                                    **tokenizer_kwargs)
             
-            pred_answer_before_filtering_array.append(pred_answer)
-            pred_hypothesis_before_filtering_array.append(pred_hypothesis)
-            label_before_filtering_array.append(predicted_label)
+            pred_answer_before_filtering_array.append([pred_answer])
+            pred_hypothesis_before_filtering_array.append([pred_hypothesis])
+            label_before_filtering_array.append([predicted_label])
             
             # Cek label dari answer prediksi dan context, bila labelnya entailment (atau neutral), maka answernya jadi hasil akhir
-            if predicted_label == 'neutral':
+            if predicted_label['label'] == 'neutral':
                 if type_qas == 'entailment or neutral':
                     question_array.append(question_decoded)
                     context_array.append(context_decoded)
-                    pred_answer_after_filtering_array.append(pred_answer)
+                    pred_answer_after_filtering_array.append([pred_answer])
                     gold_answer_array.append(gold_answer)
-                    pred_hypothesis_after_filtering_array.append(pred_hypothesis)
+                    pred_hypothesis_after_filtering_array.append([pred_hypothesis])
                     gold_hypothesis_array.append(gold_hypothesis)
-                    label_after_filtering_array.append(predicted_label)
+                    label_after_filtering_array.append([predicted_label])
 
-            if predicted_label == 'entailment':
+            if predicted_label['label'] == 'entailment':
                 if type_qas == 'entailment only' or type_qas == 'entailment or neutral':
                     question_array.append(question_decoded)
                     context_array.append(context_decoded)
-                    pred_answer_after_filtering_array.append(pred_answer)
+                    pred_answer_after_filtering_array.append([pred_answer])
                     gold_answer_array.append(gold_answer)
-                    pred_hypothesis_after_filtering_array.append(pred_hypothesis)
+                    pred_hypothesis_after_filtering_array.append([pred_hypothesis])
                     gold_hypothesis_array.append(gold_hypothesis)
-                    label_after_filtering_array.append(predicted_label)
+                    label_after_filtering_array.append([predicted_label])
                 
             # Cek label dari answer prediksi dan context, bila labelnya bukan entailment (atau neutral), 
             # -- maka masuk ke for-loop untuk iterasi ke argmax selanjutnya, dengan menggunakan argsort
@@ -752,49 +756,60 @@ if __name__ == "__main__":
                         # Cek label dari answer prediksi dan context
                         predicted_label_inside_loop = nlp_sc({'text': context_decoded, 
                                                             'text_pair': pred_hypothesis_inside_loop}
-                                                            , **tokenizer_kwargs)['label']
-
+                                                            , **tokenizer_kwargs)
+                                
+                        pred_answer_after_filtering_array_msi_recorded.append(pred_answer_inside_loop)
+                        pred_hypothesis_after_filtering_array_msi_recorded.append(pred_hypothesis_inside_loop)
+                        label_after_filtering_array_msi_recorded.append(predicted_label_inside_loop)
+                        
                         # Bila label-nya sudah entailment (atau neutral), maka answernya jadi hasil akhir, dan break
                         if type_qas == 'entailment only':
-                            if predicted_label_inside_loop == 'entailment':
+                            if predicted_label_inside_loop['label'] == 'entailment':
                                 isFoundBiggest = True
                                 question_array.append(question_decoded)
                                 context_array.append(context_decoded)
-                                pred_answer_after_filtering_array.append(pred_answer_inside_loop)
                                 gold_answer_array.append(gold_answer)   
-                                pred_hypothesis_after_filtering_array.append(pred_hypothesis_inside_loop)
                                 gold_hypothesis_array.append(gold_hypothesis)
-                                label_after_filtering_array.append(predicted_label_inside_loop)
+                                
+                                pred_answer_after_filtering_array.append(pred_answer_after_filtering_array_msi_recorded)
+                                pred_hypothesis_after_filtering_array.append(pred_hypothesis_after_filtering_array_msi_recorded)
+                                label_after_filtering_array.append(label_after_filtering_array_msi_recorded)
                                 break
                                 
                         elif type_qas == 'entailment or neutral':
-                            if predicted_label_inside_loop == 'entailment' or predicted_label_inside_loop == 'neutral':
+                            if predicted_label_inside_loop['label'] == 'entailment' or predicted_label_inside_loop['label'] == 'neutral':
                                 isFoundBiggest = True
                                 question_array.append(question_decoded)
                                 context_array.append(context_decoded)
-                                pred_answer_after_filtering_array.append(pred_answer_inside_loop)
                                 gold_answer_array.append(gold_answer)   
-                                pred_hypothesis_after_filtering_array.append(pred_hypothesis_inside_loop)
                                 gold_hypothesis_array.append(gold_hypothesis)
-                                label_after_filtering_array.append(predicted_label_inside_loop)
+                                
+                                pred_answer_after_filtering_array.append(pred_answer_after_filtering_array_msi_recorded)
+                                pred_hypothesis_after_filtering_array.append(pred_hypothesis_after_filtering_array_msi_recorded)
+                                label_after_filtering_array.append(label_after_filtering_array_msi_recorded)
                                 break
 
                     if isFoundBiggest == False:
                         # Bila sampai iterasi terakhir, belum entailment (atau neutral) juga, maka append saja jawaban kosong
                         
-                        pred_answer_not_found_biggest = "-" # Disini, jawaban kosong
+                        pred_answer_not_found_biggest = "" # Disini, jawaban kosong
                         
                         question_array.append(question_decoded)
                         context_array.append(context_decoded)
-                        pred_answer_after_filtering_array.append(pred_answer_not_found_biggest)
-                        gold_answer_array.append(gold_answer)
                         
                         pred_hypothesis_not_found_biggest, gold_hypothesis = smoothing(
                             question_decoded, pred_answer_not_found_biggest, gold_answer, type_smoothing)
                         
-                        pred_hypothesis_after_filtering_array.append(pred_hypothesis_not_found_biggest)
+                        pred_answer_after_filtering_array_msi_recorded.append(pred_answer_not_found_biggest)
+                        pred_hypothesis_after_filtering_array_msi_recorded.append(pred_hypothesis_not_found_biggest)
+                        label_after_filtering_array_msi_recorded.append(predicted_label_inside_loop)
+                        
+                        gold_answer_array.append(gold_answer)
                         gold_hypothesis_array.append(gold_hypothesis)
-                        label_after_filtering_array.append(predicted_label_inside_loop)
+                        
+                        pred_answer_after_filtering_array.append(pred_answer_after_filtering_array_msi_recorded)
+                        pred_hypothesis_after_filtering_array.append(pred_hypothesis_after_filtering_array_msi_recorded)
+                        label_after_filtering_array.append(label_after_filtering_array_msi_recorded)
         
         # Buat DataFrame QAS
         qas_df = pd.DataFrame({'Context': context_array, 
@@ -811,7 +826,7 @@ if __name__ == "__main__":
                             'Gold Answer': gold_answer_array,
                             'Gold Hypothesis': gold_hypothesis_array})
                             
-        #assert len(predict_result.predictions[0]) == len(qas_df), "Jumlah prediksi berbeda dengan jumlah evaluasi"
+        assert len(predict_result.predictions[0]) == len(qas_df), "Jumlah prediksi berbeda dengan jumlah evaluasi"
         
         # Return DataFrame QAS
         return qas_df
@@ -840,11 +855,11 @@ if __name__ == "__main__":
 
         for i in range(len(df)):
             
-            pred_answer_before_filtering = df["Prediction Answer Before Filtering"][i]
-            pred_answer_after_filtering = df["Prediction Answer After Filtering"][i]
+            pred_answer_before_filtering = df["Prediction Answer Before Filtering"][i][-1]
+            pred_answer_after_filtering = df["Prediction Answer After Filtering"][i][-1]
             
-            pred_label_before_filtering = df["Label Before Filtering"][i]
-            pred_label_after_filtering = df["Label After Filtering"][i]
+            pred_label_before_filtering = df["Label Before Filtering"][i][-1]['label']
+            pred_label_after_filtering = df["Label After Filtering"][i][-1]['label']
             
             gold_text = df["Gold Answer"][i]
 
@@ -925,7 +940,7 @@ if __name__ == "__main__":
         if number == 0:
             number += sys.float_info.min
         return number
-    
+
     def compute_f1_prec_rec_whole(metric_array):
         accuracy = (metric_array[0] + metric_array[3]) / \
             (metric_array[0] + metric_array[1] + 
@@ -940,7 +955,7 @@ if __name__ == "__main__":
         return accuracy, precision, recall, f1
 
     def diff_verbose_metric(metric_result_before, metric_result_after, metric):
-    
+        
         percentage = round(((metric_result_after - metric_result_before) / metric_result_before) * 100, 2)
         
         if '&' in metric: vocab = "nilai"
@@ -962,63 +977,63 @@ if __name__ == "__main__":
     
         em_before = metrics_before['exact_match']
         f1_before = metrics_before['f1']
-        
+
         print("~ METRIK PER TOKEN ~")
         print(f"Skor Exact Match sebelum filtering NLI: {em_before}")
         print(f"Skor F1 sebelum filtering NLI: {f1_before}")
         print()
-        
+
         em_after = metrics_after['exact_match']
         f1_after = metrics_after['f1']
-        
+
         print(f"Skor Exact Match setelah filtering NLI: {em_after}")
         print(f"Skor F1 setelah filtering NLI: {f1_after}")
         print()
-        
+
         em_before = convert_to_non_zero(em_before)
         f1_before = convert_to_non_zero(f1_before)
-        
+
         em_after = convert_to_non_zero(em_after)
         f1_after = convert_to_non_zero(f1_after)
-        
+
         print("~ METRIK DENGAN PARAMETER NLI ~")
         print(f"[BEFORE FILTERING] Jawaban benar & label NLI yang sesuai: {before_filtering_metric_array[0]}")
         print(f"[BEFORE FILTERING] Jawaban TIDAK benar & label NLI yang sesuai: {before_filtering_metric_array[1]}")
         print(f"[BEFORE FILTERING] Jawaban benar & label NLI yang TIDAK sesuai: {before_filtering_metric_array[2]}")
         print(f"[BEFORE FILTERING] Jawaban TIDAK benar & label NLI yang TIDAK sesuai: {before_filtering_metric_array[3]}")
         print()
-        
+
         print(f"[AFTER FILTERING] Jawaban benar & label NLI yang sesuai: {after_filtering_metric_array[0]}")
         print(f"[AFTER FILTERING] Jawaban TIDAK benar & label NLI yang sesuai: {after_filtering_metric_array[1]}")
         print(f"[AFTER FILTERING] Jawaban benar & label NLI yang TIDAK sesuai: {after_filtering_metric_array[2]}")
         print(f"[AFTER FILTERING] Jawaban TIDAK benar & label NLI yang TIDAK sesuai: {after_filtering_metric_array[3]}")
         print()
-        
+
         print("Metrik di atas, bisa direpresentasikan menjadi:")
-        
+
         acc_before_whole, prec_before_whole, rec_before_whole, f1_before_whole = compute_f1_prec_rec_whole(
             before_filtering_metric_array)
         acc_after_whole, prec_after_whole, rec_after_whole, f1_after_whole = compute_f1_prec_rec_whole(
             after_filtering_metric_array)
-        
+
         print(f"[BEFORE FILTERING] Akurasi: {acc_before_whole}")
         print(f"[BEFORE FILTERING] Precision: {prec_before_whole}")
         print(f"[BEFORE FILTERING] Recall: {rec_before_whole}")
         print(f"[BEFORE FILTERING] F1: {f1_before_whole}")
         print()
-        
+
         print(f"[AFTER FILTERING] Akurasi: {acc_after_whole}")
         print(f"[AFTER FILTERING] Precision: {prec_after_whole}")
         print(f"[AFTER FILTERING] Recall: {rec_after_whole}")
         print(f"[AFTER FILTERING] F1: {f1_after_whole}")
         print()
-        
+
         print("--- Persentase perubahan hasil metrik ---")
         print("~ METRIK PER TOKEN ~")
         diff_verbose_metric(em_before, em_after, "Exact Match")
         diff_verbose_metric(f1_before, f1_after, "F1")
         print()
-        
+
         print("~ METRIK DENGAN PARAMETER NLI ~")
         diff_verbose_metric(before_filtering_metric_array[0], after_filtering_metric_array[0], 
                             "Jawaban benar & label NLI yang sesuai")
@@ -1029,7 +1044,7 @@ if __name__ == "__main__":
         diff_verbose_metric(before_filtering_metric_array[3], after_filtering_metric_array[3], 
                             "Jawaban TIDAK benar & label NLI yang TIDAK sesuai")
         print()
-        
+
         print("Metrik di atas, bisa direpresentasikan menjadi:")
         diff_verbose_metric(acc_before_whole, acc_after_whole, "Akurasi")
         diff_verbose_metric(prec_before_whole, prec_after_whole, "Precision")
@@ -1042,6 +1057,67 @@ if __name__ == "__main__":
     os.makedirs(os.path.dirname(METRIC_RESULT_DIR), exist_ok=True)
     with open(f'{METRIC_RESULT_DIR}/metric_comparison_results.txt', "w") as f, contextlib.redirect_stdout(f):
         compare_metrics(metric_result_before_filtering, metric_result_after_filtering)
+        f.close()
+
+    ## Breakdown evaluasi, melakukan evaluasi lebih dalam lagi
+    def breakdown_evaluation(df):
+    
+        exist_true_answer_label_entailment = 0
+        exist_true_answer_label_neutral = 0
+        exist_true_answer_label_contradiction = 0
+        
+        exist_false_answer_label_entailment = 0
+        exist_false_answer_label_neutral = 0
+        exist_false_answer_label_contradiction = 0
+        
+        no_exist_true_answer = 0
+        no_exist_false_answer = 0
+        
+        for i in range(len(df)):
+            
+            pred_answer_before_filtering = df["Prediction Answer Before Filtering"][i][-1]
+            pred_answer_after_filtering = df["Prediction Answer After Filtering"][i][-1]
+            
+            pred_label_before_filtering = df["Label Before Filtering"][i][-1]['label']
+            pred_label_after_filtering = df["Label After Filtering"][i][-1]['label']
+            
+            gold_text = df["Gold Answer"][i]
+            
+            if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering == 'entailment') and (pred_answer_after_filtering != ""):
+                exist_true_answer_label_entailment += 1
+            elif (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering == 'neutral') and (pred_answer_after_filtering != ""):
+                exist_true_answer_label_neutral += 1
+            elif (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering == 'contradiction') and (pred_answer_after_filtering != ""):
+                exist_true_answer_label_contradiction += 1
+            
+            elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering == 'entailment') and (pred_answer_after_filtering != ""):
+                exist_false_answer_label_entailment += 1
+            elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering == 'neutral') and (pred_answer_after_filtering != ""):
+                exist_false_answer_label_neutral += 1
+            elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering == 'contradiction') and (pred_answer_after_filtering != ""):
+                exist_false_answer_label_contradiction += 1
+            
+            elif (pred_answer_after_filtering == gold_text) and (pred_answer_after_filtering == ""):
+                no_exist_true_answer += 1
+            elif (pred_answer_after_filtering != gold_text) and (pred_answer_after_filtering == ""):
+                no_exist_false_answer += 1
+            
+        print(f"Jawaban benar (answer exist) entailment: {exist_true_answer_label_entailment}")
+        print(f"Jawaban benar (answer exist) neutral: {exist_true_answer_label_neutral}")
+        print(f"Jawaban benar (answer exist) contradiction: {exist_true_answer_label_contradiction}")
+        
+        print(f"Jawaban benar (answer exist) entailment: {exist_false_answer_label_entailment}")
+        print(f"Jawaban benar (answer exist) neutral: {exist_false_answer_label_neutral}")
+        print(f"Jawaban benar (answer exist) contradiction: {exist_false_answer_label_contradiction}")
+        
+        print(f"Jawaban prediksi no-answer benar: {no_exist_true_answer}")
+        print(f"Jawaban prediksi no-answer salah: {no_exist_false_answer}")
+
+    breakdown_evaluation(metric_result_before_filtering, metric_result_after_filtering)
+
+    os.makedirs(os.path.dirname(METRIC_RESULT_DIR), exist_ok=True)
+    with open(f'{METRIC_RESULT_DIR}/breakdown_evaluation_results.txt', "w") as f, contextlib.redirect_stdout(f):
+        breakdown_evaluation(metric_result_before_filtering, metric_result_after_filtering)
         f.close()
 
     print(f"Selesai filtering NLI dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, model_sc: {MODEL_SC_NAME}, tq: {TYPE_QAS}, ts: {TYPE_SMOOTHING}, msi: {MAXIMUM_SEARCH_ITER}, dan token: {HUB_TOKEN}")
