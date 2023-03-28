@@ -606,11 +606,11 @@ if __name__ == "__main__":
         # Cek question type, yang berhasil berapa, yang gagal berapa?
         for i in range(len(df)):
             
-            pred_answer_after_filtering = df["Prediction Answer After Filtering"][i][-1]       
+            pred_answer = df["Prediction Answer"][i]      
             gold_text = df["Gold Answer"][i]
             current_question = df["Question"][i].split()
             
-            if (pred_answer_after_filtering == gold_text):
+            if (pred_answer == gold_text):
                 if 'Apa' in current_question: num_apa_right += 1
                 elif 'Apakah' in current_question: num_apa_right += 1
                 elif 'apa' in current_question: num_apa_right += 1
@@ -641,7 +641,7 @@ if __name__ == "__main__":
 
                 else: num_others_right += 1
             
-            elif (pred_answer_after_filtering != gold_text):
+            elif (pred_answer != gold_text):
                 if 'Apa' in current_question: num_apa_wrong += 1
                 elif 'Apakah' in current_question: num_apa_wrong += 1
                 elif 'apa' in current_question: num_apa_wrong += 1
@@ -694,11 +694,11 @@ if __name__ == "__main__":
         # Cek panjang passage, ada hubungan dengan berhasil/gagal?
         for i in range(len(df)):
             
-            pred_answer_after_filtering = df["Prediction Answer After Filtering"][i][-1]       
+            pred_answer = df["Prediction Answer"][i]     
             gold_text = df["Gold Answer"][i]
             len_current_passage = len(df["Context"][i].split())
             
-            if (pred_answer_after_filtering == gold_text):
+            if (pred_answer == gold_text):
                 if len_current_passage <= 100: 
                     under_hundred_right += 1
                 elif len_current_passage >= 101 & len_current_passage <= 150:
@@ -712,7 +712,7 @@ if __name__ == "__main__":
                 elif len_current_passage >= 301:
                     _over_301_right += 1
                     
-            elif (pred_answer_after_filtering != gold_text):
+            elif (pred_answer != gold_text):
                 if len_current_passage <= 100: 
                     under_hundred_wrong += 1
                 elif len_current_passage >= 101 & len_current_passage <= 150:
@@ -766,7 +766,7 @@ if __name__ == "__main__":
         print(f"Panjang konteks > 300: {_over_301_right}, sebesar: {round((_over_301_right/len(df) * 100), 2)} %")
         print()
         print(f"-- Bagian tentang panjang context yang terprediksi SALAH --")
-        print(f"Panjang konteks < 100: {under_hundred_right}, sebesar: {round((under_hundred_wrong/len(df) * 100), 2)} %")
+        print(f"Panjang konteks < 100: {under_hundred_wrong}, sebesar: {round((under_hundred_wrong/len(df) * 100), 2)} %")
         print(f"Panjang konteks 101 <= x <= 150: {_101_to_150_wrong}, sebesar: {round((_101_to_150_wrong/len(df) * 100), 2)} %")
         print(f"Panjang konteks 151 <= x <= 200: {_151_to_200_wrong}, sebesar: {round((_151_to_200_wrong/len(df) * 100), 2)} %")
         print(f"Panjang konteks 201 <= x <= 250: {_201_to_250_wrong}, sebesar: {round((_201_to_250_wrong/len(df) * 100), 2)} %")

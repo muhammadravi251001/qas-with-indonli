@@ -1247,7 +1247,7 @@ if __name__ == "__main__":
         print(f"Panjang konteks > 300: {_over_301_right}, sebesar: {round((_over_301_right/len(df) * 100), 2)} %")
         print()
         print(f"-- Bagian tentang panjang context yang terprediksi SALAH --")
-        print(f"Panjang konteks < 100: {under_hundred_right}, sebesar: {round((under_hundred_wrong/len(df) * 100), 2)} %")
+        print(f"Panjang konteks < 100: {under_hundred_wrong}, sebesar: {round((under_hundred_wrong/len(df) * 100), 2)} %")
         print(f"Panjang konteks 101 <= x <= 150: {_101_to_150_wrong}, sebesar: {round((_101_to_150_wrong/len(df) * 100), 2)} %")
         print(f"Panjang konteks 151 <= x <= 200: {_151_to_200_wrong}, sebesar: {round((_151_to_200_wrong/len(df) * 100), 2)} %")
         print(f"Panjang konteks 201 <= x <= 250: {_201_to_250_wrong}, sebesar: {round((_201_to_250_wrong/len(df) * 100), 2)} %")
