@@ -2,8 +2,8 @@
 
 This is a repository code accompanying my final thesis and soon-to-be paper `TODO`. The experiments can be found under the `experiments` directory:
 
-[![](https://tokei.rs/b1/github/XAMPPRocky/tokei)](https://github.com/muhammadravi251001/qas-with-indonli)
-[![](https://tokei.rs/b1/github/XAMPPRocky/tokei?category=files)](https://github.com/muhammadravi251001/qas-with-indonli)
+[![](https://tokei.rs/b1/github/muhammadravi251001/qas-with-indonli)](https://github.com/muhammadravi251001/qas-with-indonli)
+[![](https://tokei.rs/b1/github/muhammadravi251001/qas-with-indonli?category=files)](https://github.com/muhammadravi251001/qas-with-indonli)
 
 - `main_fine_tuning_qas_dataset.py`: this file contains experiment regarding to Sequence Classification task with use various kind of IndoNLI; like: Basic --the one that available in [Hugging Face](https://huggingface.co/datasets/indonli), Translated --the one that available `translate_train.tar.gz` in [this repo](https://github.com/ir-nlp-csui/indonli/tree/main/data), and lastly: Augmented --this is a concatenation from Basic & Translated version above.
 
