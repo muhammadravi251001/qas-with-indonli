@@ -1259,14 +1259,14 @@ if __name__ == "__main__":
         display(new_df)
         return new_df
     
-    general_evaluation(filtering_result)
+    reasoning_type_df = general_evaluation(filtering_result)
 
     os.makedirs(os.path.dirname(METRIC_RESULT_DIR), exist_ok=True)
     with open(f'{METRIC_RESULT_DIR}/general_evaluation_results.txt', "w") as f, contextlib.redirect_stdout(f):
         general_evaluation(filtering_result)
         f.close()
 
-    (general_evaluation(filtering_result)).to_csv(f'{OUTPUT_DIR}/sample_df_for_reasoning_type.csv')
+    reasoning_type_df.to_csv(f'{OUTPUT_DIR}/sample_df_for_reasoning_type.csv')
 
     ## Breakdown evaluasi, melakukan evaluasi lebih dalam lagi
     def breakdown_evaluation(df, TYPE_QAS):
