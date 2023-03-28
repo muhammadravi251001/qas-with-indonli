@@ -99,13 +99,14 @@ if __name__ == "__main__":
 
     import numpy as np
     import pandas as pd
+    import torch.nn as nn
 
     from multiprocessing import cpu_count
     from nusacrowd import NusantaraConfigHelper
     from datetime import datetime
     from tqdm import tqdm
-    import torch.nn as nn
-
+    from IPython.display import display
+    
     from datasets import (
         load_dataset, 
         Dataset,
@@ -1062,8 +1063,213 @@ if __name__ == "__main__":
         compare_metrics(metric_result_before_filtering, metric_result_after_filtering)
         f.close()
 
+    ## Evaluasi umum yang berhubungan dengan EDA
+    def general_evaluation(df):
+    
+        num_apa_right = 0
+        num_dimana_right = 0
+        num_kapan_right = 0
+        num_siapa_right = 0
+        num_bagaimana_right = 0
+        num_kenapa_right = 0
+        num_berapa_right = 0
+        num_others_right = 0
+        
+        num_apa_wrong = 0
+        num_dimana_wrong = 0
+        num_kapan_wrong = 0
+        num_siapa_wrong = 0
+        num_bagaimana_wrong = 0
+        num_kenapa_wrong = 0
+        num_berapa_wrong = 0
+        num_others_wrong = 0
+        
+        # Cek question type, yang berhasil berapa, yang gagal berapa?
+        for i in range(len(df)):
+            
+            pred_answer_after_filtering = df["Prediction Answer After Filtering"][i][-1]       
+            gold_text = df["Gold Answer"][i]
+            current_question = df["Question"][i].split()
+            
+            if (pred_answer_after_filtering == gold_text):
+                if 'Apa' in current_question: num_apa_right += 1
+                elif 'Apakah' in current_question: num_apa_right += 1
+                elif 'apa' in current_question: num_apa_right += 1
+                elif 'apakah' in current_question: num_apa_right += 1
+
+                elif 'Dimana' in current_question: num_dimana_right += 1
+                elif 'dimana' in current_question: num_dimana_right += 1
+                elif 'mana' in current_question: num_dimana_right += 1
+
+                elif 'Kapan' in current_question: num_kapan_right += 1
+                elif 'kapan' in current_question: num_kapan_right += 1
+
+                elif 'Siapa' in current_question: num_siapa_right += 1
+                elif 'siapa' in current_question: num_siapa_right += 1
+
+                elif 'Bagaimana' in current_question: num_bagaimana_right += 1
+                elif 'bagaimana' in current_question: num_bagaimana_right += 1
+
+                elif 'Mengapa' in current_question: num_kenapa_right += 1
+                elif 'Kenapa' in current_question: num_kenapa_right += 1
+                elif 'mengapa' in current_question: num_kenapa_right += 1
+                elif 'kenapa' in current_question: num_kenapa_right += 1
+
+                elif 'Berapa' in current_question: num_berapa_right += 1
+                elif 'Berapakah' in current_question: num_berapa_right += 1
+                elif 'berapa' in current_question: num_berapa_right += 1
+                elif 'berapakah' in current_question: num_berapa_right += 1
+
+                else: num_others_right += 1
+            
+            elif (pred_answer_after_filtering != gold_text):
+                if 'Apa' in current_question: num_apa_wrong += 1
+                elif 'Apakah' in current_question: num_apa_wrong += 1
+                elif 'apa' in current_question: num_apa_wrong += 1
+                elif 'apakah' in current_question: num_apa_wrong += 1
+
+                elif 'Dimana' in current_question: num_dimana_wrong += 1
+                elif 'dimana' in current_question: num_dimana_wrong += 1
+                elif 'mana' in current_question: num_dimana_wrong += 1
+
+                elif 'Kapan' in current_question: num_kapan_wrong += 1
+                elif 'kapan' in current_question: num_kapan_wrong += 1
+
+                elif 'Siapa' in current_question: num_siapa_wrong += 1
+                elif 'siapa' in current_question: num_siapa_wrong += 1
+
+                elif 'Bagaimana' in current_question: num_bagaimana_wrong += 1
+                elif 'bagaimana' in current_question: num_bagaimana_wrong += 1
+
+                elif 'Mengapa' in current_question: num_kenapa_wrong += 1
+                elif 'Kenapa' in current_question: num_kenapa_wrong += 1
+                elif 'mengapa' in current_question: num_kenapa_wrong += 1
+                elif 'kenapa' in current_question: num_kenapa_wrong += 1
+
+                elif 'Berapa' in current_question: num_berapa_wrong += 1
+                elif 'Berapakah' in current_question: num_berapa_wrong += 1
+                elif 'berapa' in current_question: num_berapa_wrong += 1
+                elif 'berapakah' in current_question: num_berapa_wrong += 1
+
+                else: num_others_wrong += 1
+        
+        assert len(df) == num_apa_right+num_dimana_right+num_kapan_right+num_siapa_right+\
+                            num_bagaimana_right+num_kenapa_right+num_berapa_right+num_others_right+\
+                            num_apa_wrong+num_dimana_wrong+num_kapan_wrong+num_siapa_wrong+\
+                            num_bagaimana_wrong+num_kenapa_wrong+num_berapa_wrong+num_others_wrong
+        
+        under_hundred_right = 0
+        _101_to_150_right = 0
+        _151_to_200_right = 0
+        _201_to_250_right = 0
+        _251_to_300_right = 0
+        _over_301_right = 0
+        
+        under_hundred_wrong = 0
+        _101_to_150_wrong = 0
+        _151_to_200_wrong = 0
+        _201_to_250_wrong = 0
+        _251_to_300_wrong = 0
+        _over_301_wrong = 0
+        
+        # Cek panjang passage, ada hubungan dengan berhasil/gagal?
+        for i in range(len(df)):
+            
+            pred_answer_after_filtering = df["Prediction Answer After Filtering"][i][-1]       
+            gold_text = df["Gold Answer"][i]
+            len_current_passage = len(df["Context"][i].split())
+            
+            if (pred_answer_after_filtering == gold_text):
+                if len_current_passage <= 100: 
+                    under_hundred_right += 1
+                elif len_current_passage >= 101 & len_current_passage <= 150:
+                    _101_to_150_right += 1
+                elif len_current_passage >= 151 & len_current_passage <= 200:
+                    _151_to_200_right += 1
+                elif len_current_passage >= 201 & len_current_passage <= 250:
+                    _201_to_250_right += 1
+                elif len_current_passage >= 251 & len_current_passage <= 300:
+                    _251_to_300_right += 1
+                elif len_current_passage >= 301:
+                    _over_301_right += 1
+                    
+            elif (pred_answer_after_filtering != gold_text):
+                if len_current_passage <= 100: 
+                    under_hundred_wrong += 1
+                elif len_current_passage >= 101 & len_current_passage <= 150:
+                    _101_to_150_wrong += 1
+                elif len_current_passage >= 151 & len_current_passage <= 200:
+                    _151_to_200_wrong += 1
+                elif len_current_passage >= 201 & len_current_passage <= 250:
+                    _201_to_250_wrong += 1
+                elif len_current_passage >= 251 & len_current_passage <= 300:
+                    _251_to_300_wrong += 1
+                elif len_current_passage >= 301:
+                    _over_301_wrong += 1
+                    
+        assert len(df) == under_hundred_right+_101_to_150_right+_151_to_200_right+_201_to_250_right+\
+                            _251_to_300_right+_over_301_right+\
+                            under_hundred_wrong+_101_to_150_wrong+_151_to_200_wrong+_201_to_250_wrong+\
+                            _251_to_300_wrong+_over_301_wrong
+        
+        # Ambil berapa contoh yang gagal, coba pelajari reasoning type-nya.
+        new_df = df.sample(n=15, random_state=42)
+            
+        print("--- Bagian tentang question type ---")
+        print(f"-- Bagian tentang question type yang terprediksi BENAR --")
+        print(f"Banyak pertanyaan APA: {num_apa_right}, sebesar: {round((num_apa_right/len(df) * 100), 2)} %")
+        print(f"Banyak pertanyaan DIMANA: {num_dimana_right}, sebesar: {round((num_dimana_right/len(df) * 100), 2)} %")
+        print(f"Banyak pertanyaan KAPAN: {num_kapan_right}, sebesar: {round((num_kapan_right/len(df) * 100), 2)} %")
+        print(f"Banyak pertanyaan SIAPA: {num_siapa_right}, sebesar: {round((num_siapa_right/len(df) * 100), 2)} %")
+        print(f"Banyak pertanyaan BAGAIMANA: {num_bagaimana_right}, sebesar: {round((num_bagaimana_right/len(df) * 100), 2)} %")
+        print(f"Banyak pertanyaan KENAPA: {num_kenapa_right}, sebesar: {round((num_kenapa_right/len(df) * 100), 2)} %")
+        print(f"Banyak pertanyaan BERAPA: {num_berapa_right}, sebesar: {round((num_berapa_right/len(df) * 100), 2)} %")
+        print(f"Banyak pertanyaan LAINNYA: {num_others_right}, sebesar: {round((num_others_right/len(df) * 100), 2)} %")
+        print()
+        print(f"-- Bagian tentang question type yang terprediksi SALAH --")
+        print(f"Banyak pertanyaan APA: {num_apa_wrong}, sebesar: {round((num_apa_wrong/len(df) * 100), 2)} %")
+        print(f"Banyak pertanyaan DIMANA: {num_dimana_wrong}, sebesar: {round((num_dimana_wrong/len(df) * 100), 2)} %")
+        print(f"Banyak pertanyaan KAPAN: {num_kapan_wrong}, sebesar: {round((num_kapan_wrong/len(df) * 100), 2)} %")
+        print(f"Banyak pertanyaan SIAPA: {num_siapa_wrong}, sebesar: {round((num_siapa_wrong/len(df) * 100), 2)} %")
+        print(f"Banyak pertanyaan BAGAIMANA: {num_bagaimana_wrong}, sebesar: {round((num_bagaimana_wrong/len(df) * 100), 2)} %")
+        print(f"Banyak pertanyaan KENAPA: {num_kenapa_wrong}, sebesar: {round((num_kenapa_wrong/len(df) * 100), 2)} %")
+        print(f"Banyak pertanyaan BERAPA: {num_berapa_wrong}, sebesar: {round((num_berapa_wrong/len(df) * 100), 2)} %")
+        print(f"Banyak pertanyaan LAINNYA: {num_others_wrong}, sebesar: {round((num_others_wrong/len(df) * 100), 2)} %")
+        print()
+        
+        print("--- Bagian tentang panjang context ---")
+        print(f"-- Bagian tentang panjang context yang terprediksi BENAR --")
+        print(f"Panjang konteks < 100: {under_hundred_right}, sebesar: {round((under_hundred_right/len(df) * 100), 2)} %")
+        print(f"Panjang konteks 101 <= x <= 150: {_101_to_150_right}, sebesar: {round((_101_to_150_right/len(df) * 100), 2)} %")
+        print(f"Panjang konteks 151 <= x <= 200: {_151_to_200_right}, sebesar: {round((_151_to_200_right/len(df) * 100), 2)} %")
+        print(f"Panjang konteks 201 <= x <= 250: {_201_to_250_right}, sebesar: {round((_201_to_250_right/len(df) * 100), 2)} %")
+        print(f"Panjang konteks 251 <= x <= 300: {_251_to_300_right}, sebesar: {round((_251_to_300_right/len(df) * 100), 2)} %")
+        print(f"Panjang konteks > 300: {_over_301_right}, sebesar: {round((_over_301_right/len(df) * 100), 2)} %")
+        print()
+        print(f"-- Bagian tentang panjang context yang terprediksi SALAH --")
+        print(f"Panjang konteks < 100: {under_hundred_right}, sebesar: {round((under_hundred_wrong/len(df) * 100), 2)} %")
+        print(f"Panjang konteks 101 <= x <= 150: {_101_to_150_wrong}, sebesar: {round((_101_to_150_wrong/len(df) * 100), 2)} %")
+        print(f"Panjang konteks 151 <= x <= 200: {_151_to_200_wrong}, sebesar: {round((_151_to_200_wrong/len(df) * 100), 2)} %")
+        print(f"Panjang konteks 201 <= x <= 250: {_201_to_250_wrong}, sebesar: {round((_201_to_250_wrong/len(df) * 100), 2)} %")
+        print(f"Panjang konteks 251 <= x <= 300: {_251_to_300_wrong}, sebesar: {round((_251_to_300_wrong/len(df) * 100), 2)} %")
+        print(f"Panjang konteks > 300: {_over_301_wrong}, sebesar: {round((_over_301_wrong/len(df) * 100), 2)} %")
+        print()
+        
+        print("--- Bagian untuk analisis REASONING TYPE ---")
+        display(new_df)
+        return new_df
+    
+    general_evaluation(filtering_result)
+
+    os.makedirs(os.path.dirname(METRIC_RESULT_DIR), exist_ok=True)
+    with open(f'{METRIC_RESULT_DIR}/general_evaluation_results.txt', "w") as f, contextlib.redirect_stdout(f):
+        general_evaluation(filtering_result)
+        f.close()
+
+    (general_evaluation(filtering_result)).to_csv(f'{OUTPUT_DIR}/sample_df_for_reasoning_type.csv')
+
     ## Breakdown evaluasi, melakukan evaluasi lebih dalam lagi
-    def breakdown_evaluation(df, TYPE_QAS, MAXIMUM_SEARCH_ITER=MAXIMUM_SEARCH_ITER):
+    def breakdown_evaluation(df, TYPE_QAS):
     
         if TYPE_QAS == 'entailment only': compatible_label = ['entailment']
         elif TYPE_QAS == 'entailment or neutral': compatible_label = ['entailment', 'neutral']
@@ -1139,6 +1345,8 @@ if __name__ == "__main__":
             pred_prob_dist_after_filtering = df["Label After Filtering"][i][-1]['score']
             
             gold_text = df["Gold Answer"][i]
+
+            # Bagian untuk jawaban sebelum filtering SAMA DENGAN ground truth
             
             if (pred_answer_before_filtering == gold_text) and (pred_label_before_filtering == 'entailment') \
                     and (pred_answer_before_filtering != ""): 
@@ -1195,7 +1403,7 @@ if __name__ == "__main__":
                 elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                         : filtered_out_right_answer_to_filtered_out_wrong_answer += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
             
-            #############
+            # Bagian untuk jawaban sebelum filtering BERBEDA DENGAN ground truth
             
             elif (pred_answer_before_filtering != gold_text) and (pred_label_before_filtering == 'entailment') \
                     and (pred_answer_before_filtering != ""):
@@ -1252,7 +1460,7 @@ if __name__ == "__main__":
                 elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                         : filtered_out_wrong_answer_to_filtered_out_wrong_answer += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
             
-            #############
+            # Bagian untuk jawaban sebelum filtering SAMA DENGAN ground truth (unanswered)
             
             elif (pred_answer_before_filtering == gold_text) and (pred_label_before_filtering == 'entailment') \
                     and (pred_answer_before_filtering == ""): 
@@ -1309,7 +1517,7 @@ if __name__ == "__main__":
                 elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                         : filtered_out_right_answer_to_filtered_out_wrong_answer_unanswered += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
             
-            #############
+            # Bagian untuk jawaban sebelum filtering BERBEDA DENGAN ground truth (unanswered)
             
             elif (pred_answer_before_filtering != gold_text) and (pred_label_before_filtering == 'entailment') \
                     and (pred_answer_before_filtering == ""):
@@ -1449,11 +1657,11 @@ if __name__ == "__main__":
                 no_exist_true_answer_label_entailment+no_exist_true_answer_label_neutral+no_exist_true_answer_label_contradiction+\
                 no_exist_false_answer_label_entailment+no_exist_false_answer_label_neutral+no_exist_false_answer_label_contradiction
 
-    breakdown_evaluation(metric_result_before_filtering, metric_result_after_filtering, TYPE_QAS=TYPE_QAS)
+    breakdown_evaluation(filtering_result, TYPE_QAS=TYPE_QAS)
 
     os.makedirs(os.path.dirname(METRIC_RESULT_DIR), exist_ok=True)
     with open(f'{METRIC_RESULT_DIR}/breakdown_evaluation_results.txt', "w") as f, contextlib.redirect_stdout(f):
-        breakdown_evaluation(metric_result_before_filtering, metric_result_after_filtering)
+        breakdown_evaluation(filtering_result, TYPE_QAS=TYPE_QAS)
         f.close()
 
     print(f"Selesai filtering NLI dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, model_sc: {MODEL_SC_NAME}, tq: {TYPE_QAS}, ts: {TYPE_SMOOTHING}, msi: {MAXIMUM_SEARCH_ITER}, dan token: {HUB_TOKEN}")
