@@ -1,0 +1,142 @@
+%-----------------------------------------------------------------------------%
+% Judul Dokumen
+%-----------------------------------------------------------------------------%
+%
+% Judul laporan.
+\def\judul{Sistem Tanya Jawab Bahasa Indonesia Memanfaatkan IndoNLI}
+%
+% Tulis kembali judul laporan namun dengan bahasa Ingris
+\def\judulInggris{Indonesia's Question Answering System With Utilizing Of Indonesia Natural Language Inference (IndoNLI)}
+
+
+%-----------------------------------------------------------------------------%
+% Tipe Dokumen
+%-----------------------------------------------------------------------------%
+%
+% Tipe laporan, dapat berisi: Laporan Kerja Praktik, Kampus Merdeka, Skripsi, Tugas Akhir, Thesis, atau Disertasi
+\def\type{Skripsi}
+%
+% Nama jalur Kampus Merdeka (hanya perlu diisi jika tipe laporan adalah Kampus Merdeka
+% Contoh isian (khusus Fasilkom): Studi Independen, Magang Mitra, Magang BUMN, Bangkit, Apple Academy, BYOC
+\def\kampusMerdekaType{}
+% Jika ada perwakilan mitra, isi dengan jabatan perwakilan mitra tersebut
+% (misal: Cohort Manager)
+% Kosongkan jika tidak ada perwakilan mitra
+\def\partnerPosition{}
+% Jika ada perwakilan mitra, isi dengan nama perusahaan atau nama program
+% (misal: PT. Astra International, Bangkit Academy 2023)
+% Kosongkan jika tidak ada perwakilan mitra
+\def\partnerInstance{}
+%
+% Jenjang studi, dapat berisi: Diploma, Sarjana, Magister, atau Doktor
+\def\jenjang{Sarjana}
+
+
+%-----------------------------------------------------------------------------%
+% Informasi Penulis
+%-----------------------------------------------------------------------------%
+%
+% Tulis nama Anda
+% Kosongkan penulisDua dan penulisTiga jika Anda melaksanakan tugas akhir/laporan secara individu
+\def\penulisSatu{Muhammad Ravi Shulthan Habibi} % nama lengkap penulis pertama
+\def\penulisDua{} % nama lengkap penulis kedua
+\def\penulisTiga{} % nama lengkap penulis ketiga
+%
+% Tulis NPM Anda
+% Kosongkan npmDua dan npmTiga jika Anda melaksanakan tugas akhir/laporan secara individu
+\def\npmSatu{1906351000} % NPM penulis pertama
+\def\npmDua{} % NPM penulis kedua
+\def\npmTiga{} % NPM penulis ketiga
+%
+% Tulis Program Studi yang Anda ambil
+% Kosongkan programDua dan programTiga jika Anda melaksanakan tugas akhir/laporan secara individu
+\def\programSatu{Ilmu Komputer} % program studi penulis pertama
+\def\programDua{} % program studi penulis kedua
+\def\programTiga{} % program studi penulis ketiga
+%
+% Tulis Program Studi yang Anda ambil dalam bahasa inggris
+% Kosongkan programDua dan programTiga jika Anda melaksanakan tugas akhir/laporan secara individu
+\def\studyProgramSatu{Computer Science} % 1st author's study program
+\def\studyProgramDua{} % 2nd author's study program
+\def\studyProgramTiga{} % 3rd author's study program
+
+
+%-----------------------------------------------------------------------------%
+% Informasi Dosen Pembimbing & Penguji
+%-----------------------------------------------------------------------------%
+%
+% Tuliskan pembimbing
+% Untuk Kampus Merdeka: Tuliskan dosen PIC/pembimbing dari Fakultas Anda
+\def\pembimbingSatu{Rahmad Mahendra, M.Sc.}
+% S1 s.d. S3: Kosongkan jika tidak ada pembimbing kedua
+% Untuk Kampus Merdeka: Tuliskan penanggung jawab/penyelia/mitra
+%                       dari program Kampus Merdeka yang Anda ambil (jika ada)
+\def\pembimbingDua{Alham Fikri Aji, Ph.D}
+% S2 & S3: Kosongkan jika tidak ada pembimbing ketiga
+\def\pembimbingTiga{}
+
+%
+% Tuliskan penguji
+\def\pengujiSatu{Penguji Pertama Anda}
+\def\pengujiDua{Penguji Kedua Anda}
+% Kosongkan jika tidak ada penguji ketiga (umumnya penguji ketiga hanya ada untuk S2)
+\def\pengujiTiga{}
+% Kosongkan jika tidak ada penguji keempat, kelima, atau keenam (umumnya penguji > 3 hanya ada untuk S3)
+\def\pengujiEmpat{}
+\def\pengujiLima{}
+\def\pengujiEnam{}
+
+
+%-----------------------------------------------------------------------------%
+% Informasi Lain (Asal Fakultas, Tanggal, dsb.)
+%-----------------------------------------------------------------------------%
+%
+% Tuliskan Fakultas dimana penulis berada
+\def\fakultas{Fakultas Ilmu Komputer}
+%
+% Tuliskan bulan dan tahun publikasi laporan
+\Var{\bulanTahun}{Juni 2023}
+%
+% Tuliskan gelar yang akan diperoleh dengan menyerahkan laporan ini
+\def\gelar{S.Kom}
+%
+% Tuliskan tanggal pengesahan laporan, waktu dimana laporan diserahkan ke
+% penguji/sekretariat
+\def\tanggalSiapSidang{Tanggal Bulan Tahun}
+%
+% Tuliskan tanggal keputusan sidang dikeluarkan dan penulis dinyatakan
+% lulus/tidak lulus
+\def\tanggalLulus{Tanggal Bulan Tahun}
+
+
+%-----------------------------------------------------------------------------%
+% Judul Setiap Bab
+%-----------------------------------------------------------------------------%
+%
+% Berikut ada judul-judul setiap bab.
+% Silahkan diubah sesuai dengan kebutuhan.
+%
+\Var{\kataPengantar}{Kata Pengantar}
+\Var{\babSatu}{Pendahuluan}
+\Var{\babDua}{Studi Literatur}
+\Var{\babTiga}{Metodologi}
+\Var{\babEmpat}{Struktur Template}
+\Var{\babLima}{Kasus-Kasus Khusus}
+\Var{\kesimpulan}{Penutup}
+
+
+%-----------------------------------------------------------------------------%
+% Capitalized Variables
+% Anda tidak perlu mengubah apapun di bagian ini
+%-----------------------------------------------------------------------------%
+\Var{\Judul}{\judul}
+\Var{\Type}{\type}
+\Var{\PenulisSatu}{\penulisSatu}
+\Var{\PenulisDua}{\penulisDua}
+\Var{\PenulisTiga}{\penulisTiga}
+\Var{\Fakultas}{\fakultas}
+\Var{\ProgramSatu}{\programSatu}
+\Var{\ProgramDua}{\programDua}
+\Var{\ProgramTiga}{\programTiga}
+
+

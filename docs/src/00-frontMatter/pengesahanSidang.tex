@@ -1,0 +1,81 @@
+%
+% Halaman Pengesahan Sidang
+%
+% @author  Andreas Febrian, Andre Tampubolon
+% @version 2.1.2
+% @edit by Muhammad Aulia Adil Murtito
+%
+
+\chapter*{HALAMAN PENGESAHAN}
+\thispagestyle{empty}
+\vspace*{0.4cm}
+
+\noindent\begin{tabular}{ll p{9cm}}
+	\type~ini diajukan oleh&: & \\
+	\ifx\blank\npmDua
+	Nama&: & \penulisSatu \\
+	NPM&: & \npmSatu \\
+	Program Studi&: & \programSatu\\
+	\else
+	\bo{Penulis 1}\\
+	Nama&: & \penulisSatu \\
+	NPM&: & \npmSatu \\
+	Program Studi&: & \programSatu \vspace*{0.2cm}\\
+	\bo{Penulis 2}\\
+	Nama&: & \penulisDua \\
+	NPM&: & \npmDua \\
+	Program Studi&: & \programDua \vspace*{0.2cm}\\
+	\fi
+	\ifx\blank\npmTiga\else
+	\bo{Penulis 3}\\
+	Nama&: & \penulisTiga \\
+	NPM&: & \npmTiga \\
+	Program Studi&: & \programTiga \vspace*{0.2cm}\\
+	\fi
+	Judul \type&: & \judul \\
+\end{tabular}
+
+\vspace*{1.0cm}
+
+\noindent \bo{Telah berhasil dipertahankan di hadapan Dewan Penguji
+dan diterima sebagai bagian persyaratan yang diperlukan untuk
+memperoleh gelar \jenjang~pada Program Studi \programSatu, Fakultas
+\fakultas, Universitas Indonesia.}\\[0.2cm]
+
+\ifx\blank\npmTiga\else\clearpage\fi
+
+\begin{center}
+	\bo{DEWAN PENGUJI}
+\end{center}
+
+\vspace*{0.3cm}
+
+\begin{tabular}{l l p{7cm} l }
+	\centering
+	& & & \\
+	Pembimbing 1&: & \pembimbingSatu & (\hspace*{3.0cm}) \\
+	\ifx\blank\pembimbingDua
+    \else
+        & & & \\
+    	Pembimbing 2&: & \pembimbingDua & (\hspace*{3.0cm}) \\
+    \fi
+	& & & \\
+	Penguji 1&: & \pengujiSatu & (\hspace*{3.0cm}) \\
+	& & & \\
+	Penguji 2&: & \pengujiDua & (\hspace*{3.0cm}) \\
+	\ifx\blank\pengujiTiga
+    \else
+        & & & \\
+    	Penguji 3&: & \pengujiTiga & (\hspace*{3.0cm}) \\
+    \fi
+\end{tabular}\\
+
+\vspace*{2.0cm}
+
+\begin{tabular}{ll l}
+	Ditetapkan di&: & Depok\\
+	Tanggal&: & \tanggalLulus \\
+\end{tabular}
+
+
+\newpage
