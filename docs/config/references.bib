@@ -1,36 +1,3 @@
-@book{book:sample,
-	author    = {Ahmad Surahmad and Bedu Pian Sebedu},
-	year      = {2020},
-	month     = {Januari},
-	pages     = {},
-	title     = {Buku Test},
-	isbn      = {999-9-999-99999-9},
-	journal   = {Judul Jurnal},
-	doi       = {99.9999/9-999-99999-9},
-	publisher = {Universitas Antah Berantah},
-	address   = {Depak}
-}
-
-@manual{latex:intro,
-	author = {Jeff Clark},
-	year   = {2010},
-	month  = {Januari},
-	date   = {26},
-	title  = {Introduction to \latex},
-	url    = {http://frodo.elon.edu/tutorial/tutorial/node3.html},
-	lastchecked = {2020-09-12}
-}
-
-@misc{latex:source_code_listings,
-	author      = {Wikibooks},
-	title       = {LaTeX/Source Code Listings},
-	year        = {2020},
-	month       = {Juni},
-	date        = {25},
-	url         = {https://en.wikibooks.org/wiki/LaTeX/Source_Code_Listings},
-	lastchecked = {2020-09-12}
-}
-
 @inproceedings{bowman-etal-2015-large,
     title = "A large annotated corpus for learning natural language inference",
     author = "Bowman, Samuel R.  and
@@ -45,4 +12,272 @@
     url = "https://aclanthology.org/D15-1075",
     doi = "10.18653/v1/D15-1075",
     pages = "632--642",
+}
+
+@inproceedings{cahyawijaya-etal-2021-indonlg,
+    title = "{I}ndo{NLG}: Benchmark and Resources for Evaluating {I}ndonesian Natural Language Generation",
+    author = "Cahyawijaya, Samuel  and
+      Winata, Genta Indra  and
+      Wilie, Bryan  and
+      Vincentio, Karissa  and
+      Li, Xiaohong  and
+      Kuncoro, Adhiguna  and
+      Ruder, Sebastian  and
+      Lim, Zhi Yuan  and
+      Bahar, Syafri  and
+      Khodra, Masayu  and
+      Purwarianti, Ayu  and
+      Fung, Pascale",
+    booktitle = "Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing",
+    month = nov,
+    year = "2021",
+    address = "Online and Punta Cana, Dominican Republic",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2021.emnlp-main.699",
+    doi = "10.18653/v1/2021.emnlp-main.699",
+    pages = "8875--8898",
+    abstract = "Natural language generation (NLG) benchmarks provide an important avenue to measure progress and develop better NLG systems. Unfortunately, the lack of publicly available NLG benchmarks for low-resource languages poses a challenging barrier for building NLG systems that work well for languages with limited amounts of data. Here we introduce IndoNLG, the first benchmark to measure natural language generation (NLG) progress in three low-resource{---}yet widely spoken{---}languages of Indonesia: Indonesian, Javanese, and Sundanese. Altogether, these languages are spoken by more than 100 million native speakers, and hence constitute an important use case of NLG systems today. Concretely, IndoNLG covers six tasks: summarization, question answering, chit-chat, and three different pairs of machine translation (MT) tasks. We collate a clean pretraining corpus of Indonesian, Sundanese, and Javanese datasets, Indo4B-Plus, which is used to pretrain our models: IndoBART and IndoGPT. We show that IndoBART and IndoGPT achieve competitive performance on all tasks{---}despite using only one-fifth the parameters of a larger multilingual model, mBART-large (Liu et al., 2020). This finding emphasizes the importance of pretraining on closely related, localized languages to achieve more efficient learning and faster inference at very low-resource languages like Javanese and Sundanese.",
+}
+
+@inproceedings{chen-etal-2021-nli-models,
+    title = "Can {NLI} Models Verify {QA} Systems{'} Predictions?",
+    author = "Chen, Jifan  and
+      Choi, Eunsol  and
+      Durrett, Greg",
+    booktitle = "Findings of the Association for Computational Linguistics: EMNLP 2021",
+    month = nov,
+    year = "2021",
+    address = "Punta Cana, Dominican Republic",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2021.findings-emnlp.324",
+    doi = "10.18653/v1/2021.findings-emnlp.324",
+    pages = "3841--3854",
+    abstract = "To build robust question answering systems, we need the ability to verify whether answers to questions are truly correct, not just {``}good enough{''} in the context of imperfect QA datasets. We explore the use of natural language inference (NLI) as a way to achieve this goal, as NLI inherently requires the premise (document context) to contain all necessary information to support the hypothesis (proposed answer to the question). We leverage large pre-trained models and recent prior datasets to construct powerful question conversion and decontextualization modules, which can reformulate QA instances as premise-hypothesis pairs with very high reliability. Then, by combining standard NLI datasets with NLI examples automatically derived from QA training data, we can train NLI models to evaluate QA models{'} proposed answers. We show that our approach improves the confidence estimation of a QA model across different domains, evaluated in a selective QA setting. Careful manual analysis over the predictions of our NLI model shows that it can further identify cases where the QA model produces the right answer for the wrong reason, i.e., when the answer sentence cannot address all aspects of the question.",
+}
+
+@article{clark-etal-2020-tydi,
+    title = "{T}y{D}i {QA}: A Benchmark for Information-Seeking Question Answering in Typologically Diverse Languages",
+    author = "Clark, Jonathan H.  and
+      Choi, Eunsol  and
+      Collins, Michael  and
+      Garrette, Dan  and
+      Kwiatkowski, Tom  and
+      Nikolaev, Vitaly  and
+      Palomaki, Jennimaria",
+    journal = "Transactions of the Association for Computational Linguistics",
+    volume = "8",
+    year = "2020",
+    address = "Cambridge, MA",
+    publisher = "MIT Press",
+    url = "https://aclanthology.org/2020.tacl-1.30",
+    doi = "10.1162/tacl_a_00317",
+    pages = "454--470",
+    abstract = "Confidently making progress on multilingual modeling requires challenging, trustworthy evaluations. We present TyDi QA{---}a question answering dataset covering 11 typologically diverse languages with 204K question-answer pairs. The languages of TyDi QA are diverse with regard to their typology{---}the set of linguistic features each language expresses{---}such that we expect models performing well on this set to generalize across a large number of the world{'}s languages. We present a quantitative analysis of the data quality and example-level qualitative linguistic analyses of observed language phenomena that would not be found in English-only corpora. To provide a realistic information-seeking task and avoid priming effects, questions are written by people who want to know the answer, but don{'}t know the answer yet, and the data is collected directly in each language without the use of translation.",
+}
+
+@misc{coference-resolution,
+  title = {Coreference resolution},
+  author = {Sebastian Ruder},
+  howpublished = {\url{http://nlpprogress.com/english/coreference_resolution.html}},
+  note = {Accessed: 2023-03-30}
+}
+
+@article{DBLP:journals/corr/abs-1809-02922,
+  author    = {Dorottya Demszky and
+               Kelvin Guu and
+               Percy Liang},
+  title     = {Transforming Question Answering Datasets Into Natural Language Inference
+               Datasets},
+  journal   = {CoRR},
+  volume    = {abs/1809.02922},
+  year      = {2018},
+  url       = {http://arxiv.org/abs/1809.02922},
+  eprinttype = {arXiv},
+  eprint    = {1809.02922},
+  timestamp = {Fri, 05 Oct 2018 11:34:52 +0200},
+  biburl    = {https://dblp.org/rec/journals/corr/abs-1809-02922.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{article-nlp,
+author = {Joseph, Sethunya and Sedimo, Kutlwano and Kaniwa, Freeson and Hlomani, Hlomani and Letsholo, Keletso},
+year = {2016},
+month = {03},
+pages = {207-210},
+title = {Natural Language Processing: A Review},
+volume = {6},
+journal = {Natural Language Processing: A Review}
+}
+
+@book{daniel2007speech,
+  title={Speech and language processing: An introduction to natural language processing, computational linguistics, and speech recognition},
+  author={Daniel, Jurafsky and James H, Martin and others},
+  year={2007},
+  publisher={prentice hall}
+}
+
+@article{nlp-state-of-the-art,
+author = {Khurana, Diksha and Koli, Aditya and Khatter, Kiran and Singh, Sukhdev},
+year = {2022},
+month = {07},
+pages = {},
+title = {Natural Language Processing: State of The Art, Current Trends and Challenges},
+volume = {82},
+journal = {Multimedia Tools and Applications},
+doi = {10.1007/s11042-022-13428-4}
+}
+
+@misc{lee2019elsa,
+      title={What Would Elsa Do? Freezing Layers During Transformer Fine-Tuning}, 
+      author={Jaejun Lee and Raphael Tang and Jimmy Lin},
+      year={2019},
+      eprint={1911.03090},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
+
+@inproceedings{mahendra-etal-2021-indonli,
+    title = "{I}ndo{NLI}: A Natural Language Inference Dataset for {I}ndonesian",
+    author = "Mahendra, Rahmad  and
+      Aji, Alham Fikri  and
+      Louvan, Samuel  and
+      Rahman, Fahrurrozi  and
+      Vania, Clara",
+    booktitle = "Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing",
+    month = nov,
+    year = "2021",
+    address = "Online and Punta Cana, Dominican Republic",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2021.emnlp-main.821",
+    doi = "10.18653/v1/2021.emnlp-main.821",
+    pages = "10511--10527",
+    abstract = "We present IndoNLI, the first human-elicited NLI dataset for Indonesian. We adapt the data collection protocol for MNLI and collect {\textasciitilde}18K sentence pairs annotated by crowd workers and experts. The expert-annotated data is used exclusively as a test set. It is designed to provide a challenging test-bed for Indonesian NLI by explicitly incorporating various linguistic phenomena such as numerical reasoning, structural changes, idioms, or temporal and spatial reasoning. Experiment results show that XLM-R outperforms other pre-trained models in our data. The best performance on the expert-annotated data is still far below human performance (13.4{\%} accuracy gap), suggesting that this test set is especially challenging. Furthermore, our analysis shows that our expert-annotated data is more diverse and contains fewer annotation artifacts than the crowd-annotated data. We hope this dataset can help accelerate progress in Indonesian NLP research.",
+}
+
+@misc{muis2020sequencetosequence,
+      title={Sequence-to-Sequence Learning for Indonesian Automatic Question Generator}, 
+      author={Ferdiant Joshua Muis and Ayu Purwarianti},
+      year={2020},
+      eprint={2009.13889},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
+
+@inproceedings{putri-oh-2022-idk,
+    title = "{IDK}-{MRC}: Unanswerable Questions for {I}ndonesian Machine Reading Comprehension",
+    author = "Putri, Rifki Afina  and
+      Oh, Alice",
+    booktitle = "Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing",
+    month = dec,
+    year = "2022",
+    address = "Abu Dhabi, United Arab Emirates",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2022.emnlp-main.465",
+    pages = "6918--6933",
+    abstract = "Machine Reading Comprehension (MRC) has become one of the essential tasks in Natural Language Understanding (NLU) as it is often included in several NLU benchmarks (Liang et al., 2020; Wilie et al., 2020). However, most MRC datasets only have answerable question type, overlooking the importance of unanswerable questions. MRC models trained only on answerable questions will select the span that is most likely to be the answer, even when the answer does not actually exist in the given passage (Rajpurkar et al., 2018). This problem especially remains in medium- to low-resource languages like Indonesian. Existing Indonesian MRC datasets (Purwarianti et al., 2007; Clark et al., 2020) are still inadequate because of the small size and limited question types, i.e., they only cover answerable questions. To fill this gap, we build a new Indonesian MRC dataset called I(n)don{'}tKnow- MRC (IDK-MRC) by combining the automatic and manual unanswerable question generation to minimize the cost of manual dataset construction while maintaining the dataset quality. Combined with the existing answerable questions, IDK-MRC consists of more than 10K questions in total. Our analysis shows that our dataset significantly improves the performance of Indonesian MRC models, showing a large improvement for unanswerable questions.",
+}
+
+@inproceedings{pruksachatkun-etal-2020-intermediate,
+    title = "Intermediate-Task Transfer Learning with Pretrained Language Models: When and Why Does It Work?",
+    author = "Pruksachatkun, Yada  and
+      Phang, Jason  and
+      Liu, Haokun  and
+      Htut, Phu Mon  and
+      Zhang, Xiaoyi  and
+      Pang, Richard Yuanzhe  and
+      Vania, Clara  and
+      Kann, Katharina  and
+      Bowman, Samuel R.",
+    booktitle = "Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics",
+    month = jul,
+    year = "2020",
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2020.acl-main.467",
+    doi = "10.18653/v1/2020.acl-main.467",
+    pages = "5231--5247",
+    abstract = "While pretrained models such as BERT have shown large gains across natural language understanding tasks, their performance can be improved by further training the model on a data-rich intermediate task, before fine-tuning it on a target task. However, it is still poorly understood when and why intermediate-task training is beneficial for a given target task. To investigate this, we perform a large-scale study on the pretrained RoBERTa model with 110 intermediate-target task combinations. We further evaluate all trained models with 25 probing tasks meant to reveal the specific skills that drive transfer. We observe that intermediate tasks requiring high-level inference and reasoning abilities tend to work best. We also observe that target task performance is strongly correlated with higher-level abilities such as coreference resolution. However, we fail to observe more granular correlations between probing and target task performance, highlighting the need for further work on broad-coverage probing benchmarks. We also observe evidence that the forgetting of knowledge learned during pretraining may limit our analysis, highlighting the need for further work on transfer learning methods in these settings.",
+}
+
+@inproceedings{rajpurkar-etal-2018-know,
+    title = "Know What You Don{'}t Know: Unanswerable Questions for {SQ}u{AD}",
+    author = "Rajpurkar, Pranav  and
+      Jia, Robin  and
+      Liang, Percy",
+    booktitle = "Proceedings of the 56th Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers)",
+    month = jul,
+    year = "2018",
+    address = "Melbourne, Australia",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/P18-2124",
+    doi = "10.18653/v1/P18-2124",
+    pages = "784--789",
+    abstract = "Extractive reading comprehension systems can often locate the correct answer to a question in a context document, but they also tend to make unreliable guesses on questions for which the correct answer is not stated in the context. Existing datasets either focus exclusively on answerable questions, or use automatically generated unanswerable questions that are easy to identify. To address these weaknesses, we present SQuADRUn, a new dataset that combines the existing Stanford Question Answering Dataset (SQuAD) with over 50,000 unanswerable questions written adversarially by crowdworkers to look similar to answerable ones. To do well on SQuADRUn, systems must not only answer questions when possible, but also determine when no answer is supported by the paragraph and abstain from answering. SQuADRUn is a challenging natural language understanding task for existing models: a strong neural system that gets 86{\%} F1 on SQuAD achieves only 66{\%} F1 on SQuADRUn. We release SQuADRUn to the community as the successor to SQuAD.",
+}
+
+@inproceedings{rajpurkar-etal-2016-squad,
+    title = "{SQ}u{AD}: 100,000+ Questions for Machine Comprehension of Text",
+    author = "Rajpurkar, Pranav  and
+      Zhang, Jian  and
+      Lopyrev, Konstantin  and
+      Liang, Percy",
+    booktitle = "Proceedings of the 2016 Conference on Empirical Methods in Natural Language Processing",
+    month = nov,
+    year = "2016",
+    address = "Austin, Texas",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/D16-1264",
+    doi = "10.18653/v1/D16-1264",
+    pages = "2383--2392",
+}
+
+@misc{transformers-self-attention-to-the-rescue,
+  title = {Transformers - Self-Attention to the rescue},
+  author = {Roger Salazar}
+  howpublished = {\url{https://www.dominodatalab.com/blog/transformers-self-attention-to-the-rescue}},
+  note = {Accessed: 2023-03-30}
+}
+
+@article{DBLP:journals/corr/VaswaniSPUJGKP17,
+  author    = {Ashish Vaswani and
+               Noam Shazeer and
+               Niki Parmar and
+               Jakob Uszkoreit and
+               Llion Jones and
+               Aidan N. Gomez and
+               Lukasz Kaiser and
+               Illia Polosukhin},
+  title     = {Attention Is All You Need},
+  journal   = {CoRR},
+  volume    = {abs/1706.03762},
+  year      = {2017},
+  url       = {http://arxiv.org/abs/1706.03762},
+  eprinttype = {arXiv},
+  eprint    = {1706.03762},
+  timestamp = {Sat, 23 Jan 2021 01:20:40 +0100},
+  biburl    = {https://dblp.org/rec/journals/corr/VaswaniSPUJGKP17.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@inproceedings{williams-etal-2018-broad,
+    title = "A Broad-Coverage Challenge Corpus for Sentence Understanding through Inference",
+    author = "Williams, Adina  and
+      Nangia, Nikita  and
+      Bowman, Samuel",
+    booktitle = "Proceedings of the 2018 Conference of the North {A}merican Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long Papers)",
+    month = jun,
+    year = "2018",
+    address = "New Orleans, Louisiana",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/N18-1101",
+    doi = "10.18653/v1/N18-1101",
+    pages = "1112--1122",
+    abstract = "This paper introduces the Multi-Genre Natural Language Inference (MultiNLI) corpus, a dataset designed for use in the development and evaluation of machine learning models for sentence understanding. At 433k examples, this resource is one of the largest corpora available for natural language inference (a.k.a. recognizing textual entailment), improving upon available resources in both its coverage and difficulty. MultiNLI accomplishes this by offering data from ten distinct genres of written and spoken English, making it possible to evaluate systems on nearly the full complexity of the language, while supplying an explicit setting for evaluating cross-genre domain adaptation. In addition, an evaluation using existing machine learning models designed for the Stanford NLI corpus shows that it represents a substantially more difficult task than does that corpus, despite the two showing similar levels of inter-annotator agreement.",
+}
+
+@article{stroh2016question,
+  title={Question answering using deep learning},
+  author={Stroh, Eylon and Mathur, Priyank},
+  journal={unpublished},
+  year={2016}
 }

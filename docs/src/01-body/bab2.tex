@@ -2,273 +2,83 @@
 \chapter{\babDua}
 \label{bab:2}
 %-----------------------------------------------------------------------------%
-Untuk memulai penelitian, dibutuhkan kerangka berpikir yang sesuai untuk permasalahan yang ingin dipecahkan.
-Untuk membentuk kerangka berpikir yang sesuai, perlu dikaitkan dengan hasil studi literatur yang telah dilakukan.
-Oleh karena itu, pada bab ini, akan dijelaskan hasil studi literatur yang telah dilakukan yang telah dikaitan dengan kerangka kerja untuk penelitian ini.
-
+Bab kedua ini menjelaskan mengenai studi literatur yang telah penulis telusuri dan kaji untuk penelitian ini. Sub-bab 2.1 menjelaskan mengenai \emph{natural language processing}, bidang luas yang menjadi domain penelitian ini. Sub-bab 2.2 menjelaskan tentang sistem tanya jawab, \emph{question answering task}, bidang khusus yang menjadi domain penelitian ini. Sub-bab 2.3 menjelaskan tentang \emph{natural language inference}, salah satu alat (\emph{tools}) eksperimen untuk meningkatkan performa dari sistem tanya jawab. Sub-bab 2.4 menjelaskan tentang IndoNLI, \emph{dataset natural language inference} berbahasa Indonesia. Sub-bab 2.5 menjelaskan tentang \emph{dataset} sistem tanya jawab, \emph{dataset} tersebut ada yang berbahasa Indonesia maupun berbahasa Inggris. Sub-bab 2.6 menjelaskan tentang \emph{transformer}, salah satu arsitektur model kecerdasan buatan terbaru untuk dapat memprediksi suatu jawaban. Sub-bab 2.7 dan sub-bab 2.8 menjelaskan tentang \emph{intermediate-task transfer learning} dan \emph{task recasting}, yaitu metode-metode eksperimen yang akan dilakukan pada penelitian ini.
 
 %-----------------------------------------------------------------------------%
-\section{Apa itu \latex?}
-\label{sec:latex}
+\section{\emph{Natural Language Processing}}
 %-----------------------------------------------------------------------------%
+\emph{Natural Language Processing} (NLP), atau bila diterjemahkan menjadi Pemrosesan Bahasa Alami, merupakan salah satu bidang konsentrasi pada permasalahan kecerdasan buatan (\emph{artificial intelligence}) yang berfokus untuk melakukan analisis teks dengan menggunakan bantuan komputer \citep{article-nlp}. NLP menggunakan pengetahuan terkait bagaimana manusia memahami dan menggunakan bahasa atau linguistik, setelah itu baru manusia “mengajarkan” cara berbahasa tersebut kepada komputer. NLP muncul untuk memudahkan pekerjaan manusia untuk dapat berkomunikasi dengan komputer dalam bahasa alami/manusia \citep{nlp-state-of-the-art}. Pengembangan dan riset di bidang NLP setidaknya dapat dikategorisasi menjadi lima bidang, yaitu: \emph{natural language understanding (NLU), natural language generation (NLG), speech or voice recognition, machine translation, spelling correction and grammar checking}. 
 
-%-----------------------------------------------------------------------------%
-\subsection{\latex~Secara Singkat}
-\label{sec:latexBrief}
-%-----------------------------------------------------------------------------%
-Berdasarkan \cite{latex:intro}: \\
-\begin{tabular}{| p{13cm} |}
-	\hline
-	\\
-	LaTeX is a family of programs designed to produce publication-quality typeset documents.
-	It is particularly strong when working with mathematical symbols. \\
-	The history of LaTeX begins with a program called TEX.
-	In 1978, a computer scientist by the name of Donald Knuth grew frustrated with the mistakes that his publishers made in typesetting his work.
-	He decided to create a typesetting program that everyone could easily use to typeset documents, particularly those that include formulae, and made it freely available.
-	The result is TEX. \\
-	Knuth's product is an immensely powerful program, but one that does focus very much on small details.
-	A mathematician and computer scientist by the name of Leslie Lamport wrote a variant of TEX called \LaTeX that focuses on document structure rather than such details. \\
-	\\
-	\hline
-\end{tabular}
-
-\vspace*{0.8cm}
-
-Dokumen \LaTeX~sangat mudah, seperti halnya membuat dokumen teks biasa.
-Ada beberapa perintah yang diawali dengan tanda '\bslash'.
-Seperti perintah \code{\bslash\bslash}~yang digunakan untuk memberi baris baru.
-Perintah tersebut juga sama dengan perintah \code{\bslash{}newline}.
-Pada bagian ini akan sedikit dijelaskan cara manipulasi teks dan perintah-perintah \latex~yang mungkin akan sering digunakan.
-Jika ingin belajar hal-hal dasar mengenai \latex, silakan kunjungi:
-
-\begin{itemize}
-	\item \url{http://frodo.elon.edu/tutorial/tutorial/}, atau
-	\item \url{http://www.maths.tcd.ie/~dwilkins/LaTeXPrimer/}
-\end{itemize}
+Aplikasi dari NLP ini mencakup penerjemahan bahasa yang bukan hanya sekadar menerjemahkan kata secara langsung, namun tetap menjaga makna, tata bahasa, gramatikal kalimat tetap utuh dan sesuai dengan bahasa aslinya (\emph{machine translation}). Kedua, mengkategorisasikan suatu kalimat dengan label yang ada, misal untuk mendeteksi suatu kalimat itu memiliki makna yang positif, negatif, atau netral (\emph{text categorization}). Ketiga, mendeteksi suatu pesan merupakan \emph{spam} atau bukan (\emph{spam detection & filtering}). Keempat, mengekstrak suatu informasi dari sebuah data teks (\emph{information retrieval}). Kelima, sistem dialog (\emph{system dialogue}), bagian ini sering digunakan pada \emph{chatbot} yang otomatis menjawab pesan dari manusia dengan bahasa manusia; dan masih banyak lagi pengaplikasian yang bisa dilakukan oleh tugas (\emph{task}) NLP ini.
 
 %-----------------------------------------------------------------------------%
-\subsection{\latex~Kompiler dan IDE}
-\label{sec:latexCompiler}
+\section{Sistem Tanya Jawab (\emph{Question Answering System})}
 %-----------------------------------------------------------------------------%
-Untuk menggunakan \latex~(pada konteks hanya sebagai pengguna), tidak perlu banyak tahu mengenai hal-hal didalamnya.
-Dengan menggunakan \f{Integrated Development Environment} (IDE), penggunaan \latex~akan serupa dengan pembuatan dokumen secara visual, layaknya OpenOffice Writer atau Microsoft Word.
-Orang-orang yang menggunakan \latex~relatif lebih teliti dan terstruktur mengenai cara penulisan yang dia gunakan, karena \latex~memaksa untuk seperti itu.
+Sistem tanya jawab merupakan sistem yang dirancang untuk memenuhi kebutuhan informasi manusia yang mungkin muncul dalam situasi seperti berbicara dengan asisten virtual, berinteraksi dengan pencarian mesin (\emph{search engine}), atau sekedar menanyakan data di basis data (\emph{database}) saja \citep{daniel2007speech}. Salah satu paradigma pencarian jawaban dari suatu sistem tanya jawab ini adalah dengan berbasis pencarian informasi (\emph{information-retrieval-based}). Arti dari berbasis pencarian informasi di atas adalah: mesin diberikan suatu informasi (nanti disebut sebagai konteks) dan suatu pertanyaan, dan mesin sistem tanya jawab menggunakan metode pencarian informasi untuk menentukan bagian teks yang relevan dengan pertanyaan yang diberikan, dengan menggunakan algoritma dari \emph{machine reading comprehension} (MRC) mesin sistem tanya jawab dapat menemukan jawaban dari bagian teks tersebut dengan mengambil kalimat (\emph{span of text}) yang kemungkinan besar menjadi jawabannya; mesin sistem tanya jawab dengan berbasis pencarian informasi ini bergantung pada kumpulan teks yang besar agar mesin menjadi lebih akurat. 
 
-Untuk mencoba \latex, diperlukan kompiler dan IDE.
-Bagi pengguna Microsoft Windows dan Mac OS, instalasi kompiler \latex~dapat menggunakan MikTeX (\url{https://miktex.org/download}).
-Bagi pengguna Linux, instalasi kompiler \latex~dapat menggunakan Texlive ( \url{http://www.tug.org/texlive/}).
-Distro-distro \f{mainstream} di Linux seperti Ubuntu biasanya telah menyediakan \f{package} \code{texlive} melalui \f{package manager}.
-Apabila ingin melakukan instalasi Texlive melalui \f{package manager}, lakukan instalasi package \code{texlive-full} atau setidaknya \code{texlive-science} agar prasyarat \f{template} ini tersedia secara lengkap.
+Jenis-jenis tugas (\emph{task}) yang dapat diselesaikan oleh suatu sistem tanya jawab, antara lain: \emph{factoid question answering} dimana pertanyaan dapat dijawab dengan fakta sederhana yang dapat dituliskan dalam teks pendek, lalu \emph{long-form question answering} dimana pertanyaan dapat dijawab dengan kalimat yang panjang, biasanya pertanyaan “mengapa”; kemudian \emph{community question answering} dimana pasangan tanya jawab didapatkan dari suatu komunitas seperti Quora, dan lain sebagainya. Tugas-tugas yang dapat diselesaikan oleh sistem tanya jawab bisa bertambah varian dan ragamnya seiring dengan pesatnya riset dan pengembangan di bidang NLP.
+%-----------------------------------------------------------------------------%
+\section{\emph{Natural Language Inference}}
+%-----------------------------------------------------------------------------%
+\emph{Natural Language Inference} atau disingkat dengan NLI merupakan suatu tugas semantik (\emph{semantic task}) pada domain NLP yang bertujuan untuk mengkarakterisasi dan memanfaatkan relasi antar dua kalimat, untuk menyelesaikan hal tersebut, model membutuhkan kemampuan untuk mengurai semantik kalimat dan penalaran logis (\emph{commonsense}) yang baik \citep{bowman-etal-2015-large}. Permasalahan NLI ini dapat diselesaikan dengan berbagai teknik, seperti: menggunakan logika simbolis (\emph{symbolic logic}), menggunakan logika pengetahuan umum (\emph{knowledge-based}), dan yang paling baru adalah dengan menggunakan \emph{neural networks}. 
 
-Beberapa text editor atau IDE yang dapat digunakan adalah sebagai berikut:
-\begin{itemize}
-	\item TeXstudio (\url{https://www.texstudio.org/}).
-	\item TeXWorks (biasanya bawaan dari MikTeX).
-	\item Texmaker (\url{http://www.xm1math.net/texmaker/}).
-	\item Microsoft Visual Studio Code, dengan \f{plugin} LaTeX Workshop (\url{https://marketplace.visualstudio.com/items?itemName=James-Yu.latex-workshop}).
-	Untuk menggunakan \f{plugin} tersebut, diperlukan instalasi MikTeX dan Perl.
-	Alternatif lain untuk persyaratan tersebut adalah menggunakan \f{plugin} Remote - WSL jika memiliki distro Windows Subsystem for Linux (WSL) 2 yang sudah terpasang \code{texlive}.
-\end{itemize}
-
+Sekarang, NLI sudah dijadikan menjadi tolak ukur (\emph{benchmark}) dalam bidang representasi semantik dari suatu kalimat. Sudah banyak korpus pengujian NLI ini, antara lain seperti: \emph{Stanford Natural Language} Inference (SNLI), \emph{Multi-Genre Natural Language Inference} (MultiNLI) yang dapat digunakan sebagai bahan pengujian dari suatu sistem NLI. MultiNLI merupakan korpus yang lebih baru dibandingkan dengan SNLI dengan penambahan ragam genre tema kalimat \citep{williams-etal-2018-broad}. Pengaplikasian NLI ini masih relevan dengan permasalahan sistem tanya jawab, NLI dapat diaplikasikan sebagai \emph{intermediate task transfer learning}, validasi prediksi jawaban, dan bisa juga menghasilkan (\emph{generate}) prediksi jawaban dengan melakukan pra proses (\emph{preprocess}) terlebih dahulu.
 
 %-----------------------------------------------------------------------------%
-\section{Panduan Pengunaan Dasar \latex}
-\label{sec:latexUsage}
+\section{IndoNLI}
 %-----------------------------------------------------------------------------%
+IndoNLI merupakan \emph{dataset} NLI pertama yang diperoleh dari manusia (bukan dari mesin otomatis) dengan berbahasa Indonesia. Pada \emph{dataset} ini terdapat sekitar 18 ribu lebih pasangan kalimat yang dianotasi \citep{mahendra-etal-2021-indonli}; \emph{dataset} ini dianotasi oleh dua kelompok individu, yaitu: individu biasa yang jumlahnya lebih banyak (\emph{lay annotator}), dan para pakar dalam bidang NLP (\emph{expert annotator}). Ada beberapa bagian dari data yang sengaja dijadikan data uji coba (\emph{test bed}) dengan memasukkan beragam fenomena linguistik, seperti: penalaran numerik (\emph{numerical reasoning}), perubahan struktural kalimat (\emph{structural changes}), idiom, atau penalaran temporal dan spasial (\emph{temporal and spatial reasoning}). Kemudian, menurut \citet{mahendra-etal-2021-indonli} \emph{dataset} IndoNLI yang dianotasi oleh pakar lebih banyak keragamannya (\emph{diverse}) dan memiliki artefak anotasi yang lebih sedikit dibandingkan dengan data yang dianotasi orang banyak.
 
-%-----------------------------------------------------------------------------%
-\subsection{Bold, Italic, dan Underline}
-\label{sec:latexBIU}
-%-----------------------------------------------------------------------------%
-Hal pertama yang mungkin ditanyakan adalah bagaimana membuat huruf tercetak tebal, miring, atau memiliki garis bawah.
-Pada Texmaker, Anda bisa melakukan hal ini seperti halnya saat mengubah dokumen dengan OO Writer.
-Namun jika tetap masih tertarik dengan cara lain, ini dia:
-
-\begin{itemize}
-	\item \bo{Bold} \\
-	Gunakan perintah \code{\bslash{}textbf$\lbrace\rbrace$} atau
-	\code{\bslash{}bo$\lbrace\rbrace$}.
-	\item \f{Italic} \\
-	Gunakan perintah \code{\bslash{}textit$\lbrace\rbrace$} atau
-	\code{\bslash{}f$\lbrace\rbrace$}.
-	\item \underline{Underline} \\
-	Gunakan perintah \code{\bslash{}underline$\lbrace\rbrace$}.
-	\item $\overline{Overline}$ \\
-	Gunakan perintah \code{\bslash{}overline}.
-	\item $^{superscript}$ \\
-	Gunakan perintah \code{\bslash{}$\lbrace\rbrace$}.
-	\item $_{subscript}$ \\
-	Gunakan perintah \code{\bslash{}\_$\lbrace\rbrace$}.
-\end{itemize}
-
-Perintah \code{\bslash{}f} dan \code{\bslash{}bo} hanya dapat digunakan jika package \code{uithesis} digunakan.
+Alur pengumpulan data IndoNLI mengikuti protokol pengumpulan data \emph{Multi-Genre Natural Language Inference} (MultiNLI), yaitu dilakukan dalam alur sebagai berikut: pengumpulan teks premis dari tiga genre, yaitu dari Wikipedia, berita, dan artikel web; lalu premis-premis tersebut diberikan kepada setiap anotator dan anotator diminta untuk menuliskan enam hipotesis, masing-masing dua label \emph{entailment}, \emph{contradiction}, dan \emph{neutral}; di bagian ini anotator pakar menuliskan fenomena linguistik untuk setiap pasangan premis dan hipotesis; terakhir, dilakukan validasi untuk setiap premis, hipotesis, dan labelnya yang dilakukan secara manual oleh anotator independen lainnya. Harapan \citet{mahendra-etal-2021-indonli}, \emph{dataset} IndoNLI ini dapat membantu mengembangkan kemajuan penelitian dan riset pada bidang NLP di Indonesia.
 
 %-----------------------------------------------------------------------------%
-\subsection{Memasukan Gambar}
-\label{sec:latexImage}
+\section{\emph{Dataset} Umum Pada Sistem Tanya Jawab}
 %-----------------------------------------------------------------------------%
-Setiap gambar dapat diberikan caption dan diberikan label. Label dapat digunakan untuk menunjuk gambar tertentu.
-Jika posisi gambar berubah, maka nomor gambar juga akan diubah secara otomatis.
-Begitu juga dengan seluruh referensi yang menunjuk pada gambar tersebut.
-Contoh sederhana adalah \pic~\ref{fig:testGambar}.
-Silahkan lihat code \latex~dengan nama bab2.tex untuk melihat kode lengkapnya.
-Harap diingat bahwa caption untuk gambar selalu terletak dibawah gambar.
-
-\begin{figure}
-	\centering
-	\includegraphics[width=0.50\textwidth]
-	{assets/pics/creative_commons.png}
-	\caption{\license.}
-	\label{fig:testGambar}
-\end{figure}
-
+Pada bagian ini, akan dipaparkan berbagai macam \emph{dataset} yang biasa dan umum digunakan pada pengembangan suatu sistem tanya jawab.
 
 %-----------------------------------------------------------------------------%
-\section{Membuat Tabel}
-\label{sec:latexTable}
+\subsection{SQuAD}
 %-----------------------------------------------------------------------------%
-Tabel pada Latex dapat dibuat dengan bantuan \textit{website} seperti \url{https://www.tablesgenerator.com/}.
-Dengan menggunakan \textit{website} ini, maka pembuatan tabel akan menjadi lebih mudah.
-\textit{User interface} dari \url{https://www.tablesgenerator.com/} dapat dilihat pada Gambar \ref{fig:tablesgenerator}.
+\emph{Stanford Question Answering Dataset} atau disingkat dengan SQuAD (versi 1.1) merupakan suatu kumpulan data (\emph{dataset}) yang berisi pasangan dari 100.000 lebih pertanyaan dan jawaban \citep{rajpurkar-etal-2016-squad}. Pertanyaan diajukan kepada anotator dari sebuah konteks dari halaman Wikipedia, yang dimana jawabannya harus dapat diekstrak dari konteks halaman Wikipedia tersebut. Konteks tersebut dipilih dari 536 halaman Wikipedia. Bentuk jawaban beragam dan butuh alasan (\emph{reasoning}) untuk dapat menjawabnya. Alur pengumpulan data dilakukan dalam alur sebagai berikut: pencarian 10.000 halaman teratas pada Wikipedia, lalu dilakukan pengambilan contoh/sampel (\emph{sampling}) sebanyak 536 halaman, lalu dari halaman-halaman tersebut ditanyakan kepada anotator untuk dicari jawabannya, terakhir; untuk evaluasi model yang lebih kokoh (\emph{robust}) maka dicari lagi anotator baru untuk menambahkan jawaban baru pada sebagian pertanyaan.
 
-\begin{figure}
-	\centering
-	\includegraphics[width=0.5\textwidth]{assets/pics/tablesgenerator-dot-com.png}
-	\caption{\textit{User interface} dari \textit{website} https://www.tablesgenerator.com/}
-	\label{fig:tablesgenerator}
-\end{figure}
-
-Di sisi lain, tabel juga dapat diberi label dan caption seperti pada gambar.
-Caption pada tabel terletak pada bagian atas tabel.
-Contoh tabel sederhana dapat dilihat pada \tab~\ref{tab:tab1}.
-
-\begin{table}
-	\centering
-	\caption{Contoh Tabel}
-	\label{tab:tab1}
-	\begin{tabular}{| l | c r |}
-		\hline
-		& kol 1 & kol 2 \\
-		\hline
-		baris 1 & 1 & 2 \\
-		baris 2 & 3 & 4 \\
-		baris 3 & 5 & 6 \\
-		baris 4 & 7 & 8 \\
-		baris 5 & 9 & 10 \\
-		\hline
-		jumlah  & 25 & 30 \\
-		\hline
-	\end{tabular}
-\end{table}
-
-Adapun untuk membuat tabel panjang yang bisa melebihi dari satu halaman, gunakan perintah \code{\bslash{}begin\{longtable\}} sebagai pengganti \code{\bslash{}begin\{table\}}. Di dalam \code{longtable} tidak perlu lagi ada \code{\bslash{}begin\{tabular\}}. Kemudian, tambahkan tanda \code{\bslash{}\bslash{}} setelah baris \code{\bslash{}label\{....\}}, agar tidak menimbulkan error saat menampilkan \f{caption} di bagian atas tabel. Kemudian, untuk membatasi header yang ingin diulang pada halaman-halaman berikutnya, gunakan perintah \code{\bslash{}endhead}. Contohnya adalah sebagai berikut:
-
-\begin{longtable}{| l | c r |}
-\caption{Contoh Tabel Panjang}
-\label{tab:tab2} \\
-\hline
-& kol 1 & kol 2 \\
-\hline
-\endfirsthead % batas akhir header yang akan muncul di halaman pertama
-\hline
-& kol 1 & kol 2 \\
-\hline
-\endhead % batas akhir header yang akan muncul di halaman berikutnya
-baris 1  & 1 & 2 \\
-baris 2  & 3 & 4 \\
-baris 3  & 5 & 6 \\
-baris 4  & 7 & 8 \\
-baris 5  & 9 & 10 \\
-baris 6  & 11 & 12 \\
-baris 7  & 13 & 14 \\
-baris 8  & 15 & 16 \\
-baris 9  & 17 & 18 \\
-baris 10 & 19 & 20 \\
-baris 11 & 21 & 22 \\
-baris 12 & 23 & 24 \\
-baris 13 & 25 & 26 \\
-baris 14 & 27 & 28 \\
-baris 15 & 29 & 30 \\
-\hline
-\end{longtable}
-
-Ada jenis tabel lain yang dapat dibuat dengan \latex~berikut beberapa diantaranya.
-Contoh-contoh ini bersumber dari \url{http://en.wikibooks.org/wiki/LaTeX/Tables}
-
-\begin{table}
-	\centering
-	\caption{An Example of Rows Spanning Multiple Columns}
-	\label{row.spanning}
-	\begin{tabular}{|l|l|*{6}{c|}}
-		\hline % create horizontal line
-		No & Name & \multicolumn{3}{|c|}{Week 1} & \multicolumn{3}{|c|}{Week 2} \\
-		\cline{3-8} % create line from 3rd column till 8th column
-		& & A & B & C & A & B & C\\
-		\hline
-		1 & Lala & 1 & 2 & 3 & 4 & 5 & 6\\
-		2 & Lili & 1 & 2 & 3 & 4 & 5 & 6\\
-		3 & Lulu & 1 & 2 & 3 & 4 & 5 & 6\\
-		\hline
-	\end{tabular}
-\end{table}
-
-\begin{table}
-	\centering
-	\caption{An Example of Columns Spanning Multiple Rows}
-	\label{column.spanning}
-	\begin{tabular}{|l|c|l|}
-		\hline
-		Percobaan & Iterasi & Waktu \\
-		\hline
-		Pertama & 1 & 0.1 sec \\ \hline
-		\multirow{2}{*}{Kedua} & 1 & 0.1 sec \\
-		& 3 & 0.15 sec \\
-		\hline
-		\multirow{3}{*}{Ketiga} & 1 & 0.09 sec \\
-		& 2 & 0.16 sec \\
-		& 3 & 0.21 sec \\
-		\hline
-	\end{tabular}
-\end{table}
-
-\begin{table}
-	\centering
-	\caption{An Example of Spanning in Both Directions Simultaneously}
-	\label{mix.spanning}
-	\begin{tabular}{cc|c|c|c|c|}
-		\cline{3-6}
-		& & \multicolumn{4}{|c|}{Title} \\ \cline{3-6}
-		& & A & B & C & D \\ \hline
-		\multicolumn{1}{|c|}{\multirow{2}{*}{Type}} &
-		\multicolumn{1}{|c|}{X} & 1 & 2 & 3 & 4\\ \cline{2-6}
-		\multicolumn{1}{|c|}{}                        &
-		\multicolumn{1}{|c|}{Y} & 0.5 & 1.0 & 1.5 & 2.0\\ \cline{1-6}
-		\multicolumn{1}{|c|}{\multirow{2}{*}{Resource}} &
-		\multicolumn{1}{|c|}{I} & 10 & 20 & 30 & 40\\ \cline{2-6}
-		\multicolumn{1}{|c|}{}                        &
-		\multicolumn{1}{|c|}{J} & 5 & 10 & 15 & 20\\ \cline{1-6}
-	\end{tabular}
-\end{table}
-
+Saat ini, SQuAD sudah sampai versi 2.0, perbedaan SQuAD versi ini dengan sebelumnya adalah penambahan 50.000 soal yang tidak dapat dijawab (\emph{unanswerable question}) dari konteks halaman Wikipedia yang telah diberikan \citep{rajpurkar-etal-2018-know}. Hal tersebut dilakukan untuk memaksa model pembelajaran mesin (\emph{machine learning}) agar dapat menjawab “tidak ada jawaban” dibanding dengan harus mengarang jawaban yang sebenarnya tidak ada pada konteks yang diberikan. SQuAD sudah menjadi tolak ukur (\emph{benchmark}) dalam penilaian evaluasi dari suatu sistem tanya jawab (\emph{question answering system}).
 
 %-----------------------------------------------------------------------------%
-\section{Keterkaitan Teori Dengan Penelitian}
-\label{sec:keterkaitan}
+\subsection{TyDi-QA}
 %-----------------------------------------------------------------------------%
-\todo{Ada baiknya setelah menjelaskan teori-teori, Anda menjelaskan apa kaitan teori tersebut dengan penelitian Anda.
-Hal ini tentunya membantu pembaca dalam memahami bahwa teori yang Anda paparkan memang penting untuk memahami penelitian Anda nantinya.}
+\emph{Typologically Diverse Languages Question Answer} atau disingkat dengan TyDi-QA merupakan suatu kumpulan data (\emph{dataset}) yang berisi pasangan dari 204.000 lebih pertanyaan dan jawaban dalam 11 bahasa yang beragam secara tipologis \citep{clark-etal-2020-tydi}. Tujuan dari penggunaan bahasa yang beragam ini agar dapat menangkap beragam fenomena bahasa dan fenomena linguistik yang tidak ditemukan pada dokumen yang hanya memiliki bahasa Inggris saja. Kemudian, menurut \citet{clark-etal-2020-tydi} \emph{dataset} TyDi-QA ini lebih berkualitas dan realistis, sebab anotator yang menulis pertanyaan memang benar-benar ingin tahu jawaban dari suatu petunjuk tema (\emph{prompt}) yang diberikan, bukan sekadar menulis pertanyaan sederhana yang jawabannya dengan mudah diekstrak dari petunjuk tema (\emph{prompt}) yang diberikan. Pada \emph{dataset} ini, terdapat \emph{dataset} berbahasa Indonesia, yang terdapat pada \emph{secondary gold passage task dataset} TyDi-QA ini, bagian ini yang \citet{cahyawijaya-etal-2021-indonlg} sebut sebagai TyDi-QA-ID , dengan pembagian 15\% dari data pelatihan (\emph{training}) digunakan sebagai set pengujian (\emph{testing}).
 
-\begin{figure}
-	\centering
-	\includegraphics[width=\textwidth]{assets/pics/research_concept_map.png}
-	\caption{Keterkaitan konsep hasil studi literatur terhadap penelitian}
-	\label{fig:research_concept_map}
-\end{figure}
+Alur pengumpulan data dilakukan dalam alur sebagai berikut: anotator diberikan sebuah petunjuk tema (\emph{prompt}) dari halaman Wikipedia yang berisi 100 karakter pertama dari halaman tersebut, lalu anotator diminta untuk menulis pertanyaan (yang benar-benar ingin diketahui atau yang tidak dapat terjawab) dari petunjuk tersebut, kemudian dicarikan artikel Wikipedia lainnya untuk dapat menjawab pertanyaan tersebut, jika ditemukan jawaban di artikel tersebut, maka akan dilakukan pelabelan jawaban (\emph{answer labelling}) oleh anotator \citep{clark-etal-2020-tydi}. Sebelas bahasa yang dikumpulkan itu memang benar-benar dikumpulkan dalam bahasa aslinya, bukan penerjemahan dari bahasa yang satu ke bahasa yang lainnya, agar dapat menjaga urutan bahasa asli tersebut yang akhirnya akan bisa menangkap fenomena bahasa dan fenomena linguistik yang lebih beragam dan realistis. Harapan \citet{clark-etal-2020-tydi} adalah \emph{dataset} TyDi-QA ini menjadi tolak ukur (\emph{benchmark}) untuk sistem tanya jawab yang setidaknya dapat digunakan oleh 100 bahasa dengan penutur terbanyak.
 
-\noindent\todo{
-	Jelaskan \pic~\ref{fig:research_concept_map} di sini.
-	Setiap gambar pada tugas akhir butuh penjelasan.
-	Gambar hadir untuk mempermudah membaca memahami konteks, tetapi tidak bisa berdiri sendiri tanpa penjelasan.
-	Terkait gambar, Anda juga bisa mengatur skalanya.
-	Gambar kali ini lebarnya 0,8x dari lebar teks halaman.
-}
+%-----------------------------------------------------------------------------%
+\subsection{IDK-MRC}
+%-----------------------------------------------------------------------------%
+\emph{I Don’t Know Machine Reading Comprehension} atau yang disingkat dengan IDK-MRC merupakan suatu kumpulan data (\emph{dataset}) yang berisi dengan 5.000 lebih pertanyaan dan jawaban berbahasa Indonesia yang mayoritas pertanyaannya sengaja agar tidak bisa dijawab (\emph{unanswerable}) dari konteks yang diberikan \citep{putri-oh-2022-idk}. Sebenarnya ide pembuatan \emph{dataset} ini mirip dengan ide \emph{dataset} SQuAD versi 2.0, yang bertujuan untuk memaksa model pembelajaran mesin (\emph{machine learning}) agar dapat menjawab “tidak ada jawaban” dibandingkan harus mengarang jawaban. Namun karena SQuAD tidak memfasilitasi bahasa Indonesia, maka IDK-MRC dapat menjadi solusinya. \emph{Dataset} IDK-MRC ini dibangun di atas hasil penerjemahan dari SQuAD versi 2.0.
+
+Alur pengumpulan data dilakukan dalam alur sebagai berikut: awalnya akan dihasilkan pertanyaan yang tidak terjawab (\emph{unanswerable question}) dari mesin \emph{question generation} (QG) yang dipicu dari sebuah sampel konteks, pertanyaan, dan jawaban yang diberikan, lalu dilakukan penyaringan agar pertanyaan tersebut dapat lebih masuk akal untuk ditanyakan walaupun juga tidak terdapat jawabannya, lalu dilakukan pengecekan kemiripan dengan pertanyaan yang dapat dijawab agar pertanyaan yang tidak dapat dijawab dapat lebih relevan untuk ditanyakan, lalu akan dicek secara manual oleh anotator nilai relevansi pertanyaan tersebut dan akan dihasilkan (\emph{generate}) lagi pertanyaan yang tidak dapat terjawab secara manual agar dapat mengatasi permasalahan sulitnya mesin \emph{question generation} (QG) untuk dapat menghasilkan pertanyaan yang tak dapat terjawab dari sebagian tipe-tipe pertanyaan yang ada \citep{putri-oh-2022-idk}.
+
+%-----------------------------------------------------------------------------%
+\subsection{SQuAD-ID}
+%-----------------------------------------------------------------------------%
+\emph{Stanford Question Answering Dataset Indonesia} atau yang disingkat dengan SQuAD-ID merupakan kumpulan data (\emph{dataset}) yang berisi pasangan dari 100.000 lebih pertanyaan dan jawaban dalam bahasa Indonesia yang terdapat juga pertanyaan yang tidak terjawab di dalamnya \citep{muis2020sequencetosequence}. Mirip dengan \emph{dataset} IDK-MRC, \emph{dataset} SQuAD-ID juga merupakan hasil penerjemahan dari \emph{dataset} SQuAD versi 2.0, namun pada \emph{dataset} SQuAD-ID penerjemahan dilakukan secara otomatis, tidak menggunakan penerjemahan manual oleh anotator yang dimana \emph{dataset} IDK-MRC melakukannya. Otomasi penerjemahan \emph{dataset} SQuAD yang berbahasa Inggris menjadi SQuAD yang berbahasa Indonesia dilakukan dengan metode: \emph{Sequence-to-Sequence Learning}. Pemilihan metode tersebut dikarenakan metode tersebut adalah \emph{state-of-the-art} dari pembuatan model \emph{Automatic Question Generator} (AQG). 
+
+Alur pengumpulan data dilakukan dalam alur sebagai berikut: penerjemahan \emph{dataset} SQuAD secara kasar terlebih dahulu, lalu terjemahan tersebut dilakukan pra proses (\emph{preprocessing}), lalu terjemahan tersebut digunakan untuk suplai model \emph{sequence-to-sequence learning} yang sudah dibangun, lalu hasil prediksi dari model \emph{sequence-to-sequence learning} tersebut akan dievaluasi sebagai bagian dari evaluasi model (\emph{model evaluation}), agar model \emph{sequence-to-sequence learning} tersebut dapat lebih akurat menerjemahkan \emph{dataset} SQuAD-nya.
+
+%-----------------------------------------------------------------------------%
+\section{\emph{Transformer}}
+%-----------------------------------------------------------------------------%
+\emph{Transformer} merupakan tipe arsitektur \emph{artificial neural networks} yang digunakan untuk memecahkan masalah transformasi dari urutan masukan (\emph{input}) menjadi urutan keluaran (\emph{output}) dalam suatu aplikasi \emph{deep learning} \citep{transformers-self-attention-to-the-rescue}. Keberadaan Transformer dianggap sebagai solusi dari permasalahan-permasalahan pada \emph{recurrent neural network} (RNN) dan \emph{long short-term memory} (LSTM), yang berkaitan dengan \emph{vanishing \& exploding gradient problem} pada RNN dan keterkaitan antar kata (\emph{relationship between words}) pada LSTM. Cara \emph{Transformer} mengatasi masalah-masalah tersebut adalah dengan menggunakan \emph{self-attention}. \emph{Self-attention} merupakan mekanisme perhatian (\emph{attention}) yang menghubungkan posisi yang berbeda dari suatu urutan untuk menghitung representasi urutan tersebut \citep{DBLP:journals/corr/VaswaniSPUJGKP17}; sederhananya \emph{self-attention} merupakan mekanisme yang mempelajari keterkaitan antar kata (\emph{relationship between words}) yang gagal diatasi oleh LSTM. 
+
+Kemudian, alasan mengapa \emph{Transformer} dapat mengatasi \emph{vanishing \& exploding gradient problem}, adalah karena \emph{Transformer} tidak bergantung pada perulangan (\emph{recurrent}) seperti yang dilakukan pada RNN, namun \emph{Transformer} bergantung kepada mekanisme perhatian (\emph{attention}) sepenuhnya, sehingga \emph{Transformer} dapat terhindar dari perkalian angka-angka gradien kecil maupun besar yang dapat menyebabkan \emph{vanishing \& exploding gradient problem}. Kemudian, \emph{Transformer} memungkinkan paralelisasi yang lebih signifikan dari arsitektur-arsitektur lainnya. Hal tersebut yang membuat \emph{Transformer} menjadi \emph{state-of-the-art} model dari perkembangan arsitektur \emph{artificial neural networks} sampai saat ini.
+
+%-----------------------------------------------------------------------------%
+\section{\emph{Intermediate-Task Transfer Learning}}
+%-----------------------------------------------------------------------------%
+\emph{Intermediate-Task Transfer Learning} merupakan teknik peningkatan performa dengan melakukan \emph{fine-tuning} dengan \emph{dataset} tugas lain (\emph{intermediate task}) pada model \emph{Transformer}, lalu model yang sudah dilakukan \emph{fine-tuning} tersebut akan dilakukan \emph{fine-tuning} kembali untuk tugas tujuannya (\emph{target task}) \citep{pruksachatkun-etal-2020-intermediate}. Harapannya, dengan logis, bila suatu model sudah dilatih pada tugas lain, model tersebut cenderung akan memberikan hasil yang baik bila model yang sudah dilatih tersebut dilatih kembali di tugas yang berbeda, namun masih dalam lingkup domain \emph{task} yang relevan. Teknik \emph{Intermediate-Task Transfer Learning} ini memanfaatkan kelebihan yang terdapat pada arsitektur \emph{Transformer} yang sudah dilatih pada \emph{dataset} yang sangat besar; seharusnya kinerja \emph{Transformer} dapat ditingkatkan dengan melatih model lebih lanjut pada tugas perantara (\emph{intermediate task}) yang memiliki data yang lebih kaya, beragam, dan berkualitas; sebelum melakukan penyempurnaan model pada tugas target (\emph{target task}) via \emph{transfer learning}. 
+
+Namun, menurut \citet{pruksachatkun-etal-2020-intermediate}, masih belum mengetahui kapan dan bagaimana cara tugas perantara (\emph{intermediate task}) mempengaruhi dan bermanfaat bagi tugas target (\emph{target task}). Untuk mengetahui hal tersebut, studi \citet{pruksachatkun-etal-2020-intermediate} menemukan beberapa hal menarik, antara lain: \emph{intermediate task} membutuhkan inferensi tingkat tinggi (\emph{high-level inference}) dan kemampuan penalaran (\emph{reasoning abilities}) yang baik agar dapat bermanfaat bagi tugas targetnya, kemudian kinerja dari tugas target sangat berkorelasi dengan kemampuan inferensi tingkat yang lebih tinggi seperti pengelompokan penyebutan kata dalam teks yang mengacu pada entitas dunia nyata yang sama \citep{coference-resolution}.
+
+%-----------------------------------------------------------------------------%
+\section{\emph{Task Recasting}}
+%-----------------------------------------------------------------------------%
+\emph{Task recasting} merupakan teknik untuk mengubah bentuk \emph{dataset} (atau model), dari satu \emph{task} ke \emph{task} lainnya. \emph{Task recasting} biasanya digunakan untuk menurunkan (\emph{derive}) \emph{dataset task} untuk dapat digunakan pada \emph{task} lainnya, karena ada kecenderungan untuk mendapatkan \emph{dataset} yang lebih bagus dan lebih \emph{robust}, bila diturunkan dari \emph{dataset task} lain \citep{DBLP:journals/corr/abs-1809-02922}. Pada konteks penelitian ini, akan dilakukan \emph{task recasting} antar \emph{question answering task} dengan \emph{sequence classification task (natural language inference)} sebagai alternatif metode eksperimen yang nanti akan dilaksanakan. Penggunaan \emph{task recasting} tidak hanya sebatas menggunakan teknik ini saja (tanpa penambahan eksperimen apapun), melainkan dibutuhkan eksperimen tambahan untuk menyelesaikan eksperimen yang menggunakan \emph{task recasting} ini, pada konteks penelitian ini contohnya seperti: \emph{task recasting} dengan memanfaatkan IndoNLI sebagai verifikator ataupun \emph{task recasting} dengan memanfaatkan IndoNLI sebagai penghasil jawaban.
