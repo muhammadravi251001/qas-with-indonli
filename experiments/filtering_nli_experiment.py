@@ -1273,85 +1273,85 @@ if __name__ == "__main__":
     
         if TYPE_QAS == 'entailment only': compatible_label = ['entailment']
         elif TYPE_QAS == 'entailment or neutral': compatible_label = ['entailment', 'neutral']
-        
+
         exist_true_answer_label_entailment = 0
         exist_true_answer_label_neutral = 0
         exist_true_answer_label_contradiction = 0
-        
+
         exist_false_answer_label_entailment = 0
         exist_false_answer_label_neutral = 0
         exist_false_answer_label_contradiction = 0
-        
+
         no_exist_true_answer_label_entailment = 0
         no_exist_true_answer_label_neutral = 0
         no_exist_true_answer_label_contradiction = 0
-        
+
         no_exist_false_answer_label_entailment = 0
         no_exist_false_answer_label_neutral = 0
         no_exist_false_answer_label_contradiction = 0
-        
+
         filtered_in_right_answer_to_filtered_in_right_answer = 0
         filtered_in_right_answer_to_filtered_in_wrong_answer = 0
         filtered_in_right_answer_to_filtered_out_right_answer = 0
         filtered_in_right_answer_to_filtered_out_wrong_answer = 0
-        
+
         filtered_in_wrong_answer_to_filtered_in_right_answer = 0
         filtered_in_wrong_answer_to_filtered_in_wrong_answer = 0
         filtered_in_wrong_answer_to_filtered_out_right_answer = 0
         filtered_in_wrong_answer_to_filtered_out_wrong_answer = 0
-        
+
         filtered_out_right_answer_to_filtered_in_right_answer = 0
         filtered_out_right_answer_to_filtered_in_wrong_answer = 0
         filtered_out_right_answer_to_filtered_out_right_answer = 0
         filtered_out_right_answer_to_filtered_out_wrong_answer = 0
-        
+
         filtered_out_wrong_answer_to_filtered_in_right_answer = 0
         filtered_out_wrong_answer_to_filtered_in_wrong_answer = 0
         filtered_out_wrong_answer_to_filtered_out_right_answer = 0
         filtered_out_wrong_answer_to_filtered_out_wrong_answer = 0
-        
+
         filtered_in_right_answer_to_filtered_in_right_answer_unanswered = 0
         filtered_in_right_answer_to_filtered_in_wrong_answer_unanswered = 0
         filtered_in_right_answer_to_filtered_out_right_answer_unanswered = 0
         filtered_in_right_answer_to_filtered_out_wrong_answer_unanswered = 0
-        
+
         filtered_in_wrong_answer_to_filtered_in_right_answer_unanswered = 0
         filtered_in_wrong_answer_to_filtered_in_wrong_answer_unanswered = 0
         filtered_in_wrong_answer_to_filtered_out_right_answer_unanswered = 0
         filtered_in_wrong_answer_to_filtered_out_wrong_answer_unanswered = 0
-        
+
         filtered_out_right_answer_to_filtered_in_right_answer_unanswered = 0
         filtered_out_right_answer_to_filtered_in_wrong_answer_unanswered = 0
         filtered_out_right_answer_to_filtered_out_right_answer_unanswered = 0
         filtered_out_right_answer_to_filtered_out_wrong_answer_unanswered = 0
-        
+
         filtered_out_wrong_answer_to_filtered_in_right_answer_unanswered = 0
         filtered_out_wrong_answer_to_filtered_in_wrong_answer_unanswered = 0
         filtered_out_wrong_answer_to_filtered_out_right_answer_unanswered = 0
         filtered_out_wrong_answer_to_filtered_out_wrong_answer_unanswered = 0
-        
+
         filtered_score_labels_before_filtering = []
         filtered_score_labels_after_filtering = []
-        
+
         for i in range(len(df)):
-            
+
             pred_answer_before_filtering = df["Prediction Answer Before Filtering"][i][-1]
             pred_answer_after_filtering = df["Prediction Answer After Filtering"][i][-1]
-            
+
             pred_label_before_filtering = df["Label Before Filtering"][i][-1]['label']
             pred_label_after_filtering = df["Label After Filtering"][i][-1]['label']
-            
+
             pred_prob_dist_before_filtering = df["Label Before Filtering"][i][-1]['score']
             pred_prob_dist_after_filtering = df["Label After Filtering"][i][-1]['score']
-            
+
             gold_text = df["Gold Answer"][i]
 
             # Bagian untuk jawaban sebelum filtering SAMA DENGAN ground truth
-            
+
             if (pred_answer_before_filtering == gold_text) and (pred_label_before_filtering == 'entailment') \
                     and (pred_answer_before_filtering != ""): 
                 exist_true_answer_label_entailment += 1
-                
+
                 if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering in compatible_label) \
                         : filtered_in_right_answer_to_filtered_in_right_answer += 1
                 elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering in compatible_label) \
@@ -1360,15 +1360,15 @@ if __name__ == "__main__":
                         : filtered_in_right_answer_to_filtered_out_right_answer += 1
                 elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                         : filtered_in_right_answer_to_filtered_out_wrong_answer += 1
-            
+
             elif (pred_answer_before_filtering == gold_text) and (pred_label_before_filtering == 'neutral') \
                     and (pred_answer_before_filtering != ""): 
                 exist_true_answer_label_neutral += 1
-                
+
                 if (TYPE_QAS == 'entailment only'):
-                    
+
                     filtered_score_labels_before_filtering.append(pred_prob_dist_before_filtering)
-                    
+
                     if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering in compatible_label) \
                             : filtered_out_right_answer_to_filtered_in_right_answer += 1
                     elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering in compatible_label) \
@@ -1377,7 +1377,7 @@ if __name__ == "__main__":
                             : filtered_out_right_answer_to_filtered_out_right_answer += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
                     elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                             : filtered_out_right_answer_to_filtered_out_wrong_answer += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
-                
+
                 elif (TYPE_QAS == 'entailment or neutral'):
                     if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering in compatible_label) \
                             : filtered_in_right_answer_to_filtered_in_right_answer += 1
@@ -1387,13 +1387,13 @@ if __name__ == "__main__":
                             : filtered_in_right_answer_to_filtered_out_right_answer += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
                     elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                             : filtered_in_right_answer_to_filtered_out_wrong_answer += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
-                    
+
             elif (pred_answer_before_filtering == gold_text) and (pred_label_before_filtering == 'contradiction') \
                     and (pred_answer_before_filtering != ""): 
                 exist_true_answer_label_contradiction += 1
-                
+
                 filtered_score_labels_before_filtering.append(pred_prob_dist_before_filtering)
-                
+
                 if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering in compatible_label) \
                         : filtered_out_right_answer_to_filtered_in_right_answer += 1
                 elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering in compatible_label) \
@@ -1402,13 +1402,13 @@ if __name__ == "__main__":
                         : filtered_out_right_answer_to_filtered_out_right_answer += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
                 elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                         : filtered_out_right_answer_to_filtered_out_wrong_answer += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
-            
+
             # Bagian untuk jawaban sebelum filtering BERBEDA DENGAN ground truth
-            
+
             elif (pred_answer_before_filtering != gold_text) and (pred_label_before_filtering == 'entailment') \
                     and (pred_answer_before_filtering != ""):
                 exist_false_answer_label_entailment += 1
-                
+
                 if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering in compatible_label) \
                         : filtered_in_wrong_answer_to_filtered_in_right_answer += 1
                 elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering in compatible_label) \
@@ -1417,15 +1417,15 @@ if __name__ == "__main__":
                         : filtered_in_wrong_answer_to_filtered_out_right_answer += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
                 elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                         : filtered_in_wrong_answer_to_filtered_out_wrong_answer += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
-            
+
             elif (pred_answer_before_filtering != gold_text) and (pred_label_before_filtering == 'neutral') \
                     and (pred_answer_before_filtering != ""):
                 exist_false_answer_label_neutral += 1
-                
+
                 if (TYPE_QAS == 'entailment only'):
-                    
+
                     filtered_score_labels_before_filtering.append(pred_prob_dist_before_filtering)
-                    
+
                     if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering in compatible_label) \
                             : filtered_out_wrong_answer_to_filtered_in_right_answer += 1
                     elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering in compatible_label) \
@@ -1434,7 +1434,7 @@ if __name__ == "__main__":
                             : filtered_out_wrong_answer_to_filtered_out_right_answer += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
                     elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                             : filtered_out_wrong_answer_to_filtered_out_wrong_answer += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
-                
+
                 elif (TYPE_QAS == 'entailment or neutral'):
                     if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering in compatible_label) \
                             : filtered_in_wrong_answer_to_filtered_in_right_answer += 1
@@ -1444,13 +1444,13 @@ if __name__ == "__main__":
                             : filtered_in_wrong_answer_to_filtered_out_right_answer += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
                     elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                             : filtered_in_wrong_answer_to_filtered_out_wrong_answer += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
-                        
+
             elif (pred_answer_before_filtering != gold_text) and (pred_label_before_filtering == 'contradiction') \
                     and (pred_answer_before_filtering != ""):
                 exist_false_answer_label_contradiction += 1
-                
+
                 filtered_score_labels_before_filtering.append(pred_prob_dist_before_filtering)
-                
+
                 if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering in compatible_label) \
                         : filtered_out_wrong_answer_to_filtered_in_right_answer += 1
                 elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering in compatible_label) \
@@ -1459,13 +1459,13 @@ if __name__ == "__main__":
                         : filtered_out_wrong_answer_to_filtered_out_right_answer += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
                 elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                         : filtered_out_wrong_answer_to_filtered_out_wrong_answer += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
-            
+
             # Bagian untuk jawaban sebelum filtering SAMA DENGAN ground truth (unanswered)
-            
+
             elif (pred_answer_before_filtering == gold_text) and (pred_label_before_filtering == 'entailment') \
                     and (pred_answer_before_filtering == ""): 
                 no_exist_true_answer_label_entailment += 1
-                
+
                 if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering in compatible_label) \
                         : filtered_in_right_answer_to_filtered_in_right_answer_unanswered += 1
                 elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering in compatible_label) \
@@ -1474,15 +1474,15 @@ if __name__ == "__main__":
                         : filtered_in_right_answer_to_filtered_out_right_answer_unanswered += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
                 elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                         : filtered_in_right_answer_to_filtered_out_wrong_answer_unanswered += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
-            
+
             elif (pred_answer_before_filtering == gold_text) and (pred_label_before_filtering == 'neutral') \
                     and (pred_answer_before_filtering == ""): 
                 no_exist_true_answer_label_neutral += 1
-                
+
                 if (TYPE_QAS == 'entailment only'):
-                    
+
                     filtered_score_labels_before_filtering.append(pred_prob_dist_before_filtering)
-                    
+
                     if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering in compatible_label) \
                             : filtered_out_right_answer_to_filtered_in_right_answer_unanswered += 1
                     elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering in compatible_label) \
@@ -1491,7 +1491,7 @@ if __name__ == "__main__":
                             : filtered_out_right_answer_to_filtered_out_right_answer_unanswered += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
                     elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                             : filtered_out_right_answer_to_filtered_out_wrong_answer_unanswered += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
-                
+
                 elif (TYPE_QAS == 'entailment or neutral'):
                     if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering in compatible_label) \
                             : filtered_in_right_answer_to_filtered_in_right_answer_unanswered += 1
@@ -1501,13 +1501,13 @@ if __name__ == "__main__":
                             : filtered_in_right_answer_to_filtered_out_right_answer_unanswered += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
                     elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                             : filtered_in_right_answer_to_filtered_out_wrong_answer_unanswered += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
-                    
+
             elif (pred_answer_before_filtering == gold_text) and (pred_label_before_filtering == 'contradiction') \
                     and (pred_answer_before_filtering == ""): 
                 no_exist_true_answer_label_contradiction += 1
-                
+
                 filtered_score_labels_before_filtering.append(pred_prob_dist_before_filtering)
-                
+
                 if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering in compatible_label) \
                         : filtered_out_right_answer_to_filtered_in_right_answer_unanswered += 1
                 elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering in compatible_label) \
@@ -1516,13 +1516,13 @@ if __name__ == "__main__":
                         : filtered_out_right_answer_to_filtered_out_right_answer_unanswered += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
                 elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                         : filtered_out_right_answer_to_filtered_out_wrong_answer_unanswered += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
-            
+
             # Bagian untuk jawaban sebelum filtering BERBEDA DENGAN ground truth (unanswered)
-            
+
             elif (pred_answer_before_filtering != gold_text) and (pred_label_before_filtering == 'entailment') \
                     and (pred_answer_before_filtering == ""):
                 no_exist_false_answer_label_entailment += 1
-                
+
                 if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering in compatible_label) \
                         : filtered_in_wrong_answer_to_filtered_in_right_answer_unanswered += 1
                 elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering in compatible_label) \
@@ -1531,15 +1531,15 @@ if __name__ == "__main__":
                         : filtered_in_wrong_answer_to_filtered_out_right_answer_unanswered += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
                 elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                         : filtered_in_wrong_answer_to_filtered_out_wrong_answer_unanswered += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
-            
+
             elif (pred_answer_before_filtering != gold_text) and (pred_label_before_filtering == 'neutral') \
                     and (pred_answer_before_filtering == ""):
                 no_exist_false_answer_label_neutral += 1
-                
+
                 if (TYPE_QAS == 'entailment only'):
-                    
+
                     filtered_score_labels_before_filtering.append(pred_prob_dist_before_filtering)
-                    
+
                     if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering in compatible_label) \
                             : filtered_out_wrong_answer_to_filtered_in_right_answer_unanswered += 1
                     elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering in compatible_label) \
@@ -1548,7 +1548,7 @@ if __name__ == "__main__":
                             : filtered_out_wrong_answer_to_filtered_out_right_answer_unanswered += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
                     elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                             : filtered_out_wrong_answer_to_filtered_out_wrong_answer_unanswered += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
-                
+
                 elif (TYPE_QAS == 'entailment or neutral'):
                     if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering in compatible_label) \
                             : filtered_in_wrong_answer_to_filtered_in_right_answer_unanswered += 1
@@ -1558,13 +1558,13 @@ if __name__ == "__main__":
                             : filtered_in_wrong_answer_to_filtered_out_right_answer_unanswered += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
                     elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                             : filtered_in_wrong_answer_to_filtered_out_wrong_answer_unanswered += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
-                        
+
             elif (pred_answer_before_filtering != gold_text) and (pred_label_before_filtering == 'contradiction') \
                     and (pred_answer_before_filtering == ""):
                 no_exist_false_answer_label_contradiction += 1
-                
+
                 filtered_score_labels_before_filtering.append(pred_prob_dist_before_filtering)
-                
+
                 if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering in compatible_label) \
                         : filtered_out_wrong_answer_to_filtered_in_right_answer_unanswered += 1
                 elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering in compatible_label) \
@@ -1573,12 +1573,12 @@ if __name__ == "__main__":
                         : filtered_out_wrong_answer_to_filtered_out_right_answer_unanswered += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
                 elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                         : filtered_out_wrong_answer_to_filtered_out_wrong_answer_unanswered += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
-                
+
             #print(f"Pred answer before filtering: {pred_answer_before_filtering}")
             #print(f"Pred answer after filtering: {pred_answer_after_filtering}")
             #print(f"Gold answer: {gold_text}")
             #print()
-        
+
         print(f"--- Bagian ini hanya memperhatikan sebelum filtering ---")
         print(f"Jawaban benar (answer exist) entailment: {exist_true_answer_label_entailment}, sebesar: {round(exist_true_answer_label_entailment/len(df) * 100, 2)} %")
         print(f"Jawaban benar (answer exist) neutral: {exist_true_answer_label_neutral}, sebesar: {round(exist_true_answer_label_neutral/len(df) * 100, 2)} %")
@@ -1596,9 +1596,10 @@ if __name__ == "__main__":
         print(f"Jawaban salah (answer DO NOT exist) neutral: {no_exist_false_answer_label_neutral}, sebesar: {round(no_exist_false_answer_label_neutral/len(df) * 100, 2)} %")
         print(f"Jawaban salah (answer DO NOT exist) contradiction: {no_exist_false_answer_label_contradiction}, sebesar: {round(no_exist_false_answer_label_contradiction/len(df) * 100, 2)} %")
         print()
-        
+
         print(f"--- Bagian ini memperhatikan sebelum filtering dan setelah filtering ---")
         
+        """
         print(f"Banyaknya data sebelum filtering: BENAR & LOLOS, setelah filtering: BENAR & LOLOS: {filtered_in_right_answer_to_filtered_in_right_answer}, sebesar: {round(filtered_in_right_answer_to_filtered_in_right_answer/len(df) * 100, 2)} %")
         print(f"Banyaknya data sebelum filtering: BENAR & LOLOS, setelah filtering: SALAH & LOLOS: {filtered_in_right_answer_to_filtered_in_wrong_answer}, sebesar: {round(filtered_in_right_answer_to_filtered_in_wrong_answer/len(df) * 100, 2)} %")
         print(f"Banyaknya data sebelum filtering: BENAR & LOLOS, setelah filtering: BENAR & TERFILTER: {filtered_in_right_answer_to_filtered_out_right_answer}, sebesar: {round(filtered_in_right_answer_to_filtered_out_right_answer/len(df) * 100, 2)} %")
@@ -1610,41 +1611,97 @@ if __name__ == "__main__":
         print(f"Banyaknya data sebelum filtering: SALAH & LOLOS, setelah filtering: BENAR & TERFILTER: {filtered_in_wrong_answer_to_filtered_out_right_answer}, sebesar: {round(filtered_in_wrong_answer_to_filtered_out_right_answer/len(df) * 100, 2)} %")
         print(f"Banyaknya data sebelum filtering: SALAH & LOLOS, setelah filtering: SALAH & TERFILTER: {filtered_in_wrong_answer_to_filtered_out_wrong_answer}, sebesar: {round(filtered_in_wrong_answer_to_filtered_out_wrong_answer/len(df) * 100, 2)} %")
         print()
-        
+        """
         print(f"Banyaknya data sebelum filtering: BENAR & TERFILTER, setelah filtering: BENAR & LOLOS: {filtered_out_right_answer_to_filtered_in_right_answer}, sebesar: {round(filtered_out_right_answer_to_filtered_in_right_answer/len(df) * 100, 2)} %")
         print(f"Banyaknya data sebelum filtering: BENAR & TERFILTER, setelah filtering: SALAH & LOLOS: {filtered_out_right_answer_to_filtered_in_wrong_answer}, sebesar: {round(filtered_out_right_answer_to_filtered_in_wrong_answer/len(df) * 100, 2)} %")
         print(f"Banyaknya data sebelum filtering: BENAR & TERFILTER, setelah filtering: BENAR & TERFILTER: {filtered_out_right_answer_to_filtered_out_right_answer}, sebesar: {round(filtered_out_right_answer_to_filtered_out_right_answer/len(df) * 100, 2)} %")
         print(f"Banyaknya data sebelum filtering: BENAR & TERFILTER, setelah filtering: SALAH & TERFILTER: {filtered_out_right_answer_to_filtered_out_wrong_answer}, sebesar: {round(filtered_out_right_answer_to_filtered_out_wrong_answer/len(df) * 100, 2)} %")
         print()
-        
+
         print(f"Banyaknya data sebelum filtering: SALAH & TERFILTER, setelah filtering: BENAR & LOLOS: {filtered_out_wrong_answer_to_filtered_in_right_answer}, sebesar: {round(filtered_out_wrong_answer_to_filtered_in_right_answer/len(df) * 100, 2)} %")
         print(f"Banyaknya data sebelum filtering: SALAH & TERFILTER, setelah filtering: SALAH & LOLOS: {filtered_out_wrong_answer_to_filtered_in_wrong_answer}, sebesar: {round(filtered_out_wrong_answer_to_filtered_in_wrong_answer/len(df) * 100, 2)} %")
         print(f"Banyaknya data sebelum filtering: SALAH & TERFILTER, setelah filtering: BENAR & TERFILTER: {filtered_out_wrong_answer_to_filtered_out_right_answer}, sebesar: {round(filtered_out_wrong_answer_to_filtered_out_right_answer/len(df) * 100, 2)} %")
         print(f"Banyaknya data sebelum filtering: SALAH & TERFILTER, setelah filtering: SALAH & TERFILTER: {filtered_out_wrong_answer_to_filtered_out_wrong_answer}, sebesar: {round(filtered_out_wrong_answer_to_filtered_out_wrong_answer/len(df) * 100, 2)} %")
         print()
-        
+        """
         print(f"Banyaknya data sebelum filtering (unanswered): BENAR & LOLOS, setelah filtering: BENAR & LOLOS: {filtered_in_right_answer_to_filtered_in_right_answer_unanswered}, sebesar: {round(filtered_in_right_answer_to_filtered_in_right_answer_unanswered/len(df) * 100, 2)} %")
         print(f"Banyaknya data sebelum filtering (unanswered): BENAR & LOLOS, setelah filtering: SALAH & LOLOS: {filtered_in_right_answer_to_filtered_in_wrong_answer_unanswered}, sebesar: {round(filtered_in_right_answer_to_filtered_in_wrong_answer_unanswered/len(df) * 100, 2)} %")
         print(f"Banyaknya data sebelum filtering (unanswered): BENAR & LOLOS, setelah filtering: BENAR & TERFILTER: {filtered_in_right_answer_to_filtered_out_right_answer_unanswered}, sebesar: {round(filtered_in_right_answer_to_filtered_out_right_answer_unanswered/len(df) * 100, 2)} %")
         print(f"Banyaknya data sebelum filtering (unanswered): BENAR & LOLOS, setelah filtering: SALAH & TERFILTER: {filtered_in_right_answer_to_filtered_out_wrong_answer_unanswered}, sebesar: {round(filtered_in_right_answer_to_filtered_out_wrong_answer_unanswered/len(df) * 100, 2)} %")
         print()
-        
+
         print(f"Banyaknya data sebelum filtering (unanswered): SALAH & LOLOS, setelah filtering: BENAR & LOLOS: {filtered_in_wrong_answer_to_filtered_in_right_answer_unanswered}, sebesar: {round(filtered_in_wrong_answer_to_filtered_in_right_answer_unanswered/len(df) * 100, 2)} %")
         print(f"Banyaknya data sebelum filtering (unanswered): SALAH & LOLOS, setelah filtering: SALAH & LOLOS: {filtered_in_wrong_answer_to_filtered_in_wrong_answer_unanswered}, sebesar: {round(filtered_in_wrong_answer_to_filtered_in_wrong_answer_unanswered/len(df) * 100, 2)} %")
         print(f"Banyaknya data sebelum filtering (unanswered): SALAH & LOLOS, setelah filtering: BENAR & TERFILTER: {filtered_in_wrong_answer_to_filtered_out_right_answer_unanswered}, sebesar: {round(filtered_in_wrong_answer_to_filtered_out_right_answer_unanswered/len(df) * 100, 2)} %")
         print(f"Banyaknya data sebelum filtering (unanswered): SALAH & LOLOS, setelah filtering: SALAH & TERFILTER: {filtered_in_wrong_answer_to_filtered_out_wrong_answer_unanswered}, sebesar: {round(filtered_in_wrong_answer_to_filtered_out_wrong_answer_unanswered/len(df) * 100, 2)} %")
         print()
-        
+        """
         print(f"Banyaknya data sebelum filtering (unanswered): BENAR & TERFILTER, setelah filtering: BENAR & LOLOS: {filtered_out_right_answer_to_filtered_in_right_answer_unanswered}, sebesar: {round(filtered_out_right_answer_to_filtered_in_right_answer_unanswered/len(df) * 100, 2)} %")
         print(f"Banyaknya data sebelum filtering (unanswered): BENAR & TERFILTER, setelah filtering: SALAH & LOLOS: {filtered_out_right_answer_to_filtered_in_wrong_answer_unanswered}, sebesar: {round(filtered_out_right_answer_to_filtered_in_wrong_answer_unanswered/len(df) * 100, 2)} %")
         print(f"Banyaknya data sebelum filtering (unanswered): BENAR & TERFILTER, setelah filtering: BENAR & TERFILTER: {filtered_out_right_answer_to_filtered_out_right_answer_unanswered}, sebesar: {round(filtered_out_right_answer_to_filtered_out_right_answer_unanswered/len(df) * 100, 2)} %")
         print(f"Banyaknya data sebelum filtering (unanswered): BENAR & TERFILTER, setelah filtering: SALAH & TERFILTER: {filtered_out_right_answer_to_filtered_out_wrong_answer_unanswered}, sebesar: {round(filtered_out_right_answer_to_filtered_out_wrong_answer_unanswered/len(df) * 100, 2)} %")
         print()
-        
+
         print(f"Banyaknya data sebelum filtering (unanswered): SALAH & TERFILTER, setelah filtering: BENAR & LOLOS: {filtered_out_wrong_answer_to_filtered_in_right_answer_unanswered}, sebesar: {round(filtered_out_wrong_answer_to_filtered_in_right_answer_unanswered/len(df) * 100, 2)} %")
         print(f"Banyaknya data sebelum filtering (unanswered): SALAH & TERFILTER, setelah filtering: SALAH & LOLOS: {filtered_out_wrong_answer_to_filtered_in_wrong_answer_unanswered}, sebesar: {round(filtered_out_wrong_answer_to_filtered_in_wrong_answer_unanswered/len(df) * 100, 2)} %")
         print(f"Banyaknya data sebelum filtering (unanswered): SALAH & TERFILTER, setelah filtering: BENAR & TERFILTER: {filtered_out_wrong_answer_to_filtered_out_right_answer_unanswered}, sebesar: {round(filtered_out_wrong_answer_to_filtered_out_right_answer_unanswered/len(df) * 100, 2)} %")
         print(f"Banyaknya data sebelum filtering (unanswered): SALAH & TERFILTER, setelah filtering: SALAH & TERFILTER: {filtered_out_wrong_answer_to_filtered_out_wrong_answer_unanswered}, sebesar: {round(filtered_out_wrong_answer_to_filtered_out_wrong_answer_unanswered/len(df) * 100, 2)} %")
+        print()
+        
+        print("-- Pada pengecekan filtering awal: --")
+        if TYPE_QAS == 'entailment only':
+            accept_right = (exist_true_answer_label_entailment) \
+                / (exist_true_answer_label_entailment + exist_true_answer_label_neutral + exist_true_answer_label_contradiction)
+            reject_wrong = (exist_false_answer_label_neutral + exist_false_answer_label_contradiction) \
+                / (exist_false_answer_label_entailment + exist_false_answer_label_neutral + exist_false_answer_label_contradiction)
+            print(f"Berhasil menerima {round(accept_right * 100, 2)} % jawaban yang benar (answer exist)")
+            print(f"Berhasil menolak {round(reject_wrong * 100, 2)} % jawaban yang salah (answer exist)") 
+            print()
+            
+            no_exist_accept_right = (no_exist_true_answer_label_entailment) \
+                / (no_exist_true_answer_label_entailment + no_exist_true_answer_label_neutral + no_exist_true_answer_label_contradiction)
+            no_exist_reject_wrong = (no_exist_false_answer_label_neutral + no_exist_false_answer_label_contradiction) \
+                / (no_exist_false_answer_label_entailment + no_exist_false_answer_label_neutral + no_exist_false_answer_label_contradiction)
+            print(f"Berhasil menerima {round(no_exist_accept_right * 100, 2)} % jawaban yang benar (answer DO NOT exist)")
+            print(f"Berhasil menolak {round(no_exist_reject_wrong * 100, 2)} % jawaban yang salah (answer DO NOT exist)") 
+            print()
+            
+        elif TYPE_QAS == 'entailment or neutral':
+            accept_right = (exist_true_answer_label_entailment + exist_true_answer_label_neutral) \
+                / (exist_true_answer_label_entailment + exist_true_answer_label_neutral + exist_true_answer_label_contradiction)
+            reject_wrong = (exist_false_answer_label_contradiction) \
+                / (exist_false_answer_label_entailment + exist_false_answer_label_neutral + exist_false_answer_label_contradiction)
+            print(f"Berhasil menerima {round(accept_right * 100, 2)} % jawaban yang benar (answer exist)")
+            print(f"Berhasil menolak {round(reject_wrong * 100, 2)} % jawaban yang salah (answer exist)") 
+            print()
+            
+            no_exist_accept_right = (no_exist_true_answer_label_entailment + no_exist_true_answer_label_neutral) \
+                / (no_exist_true_answer_label_entailment + no_exist_true_answer_label_neutral + no_exist_true_answer_label_contradiction)
+            no_exist_reject_wrong = (no_exist_false_answer_label_contradiction) \
+                / (no_exist_false_answer_label_entailment + no_exist_false_answer_label_neutral + no_exist_false_answer_label_contradiction)
+            print(f"Berhasil menerima {round(no_exist_accept_right * 100, 2)} % jawaban yang benar (answer DO NOT exist)")
+            print(f"Berhasil menolak {round(no_exist_reject_wrong * 100, 2)} % jawaban yang salah (answer DO NOT exist)") 
+            print()
+            
+        print("-- Setelah pengecekan filtering berdasarkan hasil akhir MSI: --")
+        accept_right_after_filtering = (filtered_out_right_answer_to_filtered_in_right_answer + filtered_out_wrong_answer_to_filtered_in_right_answer) \
+            / (filtered_out_right_answer_to_filtered_in_right_answer + filtered_out_wrong_answer_to_filtered_in_right_answer + filtered_out_right_answer_to_filtered_out_right_answer + filtered_out_wrong_answer_to_filtered_out_right_answer)
+        
+        reject_wrong_after_filtering = (filtered_out_right_answer_to_filtered_out_wrong_answer + filtered_out_wrong_answer_to_filtered_out_wrong_answer) \
+        / (filtered_out_right_answer_to_filtered_out_wrong_answer + filtered_out_wrong_answer_to_filtered_out_wrong_answer + filtered_out_right_answer_to_filtered_in_wrong_answer + filtered_out_wrong_answer_to_filtered_in_wrong_answer)
+        
+        print(f"Berhasil menerima {round(accept_right_after_filtering * 100, 2)} % jawaban yang benar (answer exist)")
+        print(f"Berhasil menolak {round(reject_wrong_after_filtering * 100, 2)} % jawaban yang salah (answer exist)") 
+        print()
+        
+        no_exist_accept_right_after_filtering = (filtered_out_right_answer_to_filtered_in_right_answer_unanswered + filtered_out_wrong_answer_to_filtered_in_right_answer_unanswered) \
+            / (filtered_out_right_answer_to_filtered_in_right_answer_unanswered + filtered_out_wrong_answer_to_filtered_in_right_answer_unanswered + filtered_out_right_answer_to_filtered_out_right_answer_unanswered + filtered_out_wrong_answer_to_filtered_out_right_answer_unanswered)
+        
+        no_exist_reject_wrong_after_filtering = (filtered_out_right_answer_to_filtered_out_wrong_answer_unanswered + filtered_out_wrong_answer_to_filtered_out_wrong_answer_unanswered) \
+        / (filtered_out_right_answer_to_filtered_out_wrong_answer_unanswered + filtered_out_wrong_answer_to_filtered_out_wrong_answer_unanswered + filtered_out_right_answer_to_filtered_in_wrong_answer_unanswered + filtered_out_wrong_answer_to_filtered_in_wrong_answer_unanswered)
+        
+        print(f"Berhasil menerima {round(no_exist_accept_right_after_filtering * 100, 2)} % jawaban yang benar (answer DO NOT exist)")
+        print(f"Berhasil menolak {round(no_exist_reject_wrong_after_filtering * 100, 2)} % jawaban yang salah (answer DO NOT exist)") 
         print()
         
         print(f"Rerata skor yang membuat data menjadi TERFILTER sebelum iterasi MSI: {np.mean(filtered_score_labels_before_filtering)}")
@@ -1656,7 +1713,7 @@ if __name__ == "__main__":
                 exist_false_answer_label_entailment+exist_false_answer_label_neutral+exist_false_answer_label_contradiction+\
                 no_exist_true_answer_label_entailment+no_exist_true_answer_label_neutral+no_exist_true_answer_label_contradiction+\
                 no_exist_false_answer_label_entailment+no_exist_false_answer_label_neutral+no_exist_false_answer_label_contradiction
-
+        
     breakdown_evaluation(filtering_result, TYPE_QAS=TYPE_QAS)
 
     os.makedirs(os.path.dirname(METRIC_RESULT_DIR), exist_ok=True)
