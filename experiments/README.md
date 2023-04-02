@@ -16,6 +16,17 @@ cd experiments
 pip install -r requirements.txt
 ```
 
+If you not yet install git-lfs, please install. You can install git-lfs like this:
+'''
+git lfs install
+'''
+Or, like this:
+'''
+curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
+apt-get install git-lfs
+git lfs install
+'''
+
 ## Running experiments for training IndoNLI
 
 Please, check the arguments that can be passed to this code; the datatype, arguments choice, and default value.
