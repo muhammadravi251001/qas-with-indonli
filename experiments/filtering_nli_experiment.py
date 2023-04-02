@@ -1084,12 +1084,55 @@ if __name__ == "__main__":
         num_berapa_wrong = 0
         num_others_wrong = 0
         
-        # Cek question type, yang berhasil berapa, yang gagal berapa?
+        under_hundred_right = 0
+        _101_to_150_right = 0
+        _151_to_200_right = 0
+        _201_to_250_right = 0
+        _251_to_300_right = 0
+        _over_301_right = 0
+        
+        under_hundred_wrong = 0
+        _101_to_150_wrong = 0
+        _151_to_200_wrong = 0
+        _201_to_250_wrong = 0
+        _251_to_300_wrong = 0
+        _over_301_wrong = 0
+        
+        q_one_to_five_right = 0
+        q_six_to_ten_right = 0
+        q_eleven_to_fifteen_right = 0
+        q_sixteen_to_twenty_right = 0
+        q_over_twenty_right = 0
+        
+        q_one_to_five_wrong = 0
+        q_six_to_ten_wrong = 0
+        q_eleven_to_fifteen_wrong = 0
+        q_sixteen_to_twenty_wrong = 0
+        q_over_twenty_wrong = 0
+        
+        a_zero_right = 0
+        a_one_to_five_right = 0
+        a_six_to_ten_right = 0
+        a_eleven_to_fifteen_right = 0
+        a_sixteen_to_twenty_right = 0
+        a_over_twenty_right = 0
+        
+        a_zero_wrong = 0
+        a_one_to_five_wrong = 0
+        a_six_to_ten_wrong = 0
+        a_eleven_to_fifteen_wrong = 0
+        a_sixteen_to_twenty_wrong = 0
+        a_over_twenty_wrong = 0
+        
+        # Cek semua properti EDA, yang berhasil berapa, yang gagal berapa?
         for i in range(len(df)):
             
-            pred_answer_after_filtering = df["Prediction Answer Before Filtering"][i][0]       
+            pred_answer_after_filtering = df["Prediction Answer After Filtering"][i][0]       
             gold_text = df["Gold Answer"][i]
             current_question = df["Question"][i].split()
+            len_current_passage = len(df["Context"][i].split())
+            len_current_question = len(df["Question"][i].split())
+            len_current_gold_text = len(df["Gold Answer"][i].split())
             
             if (pred_answer_after_filtering == gold_text):
                 if 'Apa' in current_question: num_apa_right += 1
@@ -1121,6 +1164,43 @@ if __name__ == "__main__":
                 elif 'berapakah' in current_question: num_berapa_right += 1
 
                 else: num_others_right += 1
+                    
+                if len_current_passage <= 100: 
+                    under_hundred_right += 1
+                elif len_current_passage >= 101 & len_current_passage <= 150:
+                    _101_to_150_right += 1
+                elif len_current_passage >= 151 & len_current_passage <= 200:
+                    _151_to_200_right += 1
+                elif len_current_passage >= 201 & len_current_passage <= 250:
+                    _201_to_250_right += 1
+                elif len_current_passage >= 251 & len_current_passage <= 300:
+                    _251_to_300_right += 1
+                elif len_current_passage >= 301:
+                    _over_301_right += 1
+                    
+                if len_current_question <= 5: 
+                    q_one_to_five_right += 1
+                elif len_current_question >= 6 & len_current_question <= 10:
+                    q_six_to_ten_right += 1
+                elif len_current_question >= 11 & len_current_question <= 15:
+                    q_eleven_to_fifteen_right += 1
+                elif len_current_question >= 16 & len_current_question <= 20:
+                    q_sixteen_to_twenty_right += 1
+                elif len_current_question >= 21: 
+                    q_over_twenty_right += 1
+                    
+                if len_current_gold_text <= 5: 
+                    a_one_to_five_right += 1
+                elif len_current_gold_text >= 6 & len_current_gold_text <= 10:
+                    a_six_to_ten_right += 1
+                elif len_current_gold_text >= 11 & len_current_gold_text <= 15:
+                    a_eleven_to_fifteen_right += 1
+                elif len_current_gold_text >= 16 & len_current_gold_text <= 20:
+                    a_sixteen_to_twenty_right += 1
+                elif len_current_gold_text >= 21: 
+                    a_over_twenty_right += 1
+                elif len_current_gold_text == 0:
+                    a_zero_right += 1
             
             elif (pred_answer_after_filtering != gold_text):
                 if 'Apa' in current_question: num_apa_wrong += 1
@@ -1152,48 +1232,7 @@ if __name__ == "__main__":
                 elif 'berapakah' in current_question: num_berapa_wrong += 1
 
                 else: num_others_wrong += 1
-        
-        assert len(df) == num_apa_right+num_dimana_right+num_kapan_right+num_siapa_right+\
-                            num_bagaimana_right+num_kenapa_right+num_berapa_right+num_others_right+\
-                            num_apa_wrong+num_dimana_wrong+num_kapan_wrong+num_siapa_wrong+\
-                            num_bagaimana_wrong+num_kenapa_wrong+num_berapa_wrong+num_others_wrong
-        
-        under_hundred_right = 0
-        _101_to_150_right = 0
-        _151_to_200_right = 0
-        _201_to_250_right = 0
-        _251_to_300_right = 0
-        _over_301_right = 0
-        
-        under_hundred_wrong = 0
-        _101_to_150_wrong = 0
-        _151_to_200_wrong = 0
-        _201_to_250_wrong = 0
-        _251_to_300_wrong = 0
-        _over_301_wrong = 0
-        
-        # Cek panjang passage, ada hubungan dengan berhasil/gagal?
-        for i in range(len(df)):
-            
-            pred_answer_after_filtering = df["Prediction Answer Before Filtering"][i][0]        
-            gold_text = df["Gold Answer"][i]
-            len_current_passage = len(df["Context"][i].split())
-            
-            if (pred_answer_after_filtering == gold_text):
-                if len_current_passage <= 100: 
-                    under_hundred_right += 1
-                elif len_current_passage >= 101 & len_current_passage <= 150:
-                    _101_to_150_right += 1
-                elif len_current_passage >= 151 & len_current_passage <= 200:
-                    _151_to_200_right += 1
-                elif len_current_passage >= 201 & len_current_passage <= 250:
-                    _201_to_250_right += 1
-                elif len_current_passage >= 251 & len_current_passage <= 300:
-                    _251_to_300_right += 1
-                elif len_current_passage >= 301:
-                    _over_301_right += 1
                     
-            elif (pred_answer_after_filtering != gold_text):
                 if len_current_passage <= 100: 
                     under_hundred_wrong += 1
                 elif len_current_passage >= 101 & len_current_passage <= 150:
@@ -1207,10 +1246,49 @@ if __name__ == "__main__":
                 elif len_current_passage >= 301:
                     _over_301_wrong += 1
                     
+                if len_current_question <= 5: 
+                    q_one_to_five_wrong += 1
+                elif len_current_question >= 6 & len_current_question <= 10:
+                    q_six_to_ten_wrong += 1
+                elif len_current_question >= 11 & len_current_question <= 15:
+                    q_eleven_to_fifteen_wrong += 1
+                elif len_current_question >= 16 & len_current_question <= 20:
+                    q_sixteen_to_twenty_wrong += 1
+                elif len_current_question >= 21: 
+                    q_over_twenty_wrong += 1
+                    
+                if len_current_gold_text <= 5: 
+                    a_one_to_five_wrong += 1
+                elif len_current_gold_text >= 6 & len_current_gold_text <= 10:
+                    a_six_to_ten_wrong += 1
+                elif len_current_gold_text >= 11 & len_current_gold_text <= 15:
+                    a_eleven_to_fifteen_wrong += 1
+                elif len_current_gold_text >= 16 & len_current_gold_text <= 20:
+                    a_sixteen_to_twenty_wrong += 1
+                elif len_current_gold_text >= 21: 
+                    a_over_twenty_wrong += 1
+                elif len_current_gold_text == 0:
+                    a_zero_wrong += 1
+                
+        assert len(df) == num_apa_right+num_dimana_right+num_kapan_right+num_siapa_right+\
+                            num_bagaimana_right+num_kenapa_right+num_berapa_right+num_others_right+\
+                            num_apa_wrong+num_dimana_wrong+num_kapan_wrong+num_siapa_wrong+\
+                            num_bagaimana_wrong+num_kenapa_wrong+num_berapa_wrong+num_others_wrong
+                    
         assert len(df) == under_hundred_right+_101_to_150_right+_151_to_200_right+_201_to_250_right+\
                             _251_to_300_right+_over_301_right+\
                             under_hundred_wrong+_101_to_150_wrong+_151_to_200_wrong+_201_to_250_wrong+\
                             _251_to_300_wrong+_over_301_wrong
+        
+        assert len(df) == q_one_to_five_right+q_six_to_ten_right+q_eleven_to_fifteen_right+q_sixteen_to_twenty_right+\
+                            q_over_twenty_right+\
+                            q_one_to_five_wrong+q_six_to_ten_wrong+q_eleven_to_fifteen_wrong+q_sixteen_to_twenty_wrong+\
+                            q_over_twenty_wrong
+        
+        assert len(df) == a_one_to_five_right+a_six_to_ten_right+a_eleven_to_fifteen_right+a_sixteen_to_twenty_right+\
+                            a_over_twenty_right+a_zero_right+\
+                            a_one_to_five_wrong+a_six_to_ten_wrong+a_eleven_to_fifteen_wrong+a_sixteen_to_twenty_wrong+\
+                            a_over_twenty_wrong+a_zero_wrong
         
         # Ambil berapa contoh yang gagal, coba pelajari reasoning type-nya.
         new_df = df.sample(n=15, random_state=42)
@@ -1236,7 +1314,7 @@ if __name__ == "__main__":
         print(f"Banyak pertanyaan BERAPA: {num_berapa_wrong}, sebesar: {round((num_berapa_wrong/len(df) * 100), 2)} %")
         print(f"Banyak pertanyaan LAINNYA: {num_others_wrong}, sebesar: {round((num_others_wrong/len(df) * 100), 2)} %")
         print()
-        print(f"-- Prosentase kebenaran dari pertanyaan --")
+        print(f"-- Presentase kebenaran --")
         print(f"Banyak pertanyaan APA yang terpediksi benar sebesar: {round((num_apa_right/(num_apa_right+num_apa_wrong) * 100), 2)} %")
         print(f"Banyak pertanyaan DIMANA yang terpediksi benar sebesar: {round((num_dimana_right/(num_dimana_right+num_dimana_wrong) * 100), 2)} %")
         print(f"Banyak pertanyaan KAPAN yang terpediksi benar sebesar: {round((num_kapan_right/(num_kapan_right+num_kapan_wrong) * 100), 2)} %")
@@ -1264,9 +1342,59 @@ if __name__ == "__main__":
         print(f"Panjang konteks 251 <= x <= 300: {_251_to_300_wrong}, sebesar: {round((_251_to_300_wrong/len(df) * 100), 2)} %")
         print(f"Panjang konteks > 300: {_over_301_wrong}, sebesar: {round((_over_301_wrong/len(df) * 100), 2)} %")
         print()
-        print(f"-- Prosentase kebenaran dari pertanyaan --")
-        print(f"Panjang konteks < 100 yang terprediksi benar sebesar: {round((under_hundred_right/(under_hundred_right+under_hundred_wrong) * 100), 2)} %")
-        print(f"Panjang konteks 101 <= x <= 150 yang terprediksi benar sebesar: {round((_101_to_150_right/(_101_to_150_right+_101_to_150_wrong) * 100), 2)} %")
+        print(f"-- Presentase kebenaran --")
+        print(f"Panjang konteks < 100 yang terprediksi benar sebesar: {(under_hundred_right+under_hundred_wrong) and round((under_hundred_right/(under_hundred_right+under_hundred_wrong) * 100), 2)} %")
+        print(f"Panjang konteks 101 <= x <= 150 yang terprediksi benar sebesar: {(_101_to_150_right+_101_to_150_wrong) and round((_101_to_150_right/(_101_to_150_right+_101_to_150_wrong) * 100), 2)} %")
+        print(f"Panjang konteks 151 <= x <= 200 yang terprediksi benar sebesar: {(_151_to_200_right+_151_to_200_wrong) and round((_151_to_200_right/(_151_to_200_right+_151_to_200_wrong) * 100), 2)} %")
+        print(f"Panjang konteks 201 <= x <= 250 yang terprediksi benar sebesar: {(_201_to_250_right+_201_to_250_wrong) and round((_201_to_250_right/(_201_to_250_right+_201_to_250_wrong) * 100), 2)} %")
+        print(f"Panjang konteks 251 <= x <= 300 yang terprediksi benar sebesar: {(_251_to_300_right+_251_to_300_wrong) and round((_251_to_300_right/(_251_to_300_right+_251_to_300_wrong) * 100), 2)} %")
+        print(f"Panjang konteks > 300 yang terprediksi benar sebesar: {(_over_301_right+_over_301_wrong) and round((_over_301_right/(_over_301_right+_over_301_wrong) * 100), 2)} %")
+        print()
+        
+        print("--- Bagian tentang panjang question ---")
+        print(f"-- Bagian tentang panjang question yang terprediksi BENAR --")
+        print(f"Panjang question 1 <= x <= 5: {q_one_to_five_right}, sebesar: {round((q_one_to_five_right/len(df) * 100), 2)} %")
+        print(f"Panjang question 6 <= x <= 10: {q_six_to_ten_right}, sebesar: {round((q_six_to_ten_right/len(df) * 100), 2)} %")
+        print(f"Panjang question 11 <= x <= 15: {q_eleven_to_fifteen_right}, sebesar: {round((q_eleven_to_fifteen_right/len(df) * 100), 2)} %")
+        print(f"Panjang question 16 <= x <= 20: {q_sixteen_to_twenty_right}, sebesar: {round((q_sixteen_to_twenty_right/len(df) * 100), 2)} %")
+        print(f"Panjang question > 20: {q_over_twenty_right}, sebesar: {round((q_over_twenty_right/len(df) * 100), 2)} %")
+        print()
+        print(f"-- Bagian tentang panjang question yang terprediksi SALAH --")
+        print(f"Panjang question 1 <= x <= 5: {q_one_to_five_wrong}, sebesar: {round((q_one_to_five_wrong/len(df) * 100), 2)} %")
+        print(f"Panjang question 6 <= x <= 10: {q_six_to_ten_wrong}, sebesar: {round((q_six_to_ten_wrong/len(df) * 100), 2)} %")
+        print(f"Panjang question 11 <= x <= 15: {q_eleven_to_fifteen_wrong}, sebesar: {round((q_eleven_to_fifteen_wrong/len(df) * 100), 2)} %")
+        print(f"Panjang question 16 <= x <= 20: {q_sixteen_to_twenty_wrong}, sebesar: {round((q_sixteen_to_twenty_wrong/len(df) * 100), 2)} %")
+        print(f"Panjang question > 20: {q_over_twenty_wrong}, sebesar: {round((q_over_twenty_wrong/len(df) * 100), 2)} %")
+        print()
+        print(f"-- Presentase kebenaran --")
+        print(f"Panjang question 1 <= x <= 5 yang terprediksi benar sebesar: {(q_one_to_five_right+q_one_to_five_wrong) and round((q_one_to_five_right/(q_one_to_five_right+q_one_to_five_wrong) * 100), 2)} %")
+        print(f"Panjang question 6 <= x <= 10 yang terprediksi benar sebesar: {(q_six_to_ten_right+q_six_to_ten_wrong) and round((q_six_to_ten_right/(q_six_to_ten_right+q_six_to_ten_wrong) * 100), 2)} %")
+        print(f"Panjang question 11 <= x <= 15 yang terprediksi benar sebesar: {(q_eleven_to_fifteen_right+q_eleven_to_fifteen_wrong) and round((q_eleven_to_fifteen_right/(q_eleven_to_fifteen_right+q_eleven_to_fifteen_wrong) * 100), 2)} %")
+        print(f"Panjang question 16 <= x <= 20 yang terprediksi benar sebesar: {(q_sixteen_to_twenty_right+q_sixteen_to_twenty_wrong) and round((q_sixteen_to_twenty_right/(q_sixteen_to_twenty_right+q_sixteen_to_twenty_wrong) * 100), 2)} %")
+        print(f"Panjang question > 20 yang terprediksi benar sebesar: {round((q_over_twenty_right+q_over_twenty_wrong) and (q_over_twenty_right/(q_over_twenty_right+q_over_twenty_wrong) * 100), 2)} %")
+        print()
+        
+        print("--- Bagian tentang panjang gold answer ---")
+        print(f"-- Bagian tentang panjang gold answer yang terprediksi BENAR --")
+        print(f"Panjang question 1 <= x <= 5: {a_one_to_five_right}, sebesar: {round((a_one_to_five_right/len(df) * 100), 2)} %")
+        print(f"Panjang question 6 <= x <= 10: {a_six_to_ten_right}, sebesar: {round((a_six_to_ten_right/len(df) * 100), 2)} %")
+        print(f"Panjang question 11 <= x <= 15: {a_eleven_to_fifteen_right}, sebesar: {round((a_eleven_to_fifteen_right/len(df) * 100), 2)} %")
+        print(f"Panjang question 16 <= x <= 20: {a_sixteen_to_twenty_right}, sebesar: {round((a_sixteen_to_twenty_right/len(df) * 100), 2)} %")
+        print(f"Panjang question > 20: {a_over_twenty_right}, sebesar: {round((a_over_twenty_right/len(df) * 100), 2)} %")
+        print()
+        print(f"-- Bagian tentang panjang gold answer yang terprediksi SALAH --")
+        print(f"Panjang question 1 <= x <= 5: {a_one_to_five_wrong}, sebesar: {round((a_one_to_five_wrong/len(df) * 100), 2)} %")
+        print(f"Panjang question 6 <= x <= 10: {a_six_to_ten_wrong}, sebesar: {round((a_six_to_ten_wrong/len(df) * 100), 2)} %")
+        print(f"Panjang question 11 <= x <= 15: {a_eleven_to_fifteen_wrong}, sebesar: {round((a_eleven_to_fifteen_wrong/len(df) * 100), 2)} %")
+        print(f"Panjang question 16 <= x <= 20: {a_sixteen_to_twenty_wrong}, sebesar: {round((a_sixteen_to_twenty_wrong/len(df) * 100), 2)} %")
+        print(f"Panjang question > 20: {a_over_twenty_wrong}, sebesar: {round((a_over_twenty_wrong/len(df) * 100), 2)} %")
+        print()
+        print(f"-- Presentase kebenaran --")
+        print(f"Panjang question 1 <= x <= 5 yang terprediksi benar sebesar: {(a_one_to_five_right+a_one_to_five_wrong) and round((a_one_to_five_right/(a_one_to_five_right+a_one_to_five_wrong) * 100), 2)} %")
+        print(f"Panjang question 6 <= x <= 10 yang terprediksi benar sebesar: {(a_six_to_ten_right+a_six_to_ten_wrong) and round((a_six_to_ten_right/(a_six_to_ten_right+a_six_to_ten_wrong) * 100), 2)} %")
+        print(f"Panjang question 11 <= x <= 15 yang terprediksi benar sebesar: {(a_eleven_to_fifteen_right+a_eleven_to_fifteen_wrong) and round((a_eleven_to_fifteen_right/(a_eleven_to_fifteen_right+a_eleven_to_fifteen_wrong) * 100), 2)} %")
+        print(f"Panjang question 16 <= x <= 20 yang terprediksi benar sebesar: {(a_sixteen_to_twenty_right+a_sixteen_to_twenty_wrong) and round((a_sixteen_to_twenty_right/(a_sixteen_to_twenty_right+a_sixteen_to_twenty_wrong) * 100), 2)} %")
+        print(f"Panjang question > 20 yang terprediksi benar sebesar: {round((a_over_twenty_right+a_over_twenty_wrong) and (a_over_twenty_right/(a_over_twenty_right+a_over_twenty_wrong) * 100), 2)} %")
         print()
         
         print("--- Bagian untuk analisis REASONING TYPE ---")
@@ -1727,206 +1855,6 @@ if __name__ == "__main__":
                 exist_false_answer_label_entailment+exist_false_answer_label_neutral+exist_false_answer_label_contradiction+\
                 no_exist_true_answer_label_entailment+no_exist_true_answer_label_neutral+no_exist_true_answer_label_contradiction+\
                 no_exist_false_answer_label_entailment+no_exist_false_answer_label_neutral+no_exist_false_answer_label_contradiction
-        
-        num_apa_right = 0
-        num_dimana_right = 0
-        num_kapan_right = 0
-        num_siapa_right = 0
-        num_bagaimana_right = 0
-        num_kenapa_right = 0
-        num_berapa_right = 0
-        num_others_right = 0
-        
-        num_apa_wrong = 0
-        num_dimana_wrong = 0
-        num_kapan_wrong = 0
-        num_siapa_wrong = 0
-        num_bagaimana_wrong = 0
-        num_kenapa_wrong = 0
-        num_berapa_wrong = 0
-        num_others_wrong = 0
-        
-        # Cek question type, yang berhasil berapa, yang gagal berapa?
-        for i in range(len(df)):
-            
-            pred_answer_after_filtering = df["Prediction Answer After Filtering"][i][-1]       
-            gold_text = df["Gold Answer"][i]
-            current_question = df["Question"][i].split()
-            
-            if (pred_answer_after_filtering == gold_text):
-                if 'Apa' in current_question: num_apa_right += 1
-                elif 'Apakah' in current_question: num_apa_right += 1
-                elif 'apa' in current_question: num_apa_right += 1
-                elif 'apakah' in current_question: num_apa_right += 1
-
-                elif 'Dimana' in current_question: num_dimana_right += 1
-                elif 'dimana' in current_question: num_dimana_right += 1
-                elif 'mana' in current_question: num_dimana_right += 1
-
-                elif 'Kapan' in current_question: num_kapan_right += 1
-                elif 'kapan' in current_question: num_kapan_right += 1
-
-                elif 'Siapa' in current_question: num_siapa_right += 1
-                elif 'siapa' in current_question: num_siapa_right += 1
-
-                elif 'Bagaimana' in current_question: num_bagaimana_right += 1
-                elif 'bagaimana' in current_question: num_bagaimana_right += 1
-
-                elif 'Mengapa' in current_question: num_kenapa_right += 1
-                elif 'Kenapa' in current_question: num_kenapa_right += 1
-                elif 'mengapa' in current_question: num_kenapa_right += 1
-                elif 'kenapa' in current_question: num_kenapa_right += 1
-
-                elif 'Berapa' in current_question: num_berapa_right += 1
-                elif 'Berapakah' in current_question: num_berapa_right += 1
-                elif 'berapa' in current_question: num_berapa_right += 1
-                elif 'berapakah' in current_question: num_berapa_right += 1
-
-                else: num_others_right += 1
-            
-            elif (pred_answer_after_filtering != gold_text):
-                if 'Apa' in current_question: num_apa_wrong += 1
-                elif 'Apakah' in current_question: num_apa_wrong += 1
-                elif 'apa' in current_question: num_apa_wrong += 1
-                elif 'apakah' in current_question: num_apa_wrong += 1
-
-                elif 'Dimana' in current_question: num_dimana_wrong += 1
-                elif 'dimana' in current_question: num_dimana_wrong += 1
-                elif 'mana' in current_question: num_dimana_wrong += 1
-
-                elif 'Kapan' in current_question: num_kapan_wrong += 1
-                elif 'kapan' in current_question: num_kapan_wrong += 1
-
-                elif 'Siapa' in current_question: num_siapa_wrong += 1
-                elif 'siapa' in current_question: num_siapa_wrong += 1
-
-                elif 'Bagaimana' in current_question: num_bagaimana_wrong += 1
-                elif 'bagaimana' in current_question: num_bagaimana_wrong += 1
-
-                elif 'Mengapa' in current_question: num_kenapa_wrong += 1
-                elif 'Kenapa' in current_question: num_kenapa_wrong += 1
-                elif 'mengapa' in current_question: num_kenapa_wrong += 1
-                elif 'kenapa' in current_question: num_kenapa_wrong += 1
-
-                elif 'Berapa' in current_question: num_berapa_wrong += 1
-                elif 'Berapakah' in current_question: num_berapa_wrong += 1
-                elif 'berapa' in current_question: num_berapa_wrong += 1
-                elif 'berapakah' in current_question: num_berapa_wrong += 1
-
-                else: num_others_wrong += 1
-        
-        assert len(df) == num_apa_right+num_dimana_right+num_kapan_right+num_siapa_right+\
-                            num_bagaimana_right+num_kenapa_right+num_berapa_right+num_others_right+\
-                            num_apa_wrong+num_dimana_wrong+num_kapan_wrong+num_siapa_wrong+\
-                            num_bagaimana_wrong+num_kenapa_wrong+num_berapa_wrong+num_others_wrong
-        
-        under_hundred_right = 0
-        _101_to_150_right = 0
-        _151_to_200_right = 0
-        _201_to_250_right = 0
-        _251_to_300_right = 0
-        _over_301_right = 0
-        
-        under_hundred_wrong = 0
-        _101_to_150_wrong = 0
-        _151_to_200_wrong = 0
-        _201_to_250_wrong = 0
-        _251_to_300_wrong = 0
-        _over_301_wrong = 0
-        
-        # Cek panjang passage, ada hubungan dengan berhasil/gagal?
-        for i in range(len(df)):
-            
-            pred_answer_after_filtering = df["Prediction Answer After Filtering"][i][-1]       
-            gold_text = df["Gold Answer"][i]
-            len_current_passage = len(df["Context"][i].split())
-            
-            if (pred_answer_after_filtering == gold_text):
-                if len_current_passage <= 100: 
-                    under_hundred_right += 1
-                elif len_current_passage >= 101 & len_current_passage <= 150:
-                    _101_to_150_right += 1
-                elif len_current_passage >= 151 & len_current_passage <= 200:
-                    _151_to_200_right += 1
-                elif len_current_passage >= 201 & len_current_passage <= 250:
-                    _201_to_250_right += 1
-                elif len_current_passage >= 251 & len_current_passage <= 300:
-                    _251_to_300_right += 1
-                elif len_current_passage >= 301:
-                    _over_301_right += 1
-                    
-            elif (pred_answer_after_filtering != gold_text):
-                if len_current_passage <= 100: 
-                    under_hundred_wrong += 1
-                elif len_current_passage >= 101 & len_current_passage <= 150:
-                    _101_to_150_wrong += 1
-                elif len_current_passage >= 151 & len_current_passage <= 200:
-                    _151_to_200_wrong += 1
-                elif len_current_passage >= 201 & len_current_passage <= 250:
-                    _201_to_250_wrong += 1
-                elif len_current_passage >= 251 & len_current_passage <= 300:
-                    _251_to_300_wrong += 1
-                elif len_current_passage >= 301:
-                    _over_301_wrong += 1
-                    
-        assert len(df) == under_hundred_right+_101_to_150_right+_151_to_200_right+_201_to_250_right+\
-                            _251_to_300_right+_over_301_right+\
-                            under_hundred_wrong+_101_to_150_wrong+_151_to_200_wrong+_201_to_250_wrong+\
-                            _251_to_300_wrong+_over_301_wrong
-        
-        print("--- Bagian tentang question type ---")
-        print(f"-- Bagian tentang question type yang terprediksi BENAR --")
-        print(f"Banyak pertanyaan APA: {num_apa_right}, sebesar: {round((num_apa_right/len(df) * 100), 2)} %")
-        print(f"Banyak pertanyaan DIMANA: {num_dimana_right}, sebesar: {round((num_dimana_right/len(df) * 100), 2)} %")
-        print(f"Banyak pertanyaan KAPAN: {num_kapan_right}, sebesar: {round((num_kapan_right/len(df) * 100), 2)} %")
-        print(f"Banyak pertanyaan SIAPA: {num_siapa_right}, sebesar: {round((num_siapa_right/len(df) * 100), 2)} %")
-        print(f"Banyak pertanyaan BAGAIMANA: {num_bagaimana_right}, sebesar: {round((num_bagaimana_right/len(df) * 100), 2)} %")
-        print(f"Banyak pertanyaan KENAPA: {num_kenapa_right}, sebesar: {round((num_kenapa_right/len(df) * 100), 2)} %")
-        print(f"Banyak pertanyaan BERAPA: {num_berapa_right}, sebesar: {round((num_berapa_right/len(df) * 100), 2)} %")
-        print(f"Banyak pertanyaan LAINNYA: {num_others_right}, sebesar: {round((num_others_right/len(df) * 100), 2)} %")
-        print()
-        print(f"-- Bagian tentang question type yang terprediksi SALAH --")
-        print(f"Banyak pertanyaan APA: {num_apa_wrong}, sebesar: {round((num_apa_wrong/len(df) * 100), 2)} %")
-        print(f"Banyak pertanyaan DIMANA: {num_dimana_wrong}, sebesar: {round((num_dimana_wrong/len(df) * 100), 2)} %")
-        print(f"Banyak pertanyaan KAPAN: {num_kapan_wrong}, sebesar: {round((num_kapan_wrong/len(df) * 100), 2)} %")
-        print(f"Banyak pertanyaan SIAPA: {num_siapa_wrong}, sebesar: {round((num_siapa_wrong/len(df) * 100), 2)} %")
-        print(f"Banyak pertanyaan BAGAIMANA: {num_bagaimana_wrong}, sebesar: {round((num_bagaimana_wrong/len(df) * 100), 2)} %")
-        print(f"Banyak pertanyaan KENAPA: {num_kenapa_wrong}, sebesar: {round((num_kenapa_wrong/len(df) * 100), 2)} %")
-        print(f"Banyak pertanyaan BERAPA: {num_berapa_wrong}, sebesar: {round((num_berapa_wrong/len(df) * 100), 2)} %")
-        print(f"Banyak pertanyaan LAINNYA: {num_others_wrong}, sebesar: {round((num_others_wrong/len(df) * 100), 2)} %")
-        print()
-        print(f"-- Prosentase kebenaran dari pertanyaan --")
-        print(f"Banyak pertanyaan APA yang terpediksi benar sebesar: {round((num_apa_right/(num_apa_right+num_apa_wrong) * 100), 2)} %")
-        print(f"Banyak pertanyaan DIMANA yang terpediksi benar sebesar: {round((num_dimana_right/(num_dimana_right+num_dimana_wrong) * 100), 2)} %")
-        print(f"Banyak pertanyaan KAPAN yang terpediksi benar sebesar: {round((num_kapan_right/(num_kapan_right+num_kapan_wrong) * 100), 2)} %")
-        print(f"Banyak pertanyaan SIAPA yang terpediksi benar sebesar: {round((num_siapa_right/(num_siapa_right+num_siapa_wrong) * 100), 2)} %")
-        print(f"Banyak pertanyaan BAGAIMANA yang terpediksi benar sebesar: {round((num_bagaimana_right/(num_bagaimana_right+num_bagaimana_wrong) * 100), 2)} %")
-        print(f"Banyak pertanyaan KENAPA yang terpediksi benar sebesar: {round((num_kenapa_right/(num_kenapa_right+num_kenapa_wrong) * 100), 2)} %")
-        print(f"Banyak pertanyaan BERAPA yang terpediksi benar sebesar: {round((num_berapa_right/(num_berapa_right+num_berapa_wrong) * 100), 2)} %")
-        print(f"Banyak pertanyaan LAINNYA yang terpediksi benar sebesar: {round((num_others_right/(num_others_right+num_others_wrong) * 100), 2)} %")
-        print()
-        
-        print("--- Bagian tentang panjang context ---")
-        print(f"-- Bagian tentang panjang context yang terprediksi BENAR --")
-        print(f"Panjang konteks < 100: {under_hundred_right}, sebesar: {round((under_hundred_right/len(df) * 100), 2)} %")
-        print(f"Panjang konteks 101 <= x <= 150: {_101_to_150_right}, sebesar: {round((_101_to_150_right/len(df) * 100), 2)} %")
-        print(f"Panjang konteks 151 <= x <= 200: {_151_to_200_right}, sebesar: {round((_151_to_200_right/len(df) * 100), 2)} %")
-        print(f"Panjang konteks 201 <= x <= 250: {_201_to_250_right}, sebesar: {round((_201_to_250_right/len(df) * 100), 2)} %")
-        print(f"Panjang konteks 251 <= x <= 300: {_251_to_300_right}, sebesar: {round((_251_to_300_right/len(df) * 100), 2)} %")
-        print(f"Panjang konteks > 300: {_over_301_right}, sebesar: {round((_over_301_right/len(df) * 100), 2)} %")
-        print()
-        print(f"-- Bagian tentang panjang context yang terprediksi SALAH --")
-        print(f"Panjang konteks < 100: {under_hundred_wrong}, sebesar: {round((under_hundred_wrong/len(df) * 100), 2)} %")
-        print(f"Panjang konteks 101 <= x <= 150: {_101_to_150_wrong}, sebesar: {round((_101_to_150_wrong/len(df) * 100), 2)} %")
-        print(f"Panjang konteks 151 <= x <= 200: {_151_to_200_wrong}, sebesar: {round((_151_to_200_wrong/len(df) * 100), 2)} %")
-        print(f"Panjang konteks 201 <= x <= 250: {_201_to_250_wrong}, sebesar: {round((_201_to_250_wrong/len(df) * 100), 2)} %")
-        print(f"Panjang konteks 251 <= x <= 300: {_251_to_300_wrong}, sebesar: {round((_251_to_300_wrong/len(df) * 100), 2)} %")
-        print(f"Panjang konteks > 300: {_over_301_wrong}, sebesar: {round((_over_301_wrong/len(df) * 100), 2)} %")
-        print()
-        print(f"-- Prosentase kebenaran dari pertanyaan --")
-        print(f"Panjang konteks < 100 yang terprediksi benar sebesar: {round((under_hundred_right/(under_hundred_right+under_hundred_wrong) * 100), 2)} %")
-        print(f"Panjang konteks 101 <= x <= 150 yang terprediksi benar sebesar: {round((_101_to_150_right/(_101_to_150_right+_101_to_150_wrong) * 100), 2)} %")
-        print()
         
     breakdown_evaluation(filtering_result, TYPE_QAS=TYPE_QAS)
 
