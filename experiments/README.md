@@ -98,7 +98,7 @@ With use of `-msc {YOUR_MODEL_CHOICE}` flag, that means you doing Intermediate T
 
 Please, check the arguments that can be passed to this code; the datatype, arguments choice, and default value.
 ```
-python main_training_indonli.py -h
+python filtering_nli_experiment.py -h
 ```
 
 To run this filtering QAS based on NLI experiments, you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token, --batch_size} if you don't want using the default value provided:
