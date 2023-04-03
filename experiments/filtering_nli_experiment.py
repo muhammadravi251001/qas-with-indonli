@@ -1127,7 +1127,7 @@ if __name__ == "__main__":
         # Cek semua properti EDA, yang berhasil berapa, yang gagal berapa?
         for i in range(len(df)):
             
-            pred_answer_after_filtering = df["Prediction Answer After Filtering"][i][0]       
+            pred_answer_after_filtering = df["Prediction Answer After Filtering"][i][-1]       
             gold_text = df["Gold Answer"][i]
             current_question = df["Question"][i].split()
             len_current_passage = len(df["Context"][i].split())
