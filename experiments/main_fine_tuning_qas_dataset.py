@@ -381,24 +381,23 @@ if __name__ == "__main__":
             return text.lower()
         return white_space_fix(remove_articles(remove_punc(lower(s))))
 
-    def compute_f1_prec_rec(pred, gold):
+    def compute_f1(pred, gold):
         pred_tokens = normalize_text(pred).split() # True positive + False positive = Untuk precision
         gold_tokens = normalize_text(gold).split() # True positive + False negatives = Untuk recall
         common = collections.Counter(pred_tokens) & collections.Counter(gold_tokens)
         num_same = sum(common.values()) # True positive
         
         if len(gold_tokens) == 0 or len(pred_tokens) == 0: 
-            var = int(gold_tokens == pred_tokens)
-            return var, var, var
+            return int(gold_tokens == pred_tokens)
         
         if num_same == 0:
-            return 0, 0, 0
+            return 0
         
         precision = 1.0 * num_same / len(pred_tokens)
         recall = 1.0 * num_same / len(gold_tokens)
         f1 = (2.0 * precision * recall) / (precision + recall)
         
-        return f1, precision, recall
+        return f1
 
     def compute_metrics(predict_result):
         predictions_idx = np.argmax(predict_result.predictions, axis=2)
@@ -406,8 +405,6 @@ if __name__ == "__main__":
         label_array = np.asarray(predict_result.label_ids)
         total_correct = 0
         f1_array = []
-        precision_array = []
-        recall_array = []
         
         for i in range(len(predict_result.predictions[0])):
             start_pred_idx = predictions_idx[0][i]
@@ -423,18 +420,14 @@ if __name__ == "__main__":
             if pred_text == gold_text:
                 total_correct += 1
 
-            f1, precision, recall = compute_f1_prec_rec(pred=pred_text, gold=gold_text)
+            f1 = compute_f1(pred=pred_text, gold=gold_text)
             
             f1_array.append(f1)
-            precision_array.append(precision)
-            recall_array.append(recall)
 
         exact_match = ((total_correct / denominator) * 100.0)
         final_f1 = np.mean(f1_array) * 100.0
-        final_precision = np.mean(precision_array) * 100.0
-        final_recall = np.mean(recall_array) * 100.0
         
-        return {'exact_match': exact_match, 'f1': final_f1, 'precision': final_precision, 'recall': final_recall}
+        return {'exact_match': exact_match, 'f1': final_f1}
 
     # ## Mendefinisikan argumen (dataops) untuk training nanti
     TIME_NOW = str(datetime.now()).replace(":", "-").replace(" ", "_").replace(".", "_")
