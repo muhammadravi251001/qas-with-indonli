@@ -12,6 +12,8 @@ Pada sub-bab ini, akan dijelaskan mengenai tahapan penelitian yang penulis gunak
     
     \item \textbf{Persiapan data, model, dan metode}: Pada tahap ini penulis melakukan pencarian untuk memilih data, model, dan metode eksperimen apa saja yang akan digunakan dalam penelitian ini. Tahap ini meliputi pemilihan data dan model yang akan digunakan untuk tiap metode dan penjelasan metode yang dipakai untuk penelitian. Pada akhirnya, penulis menentukan beberapa \emph{dataset} sistem tanya jawab: SQuAD-ID, TyDi-QA-ID, dan IDK-MRC sebagai dataset pengujian sistem tanya jawab, dan pada penelitian ini menggunakan model-model seperti: \emph{indolem/indobert-base-uncased, indobenchmark/indobert-large-p2, xlm-roberta-base}, dan \emph{xlm-roberta-large}. Kemudian, untuk metode penelitian, penulis memutuskan untuk menggunakan tiga metode eksperimen, yaitu: \emph{intermediate-task transfer learning}, \emph{task recasting} dengan IndoNLI sebagai verifikator, dan \emph{task recasting} dengan IndoNLI sebagai penghasil jawaban. Hasil dari tahap ini adalah data yang akan digunakan pada tahap selanjutnya.
 
+    \item \textbf{Eksplorasi \emph{dataset} (EDA)}: Pada tahap ini penulis melakukan eksplorasi dari \emph{dataset} sistem tanya jawab yang telah dipilih, yaitu: SQuAD-ID, TyDi-QA-ID, dan IDK-MRC. Eksplorasi \emph{dataset} (EDA) dilakukan dengan bertujuan untuk mengerti karakteristik dari suatu \emph{dataset} sistem tanya jawab yang sedang diproses.
+    
     \item \textbf{Pelatihan model dan eksperimen}: Pada tahap ini penulis melakukan pelatihan model dan eksperimen-eksperimen berdasarkan data, model, dan metode yang sudah dipilih pada tahap sebelumnya. Tahap ini meliputi pelatihan model yang akan digunakan untuk tiap metode. Hasil dari tahap ini adalah model yang sudah dilatih berdasarkan metode yang telah dipilih yang menghasilkan hasil eksperimen untuk dilakukan analisis pada tahap berikutnya.
 
     \item \textbf{Evaluasi dan analisis hasil}: Pada tahap ini penulis melakukan evaluasi dan analisis berdasarkan hasil yang sudah didapatkan pada tahap sebelumnya. Tahap ini meliputi pemilihan metrik evaluasi yang digunakan untuk setiap metode eksperimen penelitian.
@@ -47,6 +49,47 @@ Pada tahapan eksperimen ini, penulis menggunakan metode yang persis digunakan ol
 \subsubsection{\emph{Task Recasting} dengan IndoNLI sebagai penghasil jawaban}
 %-----------------------------------------------------------------------------%
 \todo
+
+%-----------------------------------------------------------------------------%
+\section{Eksplorasi \emph{dataset} (EDA)}
+%-----------------------------------------------------------------------------%
+Pada sub-bab ini, akan dijelaskan mengenai eksplorasi \emph{dataset} (EDA) sistem tanya jawab yang telah dipilih sebelumnya. Eksplorasi yang penulis lakukan sama persis dengan apa yang telah dilakukan \citet{nguyen-etal-2020-vietnamese} pada tahapan ekplorasi \emph{dataset machine reading comprehension} untuk bahasa Vietnam. Ada beberapa bagian yang penulis jadikan bahan eksplorasi, antara lain:
+
+\begin{itemize}
+
+    \item \emph{Overview Statistics}
+
+        \begin{itemize}
+            \item Banyaknya artikel.
+            \item Banyaknya konteks.
+            \item Banyaknya pertanyaan.
+            \item Banyaknya jawaban yang eksis.
+            \item Banyaknya jawaban yang tidak eksis.
+            \item Rata-rata panjang kata dari konteks.
+            \item Rata-rata panjang kata dari pertanyaan.
+            \item Rata-rata panjang kata dari jawaban.
+            \item \emph{Vocabulary size}.
+        \end{itemize}
+
+    \item \emph{Length-based analysis}
+
+        \begin{itemize}
+            \item Rincian distribusi panjang kata dari konteks.
+            \item Rincian distribusi panjang kata dari pertanyaan.
+            \item Rincian distribusi panjang kata dari jawaban.
+        \end{itemize}
+        
+    \item \emph{Type-based analysis}
+
+        \begin{itemize}
+            \item \emph{Question type}.
+            \item \emph{Reasoning type}.
+        \end{itemize}
+
+\end{itemize}
+
+Properti-properti di atas yang akan menjadi bahan evaluasi dan analisis penelitian ini yang telah tertuang pada \hyperref[sec:rumusanMasalah]{rumusan masalah} dan \hyperref[sec:tujuanPenelitian]{tujuan penelitian} yang telah dituliskan di \hyperref[bab:1]{bab 1} di atas.
+
 
 %-----------------------------------------------------------------------------%
 \section{Pelatihan Model dan Eksperimen}
