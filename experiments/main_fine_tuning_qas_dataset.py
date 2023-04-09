@@ -119,7 +119,7 @@ if __name__ == "__main__":
         BertForQuestionAnswering,
         AutoTokenizer,
         EarlyStoppingCallback, 
-        AutoModel
+        AutoModelForQuestionAnswering
     )
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -334,7 +334,7 @@ if __name__ == "__main__":
 
     # # Tahapan fine-tune dataset QAS diatas model
     # ## Gunakan model Sequence Classification yang sudah pre-trained
-    model_qa = BertForQuestionAnswering.from_pretrained(MODEL_NAME)
+    model_qa = AutoModelForQuestionAnswering.from_pretrained(MODEL_NAME)
     
     desired_out_features = 2
     model_qa.qa_outputs = nn.Linear(model_qa.qa_outputs.in_features, desired_out_features)
