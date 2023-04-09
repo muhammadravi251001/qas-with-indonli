@@ -338,6 +338,26 @@ if __name__ == "__main__":
     
     desired_out_features = 2
     model_qa.qa_outputs = nn.Linear(model_qa.qa_outputs.in_features, desired_out_features)
+
+    if MODEL_NAME == "xlm-roberta-large":
+
+        desired_num_embeddings = 2
+        desired_padding_idx = 0
+
+        model_qa.roberta.embeddings.word_embeddings = nn.Embedding(
+            model_qa.roberta.embeddings.word_embeddings.num_embeddings, 
+            model_qa.roberta.embeddings.word_embeddings.embedding_dim, 
+            padding_idx=desired_padding_idx
+            )
+        model_qa.roberta.embeddings.position_embeddings = nn.Embedding(
+            model_qa.roberta.embeddings.position_embeddings.num_embeddings, 
+            model_qa.roberta.embeddings.position_embeddings.embedding_dim, 
+            padding_idx=desired_padding_idx
+            )
+        model_qa.roberta.embeddings.token_type_embeddings = nn.Embedding(
+            desired_num_embeddings, 
+            model_qa.roberta.embeddings.token_type_embeddings.embedding_dim,
+            )
     
     model_qa = model_qa.to(device)
 

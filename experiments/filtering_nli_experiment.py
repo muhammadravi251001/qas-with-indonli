@@ -23,7 +23,8 @@ if __name__ == "__main__":
     # Otak-atik dulu hasil HF dari Pak Aji untuk IndoNLU dan XLMR
     if (args.model_name) in base_model:
         if (args.model_name) == "indolem":
-            MODEL_NAME = "afaji/fine-tuned-DatasetQAS-IDK-MRC-with-indobert-base-uncased-without-ITTL-without-freeze-LR-1e-05"
+            #MODEL_NAME = "afaji/fine-tuned-DatasetQAS-IDK-MRC-with-indobert-base-uncased-without-ITTL-without-freeze-LR-1e-05"
+            MODEL_NAME = "indolem/indobert-base-uncased"
         elif (args.model_name) == "indonlu":
             MODEL_NAME = "indobenchmark/indobert-large-p2"
         elif (args.model_name) == "xlmr":
