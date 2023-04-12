@@ -326,8 +326,7 @@ if __name__ == "__main__":
                 'STRIDE': STRIDE, 'rindex': rindex, 'operator': operator}
     )
 
-    tokenized_data_qas_id = tokenized_data_qas_id.remove_columns(["offset_mapping", 
-                                            "overflow_to_sample_mapping"])
+    tokenized_data_qas_id = tokenized_data_qas_id.remove_columns(["offset_mapping", "overflow_to_sample_mapping"])
     tokenized_data_qas_id.set_format("torch", columns=["input_ids", "token_type_ids"], output_all_columns=True, device=device)
     
     tokenized_data_qas_id_train = Dataset.from_dict(tokenized_data_qas_id["train"][:SAMPLE])
@@ -1290,9 +1289,6 @@ if __name__ == "__main__":
                             a_over_twenty_right+a_zero_right+\
                             a_one_to_five_wrong+a_six_to_ten_wrong+a_eleven_to_fifteen_wrong+a_sixteen_to_twenty_wrong+\
                             a_over_twenty_wrong+a_zero_wrong
-        
-        # Ambil berapa contoh yang gagal, coba pelajari reasoning type-nya.
-        new_df = df.sample(n=15, random_state=42)
             
         print("--- Bagian tentang question type ---")
         print(f"-- Bagian tentang question type yang terprediksi BENAR --")
@@ -1397,19 +1393,13 @@ if __name__ == "__main__":
         print(f"Panjang question 16 <= x <= 20 yang terprediksi benar sebesar: {(a_sixteen_to_twenty_right+a_sixteen_to_twenty_wrong) and round((a_sixteen_to_twenty_right/(a_sixteen_to_twenty_right+a_sixteen_to_twenty_wrong) * 100), 2)} %")
         print(f"Panjang question > 20 yang terprediksi benar sebesar: {round((a_over_twenty_right+a_over_twenty_wrong) and (a_over_twenty_right/(a_over_twenty_right+a_over_twenty_wrong) * 100), 2)} %")
         print()
-        
-        print("--- Bagian untuk analisis REASONING TYPE ---")
-        display(new_df)
-        return new_df
     
-    reasoning_type_df = general_evaluation(filtering_result)
+    general_evaluation(filtering_result)
 
     os.makedirs(os.path.dirname(METRIC_RESULT_DIR), exist_ok=True)
     with open(f'{METRIC_RESULT_DIR}/general_evaluation_results.txt', "w") as f, contextlib.redirect_stdout(f):
         general_evaluation(filtering_result)
         f.close()
-
-    reasoning_type_df.to_csv(f'{OUTPUT_DIR}/sample_df_for_reasoning_type.csv')
 
     ## Breakdown evaluasi, melakukan evaluasi lebih dalam lagi
     def breakdown_evaluation(df, TYPE_QAS):

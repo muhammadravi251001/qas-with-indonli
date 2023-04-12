@@ -110,6 +110,7 @@ if __name__ == "__main__":
     TrainingArguments,
     Trainer,
     BertForSequenceClassification,
+    AutoModelForSequenceClassification,
     AutoTokenizer,
     EarlyStoppingCallback, 
     AutoModel
@@ -188,7 +189,9 @@ if __name__ == "__main__":
     label2id = {'entailment': 0, 'neutral': 
                 1, 'contradiction': 2}
     
+    # ## Menggunakan library evaluate untuk evaluasi metrik
     accuracy = evaluate.load('accuracy')
+    f1 = evaluate.load('f1')
 
     # # Tahapan fine-tune IndoNLI diatas IndoBERT
     # ## Fungsi utilitas untuk komputasi metrik
@@ -196,15 +199,20 @@ if __name__ == "__main__":
         predictions = eval_pred.predictions
         labels = eval_pred.label_ids
         predictions = np.argmax(predictions, axis=1)
-        return accuracy.compute(
-            predictions=predictions, references=labels)
+        
+        return {'accuracy': accuracy.compute(predictions=predictions, references=labels), 
+                'f1': f1.compute(predictions=predictions, references=labels)}
 
     # ## Gunakan model Sequence Classification yang sudah pre-trained
-    model_sc = BertForSequenceClassification.from_pretrained(
+    model_sc = AutoModelForSequenceClassification.from_pretrained(
         MODEL_NAME, num_labels=3, 
         id2label=id2label, label2id=label2id)
 
+    # Otak-atik model SC dari XLMR TODO
+    if MODEL_NAME == "xlm-roberta-large": pass
+
     model_sc = model_sc.to(device)
+    
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
     # ## Mendefinisikan argumen (dataops) untuk training nanti
@@ -261,7 +269,7 @@ if __name__ == "__main__":
         push_to_hub=True,
         hub_model_id=REPO_NAME,
         load_best_model_at_end=True,
-        metric_for_best_model='accuracy',
+        metric_for_best_model='f1',
     )
 
     # ## Mulai training untuk fine-tune IndoNLI diatas IndoBERT

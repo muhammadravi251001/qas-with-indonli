@@ -71,6 +71,7 @@ if __name__ == "__main__":
     SEED = SEED
     BATCH_SIZE = BATCH_SIZE
     
+    MODEL_NER_NAME = "cahya/xlm-roberta-base-indonesian-NER"
     GRADIENT_ACCUMULATION = 4
     MAX_LENGTH = 400
     STRIDE = 100
@@ -119,7 +120,8 @@ if __name__ == "__main__":
         BertForQuestionAnswering,
         AutoTokenizer,
         EarlyStoppingCallback, 
-        AutoModelForQuestionAnswering
+        AutoModelForQuestionAnswering,
+        pipeline
     )
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -258,6 +260,7 @@ if __name__ == "__main__":
 
     def preprocess_function_qa(examples, tokenizer, MAX_LENGTH=MAX_LENGTH, STRIDE=STRIDE, 
                                rindex=rindex, operator=operator):
+        
         examples["question"] = [q.lstrip() for q in examples["question"]]
         examples["context"] = [c.lstrip() for c in examples["context"]]
 
@@ -528,11 +531,31 @@ if __name__ == "__main__":
 
     trainer_qa.train()
 
-    # ## Simpan model Sequence Classification
+    # ## Simpan model Question Answering
     trainer_qa.save_model(MODEL_DIR)
 
+    # ## Assign answer type untuk evaluasi nanti
+    nlp_ner = pipeline(task="ner", model=MODEL_NER_NAME, tokenizer=MODEL_NER_NAME)
+
+    def assign_answer_types(answer, nlp=nlp_ner):
+    
+        if answer == str(): 
+            return ["NULL"]
+        
+        entity_array = []    
+        ner_result = nlp(answer)
+        
+        for i in ner_result:
+            entity = i['entity'][2:]
+            entity_array.append(entity)
+        
+        if entity_array == []: 
+            return ["NULL"]
+
+        return list(set(entity_array))
+
     # ## Method untuk melihat isi PredictionOutput
-    def represent_prediction_output(predict_result):
+    def represent_prediction_output(predict_result, assign_answer_types=assign_answer_types):
         predictions_idx = np.argmax(predict_result.predictions, axis=2)
         label_array = np.asarray(predict_result.label_ids)
             
@@ -579,7 +602,176 @@ if __name__ == "__main__":
         qas_df = pd.DataFrame({'Context': context_array, 
                                 'Question': question_array, 
                                 'Prediction Answer': pred_answer_array,
-                                'Gold Answer': gold_answer_array})
+                                'Gold Answer': gold_answer_array,
+                                'Answer Type': assign_answer_types(answer=gold_answer_array),
+                                'Reasoning Type:': '-' })
+        
+        if DATA_NAME == "Squad-ID": 
+            pass
+        
+        elif DATA_NAME == "IDK-MRC":
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+        
+        elif DATA_NAME == "TYDI-QA-ID":
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''
+            qas_df['Reasoning Type'][0] = ''        
         
         assert len(predict_result.predictions[0]) == len(qas_df), "Jumlah prediksi berbeda dengan jumlah evaluasi"
         
@@ -659,7 +851,7 @@ if __name__ == "__main__":
         # Cek semua properti EDA, yang berhasil berapa, yang gagal berapa?
         for i in range(len(df)):
             
-            pred_answer = df["Prediction Answer"][i][0]       
+            pred_answer = df["Prediction Answer"][i]     
             gold_text = df["Gold Answer"][i]
             current_question = df["Question"][i].split()
             len_current_passage = len(df["Context"][i].split())
@@ -821,9 +1013,6 @@ if __name__ == "__main__":
                             a_over_twenty_right+a_zero_right+\
                             a_one_to_five_wrong+a_six_to_ten_wrong+a_eleven_to_fifteen_wrong+a_sixteen_to_twenty_wrong+\
                             a_over_twenty_wrong+a_zero_wrong
-        
-        # Ambil berapa contoh yang gagal, coba pelajari reasoning type-nya.
-        new_df = df.sample(n=15, random_state=42)
             
         print("--- Bagian tentang question type ---")
         print(f"-- Bagian tentang question type yang terprediksi BENAR --")
@@ -928,19 +1117,13 @@ if __name__ == "__main__":
         print(f"Panjang question 16 <= x <= 20 yang terprediksi benar sebesar: {(a_sixteen_to_twenty_right+a_sixteen_to_twenty_wrong) and round((a_sixteen_to_twenty_right/(a_sixteen_to_twenty_right+a_sixteen_to_twenty_wrong) * 100), 2)} %")
         print(f"Panjang question > 20 yang terprediksi benar sebesar: {round((a_over_twenty_right+a_over_twenty_wrong) and (a_over_twenty_right/(a_over_twenty_right+a_over_twenty_wrong) * 100), 2)} %")
         print()
-        
-        print("--- Bagian untuk analisis REASONING TYPE ---")
-        display(new_df)
-        return new_df
     
-    reasoning_type_df = general_evaluation(qas_df)
+    general_evaluation(qas_df)
 
     os.makedirs(os.path.dirname(METRIC_RESULT_DIR), exist_ok=True)
     with open(f'{METRIC_RESULT_DIR}/general_evaluation_results.txt', "w") as f, contextlib.redirect_stdout(f):
         general_evaluation(qas_df)
         f.close()
-
-    reasoning_type_df.to_csv(f'{OUTPUT_DIR}/sample_df_for_reasoning_type.csv')
     
     metric_result = compute_metrics(predict_result)
     os.makedirs(os.path.dirname(METRIC_RESULT_DIR), exist_ok=True)
