@@ -75,11 +75,11 @@ if __name__ == "__main__":
     BATCH_SIZE = BATCH_SIZE
     
     GRADIENT_ACCUMULATION = 8
-    MAX_LENGTH = 400
-    STRIDE = 100
+    MAX_LENGTH = 512
+    STRIDE = 128
     LOGGING_STEPS = 50
     WARMUP_RATIO = 0.0
-    WEIGHT_DECAY = 0.01
+    WEIGHT_DECAY = 0.0
     EVAL_STEPS_RATIO = 0.5
 
     import os
