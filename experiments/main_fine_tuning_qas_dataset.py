@@ -135,19 +135,19 @@ if __name__ == "__main__":
         data_qas_id = conhelps.filtered(lambda x: 'squad_id' in x.dataset_name)[0].load_dataset()
 
         df_train = pd.DataFrame(data_qas_id['train'])
-        df_validation = pd.DataFrame(data_qas_id['validation'])
+        df_test = pd.DataFrame(data_qas_id['validation'])
 
         cols = ['context', 'question', 'answer']
-        new_df_val = pd.DataFrame(columns=cols)
+        new_df_test = pd.DataFrame(columns=cols)
 
-        for i in tqdm(range(len(df_validation['context']))):
-            new_df_val = new_df_val.append({'context': df_validation["context"][i], 
-                                            'question': df_validation["question"][i], 
-                                            'answer': {"text": eval(df_validation["answer"][i][0])['text'], 
-                                            "answer_start": eval(df_validation["answer"][i][0])['answer_start'], 
-                                            "answer_end": eval(df_validation["answer"][i][0])['answer_end']}}, 
+        for i in tqdm(range(len(df_test['context']))):
+            new_df_test = new_df_test.append({'context': df_test["context"][i], 
+                                            'question': df_test["question"][i], 
+                                            'answer': {"text": eval(df_test["answer"][i][0])['text'], 
+                                            "answer_start": eval(df_test["answer"][i][0])['answer_start'], 
+                                            "answer_end": eval(df_test["answer"][i][0])['answer_end']}}, 
                                         ignore_index=True)
-            
+
         cols = ['context', 'question', 'answer']
         new_df_train = pd.DataFrame(columns=cols)
 
@@ -159,10 +159,14 @@ if __name__ == "__main__":
                                             "answer_end": eval(df_train["answer"][i][0])['answer_end']}}, 
                                         ignore_index=True)
 
-        train_dataset = Dataset.from_dict(new_df_train)
-        validation_dataset = Dataset.from_dict(new_df_val)
+        train_final_df = new_df_train[:-1066]
+        validation_final_df = new_df_train[-1066:]
 
-        data_qas_id = DatasetDict({"train": train_dataset, "validation": validation_dataset})
+        train_dataset = Dataset.from_dict(train_final_df)
+        validation_dataset = Dataset.from_dict(validation_final_df)
+        test_dataset = Dataset.from_dict(df_test)
+
+        data_qas_id = DatasetDict({"train": train_dataset, "validation": validation_dataset, "test": test_dataset})
 
     elif (DATA_NAME == "IDK-MRC"):
         conhelps = NusantaraConfigHelper()
@@ -170,26 +174,7 @@ if __name__ == "__main__":
 
         df_train = pd.DataFrame(data_qas_id['train'])
         df_validation = pd.DataFrame(data_qas_id['validation'])
-
-        cols = ['context', 'question', 'answer']
-        new_df_val = pd.DataFrame(columns=cols)
-
-        for i in tqdm(range(len(df_validation['context']))):
-            for j in df_validation["qas"][i]:
-                if len(j['answers']) != 0:
-                    new_df_val = new_df_val.append({'context': df_validation["context"][i], 
-                                                    'question': j['question'], 
-                                                    'answer': {"text": j['answers'][0]['text'], 
-                                                               "answer_start": j['answers'][0]['answer_start'], 
-                                                               "answer_end": j['answers'][0]['answer_start'] + len(j['answers'][0]['text'])}}, 
-                                                               ignore_index=True)
-                else:
-                    new_df_val = new_df_val.append({'context': df_validation["context"][i], 
-                                                    'question': j['question'], 
-                                                    'answer': {"text": str(), 
-                                                               "answer_start": 0, 
-                                                               "answer_end": 0}}, 
-                                                               ignore_index=True)
+        df_test = pd.DataFrame(data_qas_id['test'])
 
         cols = ['context', 'question', 'answer']
         new_df_train = pd.DataFrame(columns=cols)
@@ -211,10 +196,51 @@ if __name__ == "__main__":
                                                                    "answer_end": 0}}, 
                                                                    ignore_index=True)
 
+        cols = ['context', 'question', 'answer']
+        new_df_val = pd.DataFrame(columns=cols)
+
+        for i in tqdm(range(len(df_validation['context']))):
+            for j in df_validation["qas"][i]:
+                if len(j['answers']) != 0:
+                    new_df_val = new_df_val.append({'context': df_validation["context"][i], 
+                                                    'question': j['question'], 
+                                                    'answer': {"text": j['answers'][0]['text'], 
+                                                               "answer_start": j['answers'][0]['answer_start'], 
+                                                               "answer_end": j['answers'][0]['answer_start'] + len(j['answers'][0]['text'])}}, 
+                                                               ignore_index=True)
+                else:
+                    new_df_val = new_df_val.append({'context': df_validation["context"][i], 
+                                                    'question': j['question'], 
+                                                    'answer': {"text": str(), 
+                                                               "answer_start": 0, 
+                                                               "answer_end": 0}}, 
+                                                               ignore_index=True)        
+
+        cols = ['context', 'question', 'answer']
+        new_df_test = pd.DataFrame(columns=cols)
+
+        for i in tqdm(range(len(df_test['context']))):
+            for j in df_test["qas"][i]:
+                if len(j['answers']) != 0:
+                    new_df_test = new_df_test.append({'context': df_test["context"][i], 
+                                                    'question': j['question'], 
+                                                    'answer': {"text": j['answers'][0]['text'], 
+                                                               "answer_start": j['answers'][0]['answer_start'], 
+                                                               "answer_end": j['answers'][0]['answer_start'] + len(j['answers'][0]['text'])}}, 
+                                                               ignore_index=True)
+                else:
+                    new_df_test = new_df_test.append({'context': df_test["context"][i], 
+                                                    'question': j['question'], 
+                                                    'answer': {"text": str(), 
+                                                               "answer_start": 0, 
+                                                               "answer_end": 0}}, 
+                                                               ignore_index=True)
+        
         train_dataset = Dataset.from_dict(new_df_train)
         validation_dataset = Dataset.from_dict(new_df_val)
+        test_dataset = Dataset.from_dict(new_df_test)
         
-        data_qas_id = DatasetDict({"train": train_dataset, "validation": validation_dataset})
+        data_qas_id = DatasetDict({"train": train_dataset, "validation": validation_dataset, "test": test_dataset})
 
     elif (DATA_NAME == "TYDI-QA-ID"):
         conhelps = NusantaraConfigHelper()
@@ -225,6 +251,7 @@ if __name__ == "__main__":
 
         cols = ['context', 'question', 'answer']
         new_df_train = pd.DataFrame(columns=cols)
+        df_test = pd.DataFrame(data_qas_id['test'])
 
         for i in range(len(df_train['context'])):
             answer_start = df_train['context'][i].index(df_train['label'][i])
@@ -249,10 +276,24 @@ if __name__ == "__main__":
                                                        "answer_end": answer_end}}, 
                                                        ignore_index=True)    
             
+        cols = ['context', 'question', 'answer']
+        new_df_test = pd.DataFrame(columns=cols)
+
+        for i in range(len(df_test['context'])):
+            answer_start = df_test['context'][i].index(df_test['label'][i])
+            answer_end = answer_start + len(df_test['label'][i])
+            new_df_test = new_df_test.append({'context': df_test["context"][i], 
+                                            'question': df_test["question"][i], 
+                                            'answer': {"text": df_test["label"][i], 
+                                                       "answer_start": answer_start, 
+                                                       "answer_end": answer_end}}, 
+                                                       ignore_index=True)
+        
         train_dataset = Dataset.from_dict(new_df_train)
         validation_dataset = Dataset.from_dict(new_df_val)
+        test_dataset = Dataset.from_dict(new_df_test)
 
-        data_qas_id = DatasetDict({"train": train_dataset, "validation": validation_dataset})
+        data_qas_id = DatasetDict({"train": train_dataset, "validation": validation_dataset, "test": test_dataset})
 
     # ## Fungsi utilitas untuk pre-process dataset QAS
     def rindex(lst, value, operator=operator):
@@ -328,8 +369,7 @@ if __name__ == "__main__":
                 'STRIDE': STRIDE, 'rindex': rindex, 'operator': operator}
     )
 
-    tokenized_data_qas_id = tokenized_data_qas_id.remove_columns(["offset_mapping", 
-                                            "overflow_to_sample_mapping"])
+    tokenized_data_qas_id = tokenized_data_qas_id.remove_columns(["offset_mapping", "overflow_to_sample_mapping"])
     tokenized_data_qas_id.set_format("torch", columns=["input_ids", "token_type_ids"], output_all_columns=True, device=device)
     
     tokenized_data_qas_id_train = Dataset.from_dict(tokenized_data_qas_id["train"][:SAMPLE])

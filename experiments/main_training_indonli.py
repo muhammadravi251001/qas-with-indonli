@@ -233,8 +233,6 @@ if __name__ == "__main__":
     METRIC_RESULT_DIR = f'{SC}/metric-result/'
     REPO_NAME = f'fine-tuned-{NAME}'[:96]
 
-    # TODO if-else untuk ubah steps_eval
-
     training_args_sc = TrainingArguments(
         
         # Checkpoint
