@@ -75,7 +75,7 @@ if __name__ == "__main__":
     MAXIMUM_SEARCH_ITER =  MAXIMUM_SEARCH_ITER
     
     MODEL_TG_NAME = "Wikidepia/IndoT5-base-paraphrase"
-    GRADIENT_ACCUMULATION = 4
+    GRADIENT_ACCUMULATION = 8
     MAX_LENGTH = 400
     STRIDE = 100
     LOGGING_STEPS = 50

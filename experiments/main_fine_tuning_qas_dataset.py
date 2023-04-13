@@ -72,7 +72,7 @@ if __name__ == "__main__":
     BATCH_SIZE = BATCH_SIZE
     
     MODEL_NER_NAME = "cahya/xlm-roberta-base-indonesian-NER"
-    GRADIENT_ACCUMULATION = 4
+    GRADIENT_ACCUMULATION = 8
     MAX_LENGTH = 400
     STRIDE = 100
     LOGGING_STEPS = 50
