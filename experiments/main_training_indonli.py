@@ -200,8 +200,10 @@ if __name__ == "__main__":
         labels = eval_pred.label_ids
         predictions = np.argmax(predictions, axis=1)
         
-        return {'accuracy': accuracy.compute(predictions=predictions, references=labels), 
-                'f1': f1.compute(predictions=predictions, references=labels)}
+        acc_result = accuracy.compute(predictions=predictions, references=labels)
+        f1_result = f1.compute(predictions=predictions, references=labels, average="weighted")
+
+        return {'accuracy': acc_result['accuracy'], 'f1': f1_result['f1']}
 
     # ## Gunakan model Sequence Classification yang sudah pre-trained
     model_sc = AutoModelForSequenceClassification.from_pretrained(
