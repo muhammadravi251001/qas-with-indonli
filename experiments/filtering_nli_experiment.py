@@ -548,11 +548,11 @@ if __name__ == "__main__":
                     if j == 'siapa' or j == 'siapakah':
                         pred_hypothesis = question.replace('?', '')
                         pred_hypothesis = pred_hypothesis.replace(j, '').lstrip()
-                        pred_hypothesis = f"{pred_hypothesis} adalah {pred_answer}"
+                        pred_hypothesis = f"{pred_answer} merupakan {pred_hypothesis}"
 
                         gold_hypothesis = question.replace('?', '')
                         gold_hypothesis = gold_hypothesis.replace(j, '').lstrip()
-                        gold_hypothesis = f"{gold_hypothesis} adalah {gold_answer}"
+                        gold_hypothesis = f"{gold_answer} merupakan {gold_hypothesis}"
 
                     elif j == 'apa' or j == 'apakah' or j == 'adakah':
                         pred_hypothesis = question.replace('?', '')
@@ -611,11 +611,25 @@ if __name__ == "__main__":
                     elif j == 'berapa' or j == 'berapakah' or j == 'seberapa': 
                         pred_hypothesis = question.replace('?', '')
                         pred_hypothesis = pred_hypothesis.replace(j, '').lstrip()
-                        pred_hypothesis = f"{pred_hypothesis} adalah {pred_answer}"
+                        
+                        if 'luas' in pred_hypothesis.split():
+                            pred_hypothesis = pred_hypothesis.replace('luas', '')
+                            pred_hypothesis = f"{pred_hypothesis} memiliki luas {pred_answer}"
+                        
+                        elif 'jumlah' in pred_hypothesis.split():
+                            pred_hypothesis = pred_hypothesis.replace('jumlah', '')
+                            pred_hypothesis = f"{pred_hypothesis} berjumlah {pred_answer}"
 
                         gold_hypothesis = question.replace('?', '')
                         gold_hypothesis = gold_hypothesis.replace(j, '').lstrip()
-                        gold_hypothesis = f"{gold_hypothesis} adalah {gold_answer}"
+                        
+                        if 'luas' in gold_hypothesis.split():
+                            gold_hypothesis = gold_hypothesis.replace('luas', '')
+                            gold_hypothesis = f"{gold_hypothesis} memiliki luas {gold_answer}"
+                        
+                        elif 'jumlah' in gold_hypothesis.split():
+                            gold_hypothesis = gold_hypothesis.replace('jumlah', '')
+                            gold_hypothesis = f"{gold_hypothesis} berjumlah {gold_answer}"
                 else:
                     pred_hypothesis = question.replace('?', '')
                     pred_hypothesis = f"{pred_hypothesis.lstrip()} adalah {pred_answer}"
