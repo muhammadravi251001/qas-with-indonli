@@ -481,7 +481,7 @@ if __name__ == "__main__":
     
     metric_result_before_filtering = compute_metrics(predict_result)
 
-    question_mark = ['siapa', 'siapakah',
+    question_word = ['siapa', 'siapakah',
                     'apa', 'apakah', 'adakah',
                     'dimana', 'dimanakah', 'darimanakah',
                     'kapan', 'kapankah',
@@ -499,7 +499,7 @@ if __name__ == "__main__":
                   device=torch.cuda.current_device())
     
     # # Membuat kode untuk smoothing answer dan question agar menjadi hipotesis yang natural
-    def smoothing(question, pred_answer, gold_answer, type, question_mark=question_mark):
+    def smoothing(question, pred_answer, gold_answer, type, question_word=question_word):
     
         if type == 'replace first':
             pred_hypothesis = question.replace('?', '')
@@ -508,9 +508,9 @@ if __name__ == "__main__":
             gold_hypothesis = question.replace('?', '')
             gold_hypothesis = gold_hypothesis.replace(question.split()[0], gold_answer)
         
-        elif type == 'replace question mark':
+        elif type == 'replace question word':
             for i in question.split():
-                if i in question_mark:
+                if i in question_word:
                     pred_hypothesis = question.replace('?', '')
                     pred_hypothesis = pred_hypothesis.replace(i, pred_answer)
 
@@ -539,7 +539,7 @@ if __name__ == "__main__":
         elif type == 'rule based':
             question = question.replace('kah', '')
             for j in question.split():
-                if j in question_mark:
+                if j in question_word:
                     if j == 'siapa' or j == 'siapakah':
                         pred_hypothesis = question.replace('?', '')
                         pred_hypothesis = pred_hypothesis.replace(j, '').lstrip()

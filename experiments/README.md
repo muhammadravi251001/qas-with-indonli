@@ -131,7 +131,7 @@ However, you can try some of these flags for your experiments, namely: `-tq`, `-
 
 `-tq` stands for `TYPE_QAS`, in this flag, you can experimenting how should your QAS system filtering based on NLI, whether you choose `entailment only` or `entailment or neutral`. 
 
-`-ts` stands for `TYPE_SMOOTHING`, in this flag, you can experimenting how should your smoothing system, to get your hypothesis as natural as possible from your answer and question from your QAS dataset, you can choose: `replace first, replace question mark, add adalah, just concat answer and question, rule based, machine generation with rule based, pure machine generation`. 
+`-ts` stands for `TYPE_SMOOTHING`, in this flag, you can experimenting how should your smoothing system, to get your hypothesis as natural as possible from your answer and question from your QAS dataset, you can choose: `replace first, replace question word, add adalah, just concat answer and question, rule based, machine generation with rule based, pure machine generation`. 
 
 `-msi` stands for `MAXIMUM_SEARCH_ITER`, in this flag, you can experimenting how much your QAS system search for entailment label (or neutral label, it depends on your choice in `TYPE_QAS`) from your QAS dataset, you can choose any integer to fill in this flag.
 
