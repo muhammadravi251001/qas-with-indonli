@@ -74,7 +74,8 @@ if __name__ == "__main__":
     BATCH_SIZE = BATCH_SIZE
     MAXIMUM_SEARCH_ITER =  MAXIMUM_SEARCH_ITER
     
-    MODEL_TG_NAME = "Wikidepia/IndoT5-base-paraphrase"
+    MODEL_TG_IND_NAME = "Wikidepia/IndoT5-base-paraphrase"
+    MODEL_TG_ENG_NAME = "humarin/chatgpt_paraphraser_on_T5_base"
     GRADIENT_ACCUMULATION = 8
     MAX_LENGTH = 512
     STRIDE = 128
@@ -107,6 +108,7 @@ if __name__ == "__main__":
     from datetime import datetime
     from tqdm import tqdm
     from IPython.display import display
+    from deep_translator import GoogleTranslator
     
     from datasets import (
         load_dataset, 
@@ -495,8 +497,11 @@ if __name__ == "__main__":
     nlp_sc = pipeline(task="text-classification", model=MODEL_SC_NAME, tokenizer=MODEL_SC_NAME, 
                     device=torch.cuda.current_device(), **tokenizer_kwargs)
 
-    nlp_tg = pipeline(task="text2text-generation", model=MODEL_TG_NAME, tokenizer=MODEL_TG_NAME, 
-                  device=torch.cuda.current_device())
+    nlp_tg_ind = pipeline(task="text2text-generation", model=MODEL_TG_IND_NAME, tokenizer=MODEL_TG_IND_NAME, 
+                  device=torch.cuda.current_device(), **tokenizer_kwargs)
+    
+    nlp_tg_eng = pipeline(task="text2text-generation", model=MODEL_TG_ENG_NAME, tokenizer=MODEL_TG_ENG_NAME, 
+                  device=torch.cuda.current_device(), **tokenizer_kwargs)
     
     # # Membuat kode untuk smoothing answer dan question agar menjadi hipotesis yang natural
     def smoothing(question, pred_answer, gold_answer, type, question_word=question_word):
@@ -620,15 +625,27 @@ if __name__ == "__main__":
 
         elif type == 'machine generation with rule based':
             pred_hypothesis, gold_hypothesis = smoothing(question, pred_answer, gold_answer, type="rule based")
-            pred_hypothesis = nlp_tg(pred_hypothesis)[0]['generated_text']
-            gold_hypothesis = nlp_tg(gold_hypothesis)[0]['generated_text']
+            pred_hypothesis = nlp_tg_ind(pred_hypothesis)[0]['generated_text']
+            gold_hypothesis = nlp_tg_ind(gold_hypothesis)[0]['generated_text']
         
         elif type == 'pure machine generation':
             pred_hypothesis = f"{question} {pred_answer}"         
             gold_hypothesis = f"{question} {gold_answer}"
             
-            pred_hypothesis = nlp_tg(pred_hypothesis)[0]['generated_text']
-            gold_hypothesis = nlp_tg(gold_hypothesis)[0]['generated_text']
+            pred_hypothesis = nlp_tg_ind(pred_hypothesis)[0]['generated_text']
+            gold_hypothesis = nlp_tg_ind(gold_hypothesis)[0]['generated_text']
+
+        elif type == 'machine generation with translation':
+            pred_hypothesis, gold_hypothesis = smoothing(question, pred_answer, gold_answer, type="rule based")
+
+            pred_hypothesis = GoogleTranslator(source='id', target='en').translate(pred_hypothesis)
+            gold_hypothesis = GoogleTranslator(source='id', target='en').translate(gold_hypothesis)
+            
+            pred_hypothesis = nlp_tg_eng(pred_hypothesis)[0]['generated_text']
+            gold_hypothesis = nlp_tg_eng(gold_hypothesis)[0]['generated_text']
+            
+            pred_hypothesis = GoogleTranslator(source='en', target='id').translate(pred_hypothesis)
+            gold_hypothesis = GoogleTranslator(source='en', target='id').translate(gold_hypothesis)
         
         return pred_hypothesis, gold_hypothesis
     
