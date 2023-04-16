@@ -53,7 +53,7 @@ Pada tahapan eksperimen ini, penulis menggunakan metode yang persis digunakan ol
 %-----------------------------------------------------------------------------%
 \section{Eksplorasi \emph{dataset} (EDA)}
 %-----------------------------------------------------------------------------%
-Pada sub-bab ini, akan dijelaskan mengenai eksplorasi \emph{dataset} (EDA) sistem tanya jawab yang telah dipilih sebelumnya. Eksplorasi yang penulis lakukan sama persis dengan apa yang telah dilakukan \citet{nguyen-etal-2020-vietnamese} pada tahapan ekplorasi \emph{dataset machine reading comprehension} untuk bahasa Vietnam. Ada beberapa bagian yang penulis jadikan bahan eksplorasi, antara lain:
+Pada sub-bab ini, akan dijelaskan mengenai eksplorasi \emph{dataset} (EDA) sistem tanya jawab yang telah dipilih sebelumnya. Eksplorasi yang penulis lakukan sama persis dengan apa yang telah dilakukan \citet{nguyen-etal-2020-vietnamese} dan \citet{rajpurkar-etal-2016-squad} pada tahapan ekplorasi \emph{dataset machine reading comprehension} untuk bahasa Vietnam. Ada beberapa bagian yang penulis jadikan bahan eksplorasi, antara lain:
 
 \begin{itemize}
 
@@ -84,11 +84,12 @@ Pada sub-bab ini, akan dijelaskan mengenai eksplorasi \emph{dataset} (EDA) siste
         \begin{itemize}
             \item \emph{Question type}.
             \item \emph{Reasoning type}.
+            \item \emph{Answer type}.
         \end{itemize}
 
 \end{itemize}
 
-Properti-properti di atas yang akan menjadi bahan evaluasi dan analisis penelitian ini yang telah tertuang pada \hyperref[sec:rumusanMasalah]{rumusan masalah} dan \hyperref[sec:tujuanPenelitian]{tujuan penelitian} yang telah dituliskan di \hyperref[bab:1]{bab 1} di atas.
+Properti-properti di atas yang akan menjadi bahan evaluasi dan analisis penelitian ini yang telah tertuang pada \hyperref[sec:rumusanMasalah]{rumusan masalah} dan \hyperref[sec:tujuanPenelitian]{tujuan penelitian} yang telah dituliskan di \hyperref[bab:1]{bab 1} di atas. Penggunaan properti-properti di atas ditujukan untuk mendalami dan menambah wawasan terkait \emph{dataset} sistem tanya jawab.
 
 
 %-----------------------------------------------------------------------------%
@@ -164,7 +165,7 @@ Alur penelitian tahapan task Recasting dengan IndoNLI sebagai verifikator yang p
 %-----------------------------------------------------------------------------%
 \section{Evaluasi dan Analisis Hasil}
 %-----------------------------------------------------------------------------%
-Pada tahap ini, akan dilakukan evaluasi dan analisis hasil ketiga metode itu dengan \emph{baseline} tanpa melakukan eksperimen sama sekali, kemudian, metrik yang dipilih sebagai bahan evaluasi dan analisis secara umum ada dua, yaitu: \emph{exact match} (atau bisa direpresentasikan sebagai akurasi) dan skor F1 berdasarkan \emph{token} prediksi jawaban. Pemilihan kedua metrik evaluasi tersebut didasari oleh keinginan penulis untuk mencontoh \citep{rajpurkar-etal-2016-squad} dalam penggunaan metrik evaluasi sistem tanya jawab. Namun, secara khusus, metrik evaluasi yang digunakan oleh setiap metode akan berbeda, contohnya akan dijelaskan pada sub-bab selanjutnya.
+Pada sub-bab ini, akan dilakukan tahapan evaluasi dan analisis hasil ketiga metode itu dengan \emph{baseline} tanpa melakukan eksperimen sama sekali, kemudian, metrik yang dipilih sebagai bahan evaluasi dan analisis secara umum ada dua, yaitu: \emph{exact match} (atau bisa direpresentasikan sebagai akurasi) dan skor F1 berdasarkan \emph{token} prediksi jawaban. Pemilihan kedua metrik evaluasi tersebut didasari oleh keinginan penulis untuk mencontoh \citep{rajpurkar-etal-2016-squad} dalam penggunaan metrik evaluasi sistem tanya jawab. Namun, secara khusus, metrik evaluasi yang digunakan oleh setiap metode akan berbeda, contohnya akan dijelaskan pada sub-bab selanjutnya.
 
 %-----------------------------------------------------------------------------%
 \subsection{\emph{Intermediate-Task Transfer Learning}}
