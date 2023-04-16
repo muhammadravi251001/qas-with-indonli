@@ -1274,7 +1274,7 @@ if __name__ == "__main__":
         repo_id=f"{USER}/{REPO_NAME}",
         repo_type="model",
         token=HUB_TOKEN,
-        path_in_repo="results",
+        path_in_repo="results/output",
     )
 
     api.upload_folder(
@@ -1282,7 +1282,7 @@ if __name__ == "__main__":
         repo_id=f"{USER}/{REPO_NAME}",
         repo_type="model",
         token=HUB_TOKEN,
-        path_in_repo="results",
+        path_in_repo="results/evaluation",
     )
 
     print(f"Selesai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, freeze: {FREEZE}, model_sc: {MODEL_SC_NAME}, dan token: {HUB_TOKEN}")

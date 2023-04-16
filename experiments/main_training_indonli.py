@@ -361,7 +361,7 @@ if __name__ == "__main__":
         repo_id=f"{USER}/{REPO_NAME}",
         repo_type="model",
         token=HUB_TOKEN,
-        path_in_repo="results",
+        path_in_repo="results/output",
     )
 
     api.upload_folder(
@@ -369,7 +369,7 @@ if __name__ == "__main__":
         repo_id=f"{USER}/{REPO_NAME}",
         repo_type="model",
         token=HUB_TOKEN,
-        path_in_repo="results",
+        path_in_repo="results/evaluation",
     )
 
 
