@@ -109,6 +109,7 @@ if __name__ == "__main__":
     from huggingface_hub import notebook_login
     from tqdm import tqdm
     from IPython.display import display
+    from huggingface_hub import HfApi
     
     from datasets import (
         load_dataset, 
@@ -1264,6 +1265,25 @@ if __name__ == "__main__":
     with open(f'{METRIC_RESULT_DIR}/metric_result.txt', "w") as f:
         f.write(str(metric_result))
         f.close()
+
+    # # Upload folder ke Hugging Face
+    api = HfApi()
+
+    api.upload_folder(
+        folder_path=f"{OUTPUT_DIR}",
+        repo_id=f"{USER}/{REPO_NAME}",
+        repo_type="model",
+        token=HUB_TOKEN,
+        path_in_repo="results",
+    )
+
+    api.upload_folder(
+        folder_path=f"{METRIC_RESULT_DIR}",
+        repo_id=f"{USER}/{REPO_NAME}",
+        repo_type="model",
+        token=HUB_TOKEN,
+        path_in_repo="results",
+    )
 
     print(f"Selesai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, freeze: {FREEZE}, model_sc: {MODEL_SC_NAME}, dan token: {HUB_TOKEN}")
     print("Program fine-tuning dataset QA selesai!")

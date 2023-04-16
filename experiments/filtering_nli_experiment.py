@@ -112,6 +112,7 @@ if __name__ == "__main__":
     from tqdm import tqdm
     from IPython.display import display
     from deep_translator import GoogleTranslator
+    from huggingface_hub import HfApi
     
     from datasets import (
         load_dataset, 
@@ -1887,6 +1888,25 @@ if __name__ == "__main__":
     with open(f'{METRIC_RESULT_DIR}/breakdown_evaluation_results.txt', "w") as f, contextlib.redirect_stdout(f):
         breakdown_evaluation(filtering_result, TYPE_QAS=TYPE_QAS)
         f.close()
+    
+    # # Upload folder ke Hugging Face
+    api = HfApi()
+
+    api.upload_folder(
+        folder_path=f"{OUTPUT_DIR}",
+        repo_id=f"{USER}/{REPO_NAME}",
+        repo_type="model",
+        token=HUB_TOKEN,
+        path_in_repo="results",
+    )
+
+    api.upload_folder(
+        folder_path=f"{METRIC_RESULT_DIR}",
+        repo_id=f"{USER}/{REPO_NAME}",
+        repo_type="model",
+        token=HUB_TOKEN,
+        path_in_repo="results",
+    )
 
     print(f"Selesai filtering NLI dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, model_sc: {MODEL_SC_NAME}, tq: {TYPE_QAS}, ts: {TYPE_SMOOTHING}, msi: {MAXIMUM_SEARCH_ITER}, dan token: {HUB_TOKEN}")
     print("Program filtering NLI selesai!")
