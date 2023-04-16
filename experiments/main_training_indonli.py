@@ -39,6 +39,9 @@ if __name__ == "__main__":
     HUB_TOKEN = str(args.token)
     BATCH_SIZE = int(args.batch_size)
 
+    if HUB_TOKEN == "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": USER = "muhammadravi251001"
+    else: USER = "afaji"
+
     import os.path
     import wget
     
@@ -209,9 +212,6 @@ if __name__ == "__main__":
     model_sc = AutoModelForSequenceClassification.from_pretrained(
         MODEL_NAME, num_labels=3, 
         id2label=id2label, label2id=label2id)
-
-    # Otak-atik model SC dari XLMR TODO
-    if MODEL_NAME == "xlm-roberta-large": pass
 
     model_sc = model_sc.to(device)
     

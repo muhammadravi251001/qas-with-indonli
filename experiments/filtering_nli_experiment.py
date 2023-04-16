@@ -73,6 +73,9 @@ if __name__ == "__main__":
     SEED = SEED
     BATCH_SIZE = BATCH_SIZE
     MAXIMUM_SEARCH_ITER =  MAXIMUM_SEARCH_ITER
+
+    if HUB_TOKEN == "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": USER = "muhammadravi251001"
+    else: USER = "afaji"
     
     MODEL_TG_IND_NAME = "Wikidepia/IndoT5-base-paraphrase"
     MODEL_TG_ENG_NAME = "humarin/chatgpt_paraphraser_on_T5_base"

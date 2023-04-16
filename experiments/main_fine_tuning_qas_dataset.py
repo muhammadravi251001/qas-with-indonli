@@ -70,6 +70,9 @@ if __name__ == "__main__":
     HUB_TOKEN = HUB_TOKEN
     SEED = SEED
     BATCH_SIZE = BATCH_SIZE
+
+    if HUB_TOKEN == "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": USER = "muhammadravi251001"
+    else: USER = "afaji"
     
     MODEL_NER_NAME = "cahya/xlm-roberta-base-indonesian-NER"
     GRADIENT_ACCUMULATION = 8
@@ -305,18 +308,34 @@ if __name__ == "__main__":
         examples["question"] = [q.lstrip() for q in examples["question"]]
         examples["context"] = [c.lstrip() for c in examples["context"]]
 
-        tokenized_examples = tokenizer(
-            examples['question'],
-            examples['context'],
-            truncation=True,
-            max_length = MAX_LENGTH,
-            stride=STRIDE,
-            return_overflowing_tokens=True,
-            return_token_type_ids=True,
-            return_offsets_mapping=True,
-            padding="max_length",
-            return_tensors='np'
-        )
+        if (args.model_name) == "xlmr":
+            
+            tokenized_examples = tokenizer(
+                examples['question'],
+                examples['context'],
+                truncation=True,
+                max_length = MAX_LENGTH,
+                stride=STRIDE,
+                return_overflowing_tokens=True,
+                return_offsets_mapping=True,
+                padding="max_length",
+                return_tensors='np'
+            )
+        
+        else:
+
+            tokenized_examples = tokenizer(
+                examples['question'],
+                examples['context'],
+                truncation=True,
+                max_length = MAX_LENGTH,
+                stride=STRIDE,
+                return_overflowing_tokens=True,
+                return_token_type_ids=True,
+                return_offsets_mapping=True,
+                padding="max_length",
+                return_tensors='np'
+            )
 
         tokenized_examples['start_positions'] = []
         tokenized_examples['end_positions'] = []
@@ -370,38 +389,19 @@ if __name__ == "__main__":
     )
 
     tokenized_data_qas_id = tokenized_data_qas_id.remove_columns(["offset_mapping", "overflow_to_sample_mapping"])
-    tokenized_data_qas_id.set_format("torch", columns=["input_ids", "token_type_ids"], output_all_columns=True, device=device)
     
+    if (args.model_name) == "xlmr":
+        tokenized_data_qas_id.set_format("torch", columns=["input_ids"], output_all_columns=True, device=device)
+    
+    else:
+        tokenized_data_qas_id.set_format("torch", columns=["input_ids", "token_type_ids"], output_all_columns=True, device=device)
+
     tokenized_data_qas_id_train = Dataset.from_dict(tokenized_data_qas_id["train"][:SAMPLE])
     tokenized_data_qas_id_validation = Dataset.from_dict(tokenized_data_qas_id["validation"][:SAMPLE])
 
     # # Tahapan fine-tune dataset QAS diatas model
     # ## Gunakan model Sequence Classification yang sudah pre-trained
-    model_qa = AutoModelForQuestionAnswering.from_pretrained(MODEL_NAME)
-    
-    desired_out_features = 2
-    model_qa.qa_outputs = nn.Linear(model_qa.qa_outputs.in_features, desired_out_features)
-
-    if MODEL_NAME == "xlm-roberta-large":
-
-        desired_num_embeddings = 2
-        desired_padding_idx = 0
-
-        model_qa.roberta.embeddings.word_embeddings = nn.Embedding(
-            model_qa.roberta.embeddings.word_embeddings.num_embeddings, 
-            model_qa.roberta.embeddings.word_embeddings.embedding_dim, 
-            padding_idx=desired_padding_idx
-            )
-        model_qa.roberta.embeddings.position_embeddings = nn.Embedding(
-            model_qa.roberta.embeddings.position_embeddings.num_embeddings, 
-            model_qa.roberta.embeddings.position_embeddings.embedding_dim, 
-            padding_idx=desired_padding_idx
-            )
-        model_qa.roberta.embeddings.token_type_embeddings = nn.Embedding(
-            desired_num_embeddings, 
-            model_qa.roberta.embeddings.token_type_embeddings.embedding_dim,
-            )
-    
+    model_qa = AutoModelForQuestionAnswering.from_pretrained(MODEL_NAME, num_labels=2)
     model_qa = model_qa.to(device)
 
     if MODEL_SC_NAME != None:
@@ -596,15 +596,16 @@ if __name__ == "__main__":
 
     # ## Method untuk melihat isi PredictionOutput
     def represent_prediction_output(predict_result, assign_answer_types=assign_answer_types):
+        
         predictions_idx = np.argmax(predict_result.predictions, axis=2)
         label_array = np.asarray(predict_result.label_ids)
-            
+
         question_array = []
         context_array = []
 
         pred_answer_array = []
         gold_answer_array = []
-        
+
         for i in tqdm(range(len(predict_result.predictions[0]))):
 
             start_pred_idx = predictions_idx[0][i]
@@ -621,24 +622,38 @@ if __name__ == "__main__":
 
             pred_answer_array.append(pred_answer)
             gold_answer_array.append(gold_answer)
-            
+
             question = []
             context = []
 
-            for j in range(len(tokenized_data_qas_id_validation[i]['token_type_ids'])):
+            if (args.model_name) == "xlmr":
 
-                if tokenized_data_qas_id_validation[i]['token_type_ids'][j] == 0:
-                    question.append(tokenized_data_qas_id_validation[i]['input_ids'][j])
+                start_question = tokenized_data_qas_id_validation[i]['input_ids'].index(0)
+                end_question = tokenized_data_qas_id_validation[i]['input_ids'].index(2)  + 1
+                start_context = end_question
 
-                else:
-                    context.append(tokenized_data_qas_id_validation[i]['input_ids'][j])
+                question.append(tokenized_data_qas_id_validation[i]['input_ids'][start_question: end_question])
+                context.append(tokenized_data_qas_id_validation[i]['input_ids'][start_context: ])
 
-            question_decoded = tokenizer.decode(question, skip_special_tokens=True)
-            context_decoded = tokenizer.decode(context, skip_special_tokens=True)
-            
+                question_decoded = tokenizer.decode(question[0], skip_special_tokens=True)
+                context_decoded = tokenizer.decode(context[0], skip_special_tokens=True)
+
+            else:
+
+                for j in range(len(tokenized_data_qas_id_validation[i]['token_type_ids'])):
+
+                    if tokenized_data_qas_id_validation[i]['token_type_ids'][j] == 0:
+                        question.append(tokenized_data_qas_id_validation[i]['input_ids'][j])
+
+                    else:
+                        context.append(tokenized_data_qas_id_validation[i]['input_ids'][j])
+
+                question_decoded = tokenizer.decode(question, skip_special_tokens=True)
+                context_decoded = tokenizer.decode(context, skip_special_tokens=True)
+
             question_array.append(question_decoded)
             context_array.append(context_decoded)
-            
+
         qas_df = pd.DataFrame({'Context': context_array, 
                                 'Question': question_array, 
                                 'Prediction Answer': pred_answer_array,
