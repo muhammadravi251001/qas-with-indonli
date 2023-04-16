@@ -8,7 +8,8 @@ parser.add_argument('-e', '--epoch', type=int, metavar='', required=True, help="
 parser.add_argument('-sa', '--sample', type=str, metavar='', required=True, help="Jumlah sampling data Anda; Integer; choice=[max, all integer]")
 parser.add_argument('-l', '--learn_rate', type=str, metavar='', required=False, help="Jumlah learning rate Anda; Float; choice=[all float]; default=1e-5", default=1e-5)
 parser.add_argument('-se', '--seed', type=int, metavar='', required=False, help="Jumlah seed Anda; Integer; choice=[all integer]; default=42", default=42)
-parser.add_argument('-bs', '--batch_size', type=int, metavar='', required=False, help="Jumlah batch-size Anda; Integer; choice=[all integer]; default=32", default=32)
+parser.add_argument('-bs', '--batch_size', type=int, metavar='', required=False, help="Jumlah batch-size Anda; Integer; choice=[all integer]; default=16", default=16)
+parser.add_argument('-ga', '--gradient_accumulation', type=int, metavar='', required=False, help="Jumlah gradient accumulation Anda; Integer; choice=[all integer]; default=8", default=8)
 parser.add_argument('-t', '--token', type=str, metavar='', required=False, help="Token Hugging Face Anda; String; choice=[all string token]; default=(TOKEN_HF_muhammadravi251001)", default="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")
 args = parser.parse_args()
 
@@ -38,6 +39,7 @@ if __name__ == "__main__":
     SEED = int(args.seed)
     HUB_TOKEN = str(args.token)
     BATCH_SIZE = int(args.batch_size)
+    GRADIENT_ACCUMULATION = int(args.gradient_accumulation)
 
     if HUB_TOKEN == "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": USER = "muhammadravi251001"
     else: USER = "afaji"
@@ -76,8 +78,8 @@ if __name__ == "__main__":
     HUB_TOKEN = HUB_TOKEN
     SEED = SEED
     BATCH_SIZE = BATCH_SIZE
+    GRADIENT_ACCUMULATION = GRADIENT_ACCUMULATION
     
-    GRADIENT_ACCUMULATION = 8
     MAX_LENGTH = 512
     STRIDE = 128
     LOGGING_STEPS = 50

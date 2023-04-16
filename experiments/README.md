@@ -34,7 +34,7 @@ Please, check the arguments that can be passed to this code; the datatype, argum
 python main_training_indonli.py -h
 ```
 
-To run this training IndoNLI experiments, you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token, --batch_size} if you don't want using the default value provided:
+To run this training IndoNLI experiments, you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token, --batch_size, etc} if you don't want using the default value provided:
 ```
 python main_training_indonli.py -m indolem -d basic -e 10 -sa max
 python main_training_indonli.py -m indolem -d translated -e 10 -sa max
@@ -56,7 +56,7 @@ Please, check the arguments that can be passed to this code; the datatype, argum
 python main_fine_tuning_qas_dataset.py -h
 ```
 
-To run this fine-tuning QAS datasets experiments WITHOUT Intermediate Task Transfer Learning (ITTL), you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token, --batch_size} if you don't want using the default value provided:
+To run this fine-tuning QAS datasets experiments WITHOUT Intermediate Task Transfer Learning (ITTL), you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token, --batch_size, etc} if you don't want using the default value provided:
 ```
 python main_fine_tuning_qas_dataset.py -m indolem -d squadid -e 16 -sa max -wi False
 python main_fine_tuning_qas_dataset.py -m indolem -d idkmrc -e 16 -sa max -wi False
@@ -73,7 +73,7 @@ python main_fine_tuning_qas_dataset.py -m xlmr -d tydiqaid -e 16 -sa max -wi Fal
 
 It should be understood that when you use the `-wi False` flag it means that you are fine-tuning the QAS dataset with the baseline flow, usually this is done as a reference whether the performance of a QAS is increasing or decreasing based on the `-wi False` baseline flow. By default, if you do not config `-wi` flag, is set to be False.
 
-And then, to run this fine-tuning QAS datasets experiments WITH Intermediate Task Transfer Learning (ITTL), you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token, --batch_size} if you don't want using the default value provided:
+And then, to run this fine-tuning QAS datasets experiments WITH Intermediate Task Transfer Learning (ITTL), you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token, --batch_size, etc} if you don't want using the default value provided:
 ```
 python main_fine_tuning_qas_dataset.py -m indolem -d squadid -e 16 -sa max -wi True
 python main_fine_tuning_qas_dataset.py -m indolem -d idkmrc -e 16 -sa max  -wi True
@@ -112,7 +112,7 @@ Please, check the arguments that can be passed to this code; the datatype, argum
 python filtering_nli_experiment.py -h
 ```
 
-To run this filtering QAS based on NLI experiments, you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token, --batch_size} if you don't want using the default value provided:
+To run this filtering QAS based on NLI experiments, you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token, --batch_size, etc} if you don't want using the default value provided:
 ```
 python filtering_nli_experiment.py -m indolem -d squadid -e 10 -sa max
 python filtering_nli_experiment.py -m indolem -d idkmrc -e 10 -sa max
