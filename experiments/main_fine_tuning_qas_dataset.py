@@ -401,6 +401,7 @@ if __name__ == "__main__":
 
     tokenized_data_qas_id_train = Dataset.from_dict(tokenized_data_qas_id["train"][:SAMPLE])
     tokenized_data_qas_id_validation = Dataset.from_dict(tokenized_data_qas_id["validation"][:SAMPLE])
+    tokenized_data_qas_id_test = Dataset.from_dict(tokenized_data_qas_id["test"][:SAMPLE])
 
     # # Tahapan fine-tune dataset QAS diatas model
     # ## Gunakan model Sequence Classification yang sudah pre-trained
@@ -598,7 +599,7 @@ if __name__ == "__main__":
         return list(set(entity_array))
 
     # ## Method untuk melihat isi PredictionOutput
-    def represent_prediction_output(predict_result, assign_answer_types=assign_answer_types):
+    def represent_prediction_output(predict_result, tokenized_data, assign_answer_types=assign_answer_types):
         
         predictions_idx = np.argmax(predict_result.predictions, axis=2)
         label_array = np.asarray(predict_result.label_ids)
@@ -617,10 +618,10 @@ if __name__ == "__main__":
             start_gold_idx = label_array[0][i]
             end_gold_idx = label_array[1][i] + 1
 
-            pred_answer = tokenizer.decode(tokenized_data_qas_id_validation[i]['input_ids']
+            pred_answer = tokenizer.decode(tokenized_data[i]['input_ids']
                                         [start_pred_idx: end_pred_idx], skip_special_tokens=True)
 
-            gold_answer = tokenizer.decode(tokenized_data_qas_id_validation[i]['input_ids']
+            gold_answer = tokenizer.decode(tokenized_data[i]['input_ids']
                                         [start_gold_idx: end_gold_idx], skip_special_tokens=True)
 
             pred_answer_array.append(pred_answer)
@@ -631,25 +632,25 @@ if __name__ == "__main__":
 
             if (args.model_name) == "xlmr":
 
-                start_question = tokenized_data_qas_id_validation[i]['input_ids'].index(0)
-                end_question = tokenized_data_qas_id_validation[i]['input_ids'].index(2)  + 1
+                start_question = tokenized_data[i]['input_ids'].index(0)
+                end_question = tokenized_data[i]['input_ids'].index(2)  + 1
                 start_context = end_question
 
-                question.append(tokenized_data_qas_id_validation[i]['input_ids'][start_question: end_question])
-                context.append(tokenized_data_qas_id_validation[i]['input_ids'][start_context: ])
+                question.append(tokenized_data[i]['input_ids'][start_question: end_question])
+                context.append(tokenized_data[i]['input_ids'][start_context: ])
 
                 question_decoded = tokenizer.decode(question[0], skip_special_tokens=True)
                 context_decoded = tokenizer.decode(context[0], skip_special_tokens=True)
 
             else:
 
-                for j in range(len(tokenized_data_qas_id_validation[i]['token_type_ids'])):
+                for j in range(len(tokenized_data[i]['token_type_ids'])):
 
-                    if tokenized_data_qas_id_validation[i]['token_type_ids'][j] == 0:
-                        question.append(tokenized_data_qas_id_validation[i]['input_ids'][j])
+                    if tokenized_data[i]['token_type_ids'][j] == 0:
+                        question.append(tokenized_data[i]['input_ids'][j])
 
                     else:
-                        context.append(tokenized_data_qas_id_validation[i]['input_ids'][j])
+                        context.append(tokenized_data[i]['input_ids'][j])
 
                 question_decoded = tokenizer.decode(question, skip_special_tokens=True)
                 context_decoded = tokenizer.decode(context, skip_special_tokens=True)
@@ -915,7 +916,7 @@ if __name__ == "__main__":
         return qas_df
 
     # # Melakukan prediksi dari model
-    predict_result = trainer_qa.predict(tokenized_data_qas_id_validation)
+    predict_result = trainer_qa.predict(tokenized_data_qas_id_test)
     os.makedirs(os.path.dirname(OUTPUT_DIR), exist_ok=True)
     with open(f'{OUTPUT_DIR}/output.txt', "w") as f:
         f.write(str(predict_result))

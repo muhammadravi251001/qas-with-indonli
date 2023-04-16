@@ -142,19 +142,19 @@ if __name__ == "__main__":
         data_qas_id = conhelps.filtered(lambda x: 'squad_id' in x.dataset_name)[0].load_dataset()
 
         df_train = pd.DataFrame(data_qas_id['train'])
-        df_validation = pd.DataFrame(data_qas_id['validation'])
+        df_test = pd.DataFrame(data_qas_id['validation'])
 
         cols = ['context', 'question', 'answer']
-        new_df_val = pd.DataFrame(columns=cols)
+        new_df_test = pd.DataFrame(columns=cols)
 
-        for i in tqdm(range(len(df_validation['context']))):
-            new_df_val = new_df_val.append({'context': df_validation["context"][i], 
-                                            'question': df_validation["question"][i], 
-                                            'answer': {"text": eval(df_validation["answer"][i][0])['text'], 
-                                            "answer_start": eval(df_validation["answer"][i][0])['answer_start'], 
-                                            "answer_end": eval(df_validation["answer"][i][0])['answer_end']}}, 
+        for i in tqdm(range(len(df_test['context']))):
+            new_df_test = new_df_test.append({'context': df_test["context"][i], 
+                                            'question': df_test["question"][i], 
+                                            'answer': {"text": eval(df_test["answer"][i][0])['text'], 
+                                            "answer_start": eval(df_test["answer"][i][0])['answer_start'], 
+                                            "answer_end": eval(df_test["answer"][i][0])['answer_end']}}, 
                                         ignore_index=True)
-            
+
         cols = ['context', 'question', 'answer']
         new_df_train = pd.DataFrame(columns=cols)
 
@@ -166,10 +166,14 @@ if __name__ == "__main__":
                                             "answer_end": eval(df_train["answer"][i][0])['answer_end']}}, 
                                         ignore_index=True)
 
-        train_dataset = Dataset.from_dict(new_df_train)
-        validation_dataset = Dataset.from_dict(new_df_val)
+        train_final_df = new_df_train[:-1066]
+        validation_final_df = new_df_train[-1066:]
 
-        data_qas_id = DatasetDict({"train": train_dataset, "validation": validation_dataset})
+        train_dataset = Dataset.from_dict(train_final_df)
+        validation_dataset = Dataset.from_dict(validation_final_df)
+        test_dataset = Dataset.from_dict(df_test)
+
+        data_qas_id = DatasetDict({"train": train_dataset, "validation": validation_dataset, "test": test_dataset})
 
     elif (DATA_NAME == "IDK-MRC"):
         conhelps = NusantaraConfigHelper()
@@ -177,26 +181,7 @@ if __name__ == "__main__":
 
         df_train = pd.DataFrame(data_qas_id['train'])
         df_validation = pd.DataFrame(data_qas_id['validation'])
-
-        cols = ['context', 'question', 'answer']
-        new_df_val = pd.DataFrame(columns=cols)
-
-        for i in tqdm(range(len(df_validation['context']))):
-            for j in df_validation["qas"][i]:
-                if len(j['answers']) != 0:
-                    new_df_val = new_df_val.append({'context': df_validation["context"][i], 
-                                                    'question': j['question'], 
-                                                    'answer': {"text": j['answers'][0]['text'], 
-                                                               "answer_start": j['answers'][0]['answer_start'], 
-                                                               "answer_end": j['answers'][0]['answer_start'] + len(j['answers'][0]['text'])}}, 
-                                                               ignore_index=True)
-                else:
-                    new_df_val = new_df_val.append({'context': df_validation["context"][i], 
-                                                    'question': j['question'], 
-                                                    'answer': {"text": str(), 
-                                                               "answer_start": 0, 
-                                                               "answer_end": 0}}, 
-                                                               ignore_index=True)
+        df_test = pd.DataFrame(data_qas_id['test'])
 
         cols = ['context', 'question', 'answer']
         new_df_train = pd.DataFrame(columns=cols)
@@ -218,10 +203,51 @@ if __name__ == "__main__":
                                                                    "answer_end": 0}}, 
                                                                    ignore_index=True)
 
+        cols = ['context', 'question', 'answer']
+        new_df_val = pd.DataFrame(columns=cols)
+
+        for i in tqdm(range(len(df_validation['context']))):
+            for j in df_validation["qas"][i]:
+                if len(j['answers']) != 0:
+                    new_df_val = new_df_val.append({'context': df_validation["context"][i], 
+                                                    'question': j['question'], 
+                                                    'answer': {"text": j['answers'][0]['text'], 
+                                                               "answer_start": j['answers'][0]['answer_start'], 
+                                                               "answer_end": j['answers'][0]['answer_start'] + len(j['answers'][0]['text'])}}, 
+                                                               ignore_index=True)
+                else:
+                    new_df_val = new_df_val.append({'context': df_validation["context"][i], 
+                                                    'question': j['question'], 
+                                                    'answer': {"text": str(), 
+                                                               "answer_start": 0, 
+                                                               "answer_end": 0}}, 
+                                                               ignore_index=True)        
+
+        cols = ['context', 'question', 'answer']
+        new_df_test = pd.DataFrame(columns=cols)
+
+        for i in tqdm(range(len(df_test['context']))):
+            for j in df_test["qas"][i]:
+                if len(j['answers']) != 0:
+                    new_df_test = new_df_test.append({'context': df_test["context"][i], 
+                                                    'question': j['question'], 
+                                                    'answer': {"text": j['answers'][0]['text'], 
+                                                               "answer_start": j['answers'][0]['answer_start'], 
+                                                               "answer_end": j['answers'][0]['answer_start'] + len(j['answers'][0]['text'])}}, 
+                                                               ignore_index=True)
+                else:
+                    new_df_test = new_df_test.append({'context': df_test["context"][i], 
+                                                    'question': j['question'], 
+                                                    'answer': {"text": str(), 
+                                                               "answer_start": 0, 
+                                                               "answer_end": 0}}, 
+                                                               ignore_index=True)
+        
         train_dataset = Dataset.from_dict(new_df_train)
         validation_dataset = Dataset.from_dict(new_df_val)
+        test_dataset = Dataset.from_dict(new_df_test)
         
-        data_qas_id = DatasetDict({"train": train_dataset, "validation": validation_dataset})
+        data_qas_id = DatasetDict({"train": train_dataset, "validation": validation_dataset, "test": test_dataset})
 
     elif (DATA_NAME == "TYDI-QA-ID"):
         conhelps = NusantaraConfigHelper()
@@ -232,6 +258,7 @@ if __name__ == "__main__":
 
         cols = ['context', 'question', 'answer']
         new_df_train = pd.DataFrame(columns=cols)
+        df_test = pd.DataFrame(data_qas_id['test'])
 
         for i in range(len(df_train['context'])):
             answer_start = df_train['context'][i].index(df_train['label'][i])
@@ -256,10 +283,24 @@ if __name__ == "__main__":
                                                        "answer_end": answer_end}}, 
                                                        ignore_index=True)    
             
+        cols = ['context', 'question', 'answer']
+        new_df_test = pd.DataFrame(columns=cols)
+
+        for i in range(len(df_test['context'])):
+            answer_start = df_test['context'][i].index(df_test['label'][i])
+            answer_end = answer_start + len(df_test['label'][i])
+            new_df_test = new_df_test.append({'context': df_test["context"][i], 
+                                            'question': df_test["question"][i], 
+                                            'answer': {"text": df_test["label"][i], 
+                                                       "answer_start": answer_start, 
+                                                       "answer_end": answer_end}}, 
+                                                       ignore_index=True)
+        
         train_dataset = Dataset.from_dict(new_df_train)
         validation_dataset = Dataset.from_dict(new_df_val)
+        test_dataset = Dataset.from_dict(new_df_test)
 
-        data_qas_id = DatasetDict({"train": train_dataset, "validation": validation_dataset})
+        data_qas_id = DatasetDict({"train": train_dataset, "validation": validation_dataset, "test": test_dataset})
 
     # ## Fungsi utilitas untuk pre-process dataset QAS
     def rindex(lst, value, operator=operator):
@@ -267,21 +308,38 @@ if __name__ == "__main__":
 
     def preprocess_function_qa(examples, tokenizer, MAX_LENGTH=MAX_LENGTH, STRIDE=STRIDE, 
                                rindex=rindex, operator=operator):
+        
         examples["question"] = [q.lstrip() for q in examples["question"]]
         examples["context"] = [c.lstrip() for c in examples["context"]]
 
-        tokenized_examples = tokenizer(
-            examples['question'],
-            examples['context'],
-            truncation=True,
-            max_length = MAX_LENGTH,
-            stride=STRIDE,
-            return_overflowing_tokens=True,
-            return_token_type_ids=True,
-            return_offsets_mapping=True,
-            padding="max_length",
-            return_tensors='np'
-        )
+        if (args.model_name) == "xlmr":
+            
+            tokenized_examples = tokenizer(
+                examples['question'],
+                examples['context'],
+                truncation=True,
+                max_length = MAX_LENGTH,
+                stride=STRIDE,
+                return_overflowing_tokens=True,
+                return_offsets_mapping=True,
+                padding="max_length",
+                return_tensors='np'
+            )
+        
+        else:
+
+            tokenized_examples = tokenizer(
+                examples['question'],
+                examples['context'],
+                truncation=True,
+                max_length = MAX_LENGTH,
+                stride=STRIDE,
+                return_overflowing_tokens=True,
+                return_token_type_ids=True,
+                return_offsets_mapping=True,
+                padding="max_length",
+                return_tensors='np'
+            )
 
         tokenized_examples['start_positions'] = []
         tokenized_examples['end_positions'] = []
@@ -335,10 +393,16 @@ if __name__ == "__main__":
     )
 
     tokenized_data_qas_id = tokenized_data_qas_id.remove_columns(["offset_mapping", "overflow_to_sample_mapping"])
-    tokenized_data_qas_id.set_format("torch", columns=["input_ids", "token_type_ids"], output_all_columns=True, device=device)
+    
+    if (args.model_name) == "xlmr":
+        tokenized_data_qas_id.set_format("torch", columns=["input_ids"], output_all_columns=True, device=device)
+    
+    else:
+        tokenized_data_qas_id.set_format("torch", columns=["input_ids", "token_type_ids"], output_all_columns=True, device=device)
     
     tokenized_data_qas_id_train = Dataset.from_dict(tokenized_data_qas_id["train"][:SAMPLE])
     tokenized_data_qas_id_validation = Dataset.from_dict(tokenized_data_qas_id["validation"][:SAMPLE])
+    tokenized_data_qas_id_test = Dataset.from_dict(tokenized_data_qas_id["test"][:SAMPLE])
 
     # # Tahapan fine-tune dataset QAS diatas model
     # ## Gunakan model Sequence Classification yang sudah pre-trained
@@ -481,7 +545,7 @@ if __name__ == "__main__":
     trainer_qa.save_model(MODEL_DIR)
 
     # # Melakukan prediksi dari model
-    predict_result = trainer_qa.predict(tokenized_data_qas_id_validation)
+    predict_result = trainer_qa.predict(tokenized_data_qas_id_test)
     os.makedirs(os.path.dirname(OUTPUT_DIR), exist_ok=True)
     with open(f'{OUTPUT_DIR}/output.txt', "w") as f:
         f.write(str(predict_result))
@@ -670,7 +734,7 @@ if __name__ == "__main__":
         return pred_hypothesis, gold_hypothesis
     
     # # Membuat kode untuk filtering answer berdasarkan label NLI: entailment (atau neutral) yang bisa menjadi hasil akhir prediksi
-    def filtering_based_on_nli(predict_result, type_smoothing, type_qas, MAXIMUM_SEARCH_ITER=MAXIMUM_SEARCH_ITER):
+    def filtering_based_on_nli(predict_result, tokenized_data, type_smoothing, type_qas, MAXIMUM_SEARCH_ITER=MAXIMUM_SEARCH_ITER):
     
     # Ekstrak dari PredictionOutput QAS
         predictions_idx = np.argsort(predict_result.predictions, axis=2)[:, :, 1 * -1]
@@ -703,29 +767,41 @@ if __name__ == "__main__":
             end_gold_idx = label_array[1][i] + 1
             
             # Retrieve answer prediksi
-            pred_answer = tokenizer.decode(tokenized_data_qas_id_validation[i]['input_ids']
+            pred_answer = tokenizer.decode(tokenized_data[i]['input_ids']
                                         [start_pred_idx: end_pred_idx], skip_special_tokens=True)
             
             # Retrieve answer gold
-            gold_answer = tokenizer.decode(tokenized_data_qas_id_validation[i]['input_ids']
+            gold_answer = tokenizer.decode(tokenized_data[i]['input_ids']
                                         [start_gold_idx: end_gold_idx], skip_special_tokens=True)
             
             question = []
             context = []
             
-            # Iterasi ini untuk retrieve question dan context index yang bersangkutan
-            for j in range(len(tokenized_data_qas_id_validation[i]['token_type_ids'])):
-                
-                # Bila token_type_ids-nya 0, maka itu question (sesuai dengan urutan tokenisasi)
-                if tokenized_data_qas_id_validation[i]['token_type_ids'][j] == 0:
-                    question.append(tokenized_data_qas_id_validation[i]['input_ids'][j])
-                
-                # Bila token_type_ids-nya 1, maka itu context (sesuai dengan urutan tokenisasi)
-                else:
-                    context.append(tokenized_data_qas_id_validation[i]['input_ids'][j])
+            if (args.model_name) == "xlmr":
+
+                start_question = tokenized_data[i]['input_ids'].index(0)
+                end_question = tokenized_data[i]['input_ids'].index(2)  + 1
+                start_context = end_question
+
+                question.append(tokenized_data[i]['input_ids'][start_question: end_question])
+                context.append(tokenized_data[i]['input_ids'][start_context: ])
+
+                question_decoded = tokenizer.decode(question[0], skip_special_tokens=True)
+                context_decoded = tokenizer.decode(context[0], skip_special_tokens=True)
+
+            else:
+
+                for j in range(len(tokenized_data[i]['token_type_ids'])):
+
+                    if tokenized_data[i]['token_type_ids'][j] == 0:
+                        question.append(tokenized_data[i]['input_ids'][j])
+
+                    else:
+                        context.append(tokenized_data[i]['input_ids'][j])
+
+                question_decoded = tokenizer.decode(question, skip_special_tokens=True)
+                context_decoded = tokenizer.decode(context, skip_special_tokens=True)
             
-            question_decoded = tokenizer.decode(question, skip_special_tokens=True)
-            context_decoded = tokenizer.decode(context, skip_special_tokens=True)
             pred_hypothesis, gold_hypothesis = smoothing(question_decoded, pred_answer, gold_answer, type_smoothing)
 
             # Cek label dari answer prediksi dan context
@@ -788,7 +864,7 @@ if __name__ == "__main__":
                         end_pred_idx = predictions_idx_inside_loop[1][i] + 1
 
                         # Retrieve answer prediksi
-                        pred_answer_inside_loop = tokenizer.decode(tokenized_data_qas_id_validation[i]['input_ids']
+                        pred_answer_inside_loop = tokenizer.decode(tokenized_data[i]['input_ids']
                                                     [start_pred_idx: end_pred_idx], skip_special_tokens=True)
                         
                         pred_hypothesis_inside_loop, gold_hypothesis = smoothing(
