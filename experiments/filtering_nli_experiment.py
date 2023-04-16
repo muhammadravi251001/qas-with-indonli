@@ -1109,7 +1109,7 @@ if __name__ == "__main__":
         num_kenapa_right = 0
         num_berapa_right = 0
         num_others_right = 0
-        
+
         num_apa_wrong = 0
         num_dimana_wrong = 0
         num_kapan_wrong = 0
@@ -1118,40 +1118,40 @@ if __name__ == "__main__":
         num_kenapa_wrong = 0
         num_berapa_wrong = 0
         num_others_wrong = 0
-        
+
         under_hundred_right = 0
         _101_to_150_right = 0
         _151_to_200_right = 0
         _201_to_250_right = 0
         _251_to_300_right = 0
         _over_301_right = 0
-        
+
         under_hundred_wrong = 0
         _101_to_150_wrong = 0
         _151_to_200_wrong = 0
         _201_to_250_wrong = 0
         _251_to_300_wrong = 0
         _over_301_wrong = 0
-        
+
         q_one_to_five_right = 0
         q_six_to_ten_right = 0
         q_eleven_to_fifteen_right = 0
         q_sixteen_to_twenty_right = 0
         q_over_twenty_right = 0
-        
+
         q_one_to_five_wrong = 0
         q_six_to_ten_wrong = 0
         q_eleven_to_fifteen_wrong = 0
         q_sixteen_to_twenty_wrong = 0
         q_over_twenty_wrong = 0
-        
+
         a_zero_right = 0
         a_one_to_five_right = 0
         a_six_to_ten_right = 0
         a_eleven_to_fifteen_right = 0
         a_sixteen_to_twenty_right = 0
         a_over_twenty_right = 0
-        
+
         a_zero_wrong = 0
         a_one_to_five_wrong = 0
         a_six_to_ten_wrong = 0
@@ -1159,15 +1159,106 @@ if __name__ == "__main__":
         a_sixteen_to_twenty_wrong = 0
         a_over_twenty_wrong = 0
         
+        num_Person_right = 0
+        num_NORP_right = 0
+        num_Facility_right = 0
+        num_Organization_right = 0
+        num_Geo_Political_Entity_right = 0
+        num_Location_right = 0
+        num_Product_right = 0
+        num_Event_right = 0
+        num_Work_of_Art_right = 0
+        num_Law_right = 0
+        num_Language_right = 0
+        num_Date_right = 0
+        num_Time_right = 0
+        num_Percent_right = 0
+        num_Money_right = 0
+        num_Quantity_right = 0
+        num_Ordinal_right = 0
+        num_Cardinal_right = 0
+        num_null_right = 0
+        num_REG_right = 0
+        
+        num_Person_wrong = 0
+        num_NORP_wrong = 0
+        num_Facility_wrong = 0
+        num_Organization_wrong = 0
+        num_Geo_Political_Entity_wrong = 0
+        num_Location_wrong = 0
+        num_Product_wrong = 0
+        num_Event_wrong = 0
+        num_Work_of_Art_wrong = 0
+        num_Law_wrong = 0
+        num_Language_wrong = 0
+        num_Date_wrong = 0
+        num_Time_wrong = 0
+        num_Percent_wrong = 0
+        num_Money_wrong = 0
+        num_Quantity_wrong = 0
+        num_Ordinal_wrong = 0
+        num_Cardinal_wrong = 0
+        num_null_wrong = 0
+        num_REG_wrong = 0
+        
+        denominator_answer_type = 0
+
         # Cek semua properti EDA, yang berhasil berapa, yang gagal berapa?
         for i in range(len(df)):
-            
+
             pred_answer_after_filtering = df["Prediction Answer After Filtering"][i][-1]       
             gold_text = df["Gold Answer"][i]
             current_question = df["Question"][i].split()
             len_current_passage = len(df["Context"][i].split())
             len_current_question = len(df["Question"][i].split())
             len_current_gold_text = len(df["Gold Answer"][i].split())
+
+            for answer_type in df['Answer Type'][i]:
+                denominator_answer_type += 1
+                
+                if (pred_answer_after_filtering == gold_text):
+                    if answer_type == 'PER': num_Person_right += 1
+                    elif answer_type == 'NOR': num_NORP_right += 1
+                    elif answer_type == 'FAC': num_Facility_right += 1
+                    elif answer_type == 'ORG': num_Organization_right += 1
+                    elif answer_type == 'GPE': num_Geo_Political_Entity_right += 1
+                    elif answer_type == 'LOC': num_Location_right += 1
+                    elif answer_type == 'PRD': num_Product_right += 1
+                    elif answer_type == 'EVT': num_Event_right += 1
+                    elif answer_type == 'WOA': num_Work_of_Art_right += 1
+                    elif answer_type == 'LAW': num_Law_right += 1
+                    elif answer_type == 'LAN': num_Language_right += 1
+                    elif answer_type == 'DAT': num_Date_right += 1
+                    elif answer_type == 'TIM': num_Time_right += 1
+                    elif answer_type == 'PRC': num_Percent_right += 1
+                    elif answer_type == 'MON': num_Money_right += 1
+                    elif answer_type == 'QTY': num_Quantity_right += 1
+                    elif answer_type == 'ORD': num_Ordinal_right += 1
+                    elif answer_type == 'CRD': num_Cardinal_right += 1
+                    elif answer_type == 'REG': num_REG_right += 1
+                    elif answer_type == 'NULL': num_null_right += 1
+                
+                elif (pred_answer_after_filtering != gold_text):
+                    if answer_type == 'PER': num_Person_wrong += 1
+                    elif answer_type == 'NOR': num_NORP_wrong += 1
+                    elif answer_type == 'FAC': num_Facility_wrong += 1
+                    elif answer_type == 'ORG': num_Organization_wrong += 1
+                    elif answer_type == 'GPE': num_Geo_Political_Entity_wrong += 1
+                    elif answer_type == 'LOC': num_Location_wrong += 1
+                    elif answer_type == 'PRD': num_Product_wrong += 1
+                    elif answer_type == 'EVT': num_Event_wrong += 1
+                    elif answer_type == 'WOA': num_Work_of_Art_wrong += 1
+                    elif answer_type == 'LAW': num_Law_wrong += 1
+                    elif answer_type == 'LAN': num_Language_wrong += 1
+                    elif answer_type == 'DAT': num_Date_wrong += 1
+                    elif answer_type == 'TIM': num_Time_wrong += 1
+                    elif answer_type == 'PRC': num_Percent_wrong += 1
+                    elif answer_type == 'MON': num_Money_wrong += 1
+                    elif answer_type == 'QTY': num_Quantity_wrong += 1
+                    elif answer_type == 'ORD': num_Ordinal_wrong += 1
+                    elif answer_type == 'CRD': num_Cardinal_wrong += 1
+                    elif answer_type == 'REG': num_REG_wrong += 1
+                    elif answer_type == 'NULL': num_null_wrong += 1
             
             if (pred_answer_after_filtering == gold_text):
                 if 'Apa' in current_question: num_apa_right += 1
@@ -1199,7 +1290,7 @@ if __name__ == "__main__":
                 elif 'berapakah' in current_question: num_berapa_right += 1
 
                 else: num_others_right += 1
-                    
+
                 if len_current_passage <= 100: 
                     under_hundred_right += 1
                 elif len_current_passage >= 101 & len_current_passage <= 150:
@@ -1212,7 +1303,7 @@ if __name__ == "__main__":
                     _251_to_300_right += 1
                 elif len_current_passage >= 301:
                     _over_301_right += 1
-                    
+
                 if len_current_question <= 5: 
                     q_one_to_five_right += 1
                 elif len_current_question >= 6 & len_current_question <= 10:
@@ -1223,7 +1314,7 @@ if __name__ == "__main__":
                     q_sixteen_to_twenty_right += 1
                 elif len_current_question >= 21: 
                     q_over_twenty_right += 1
-                    
+
                 if len_current_gold_text <= 5: 
                     a_one_to_five_right += 1
                 elif len_current_gold_text >= 6 & len_current_gold_text <= 10:
@@ -1236,7 +1327,7 @@ if __name__ == "__main__":
                     a_over_twenty_right += 1
                 elif len_current_gold_text == 0:
                     a_zero_right += 1
-            
+
             elif (pred_answer_after_filtering != gold_text):
                 if 'Apa' in current_question: num_apa_wrong += 1
                 elif 'Apakah' in current_question: num_apa_wrong += 1
@@ -1267,7 +1358,7 @@ if __name__ == "__main__":
                 elif 'berapakah' in current_question: num_berapa_wrong += 1
 
                 else: num_others_wrong += 1
-                    
+
                 if len_current_passage <= 100: 
                     under_hundred_wrong += 1
                 elif len_current_passage >= 101 & len_current_passage <= 150:
@@ -1280,7 +1371,7 @@ if __name__ == "__main__":
                     _251_to_300_wrong += 1
                 elif len_current_passage >= 301:
                     _over_301_wrong += 1
-                    
+
                 if len_current_question <= 5: 
                     q_one_to_five_wrong += 1
                 elif len_current_question >= 6 & len_current_question <= 10:
@@ -1291,7 +1382,7 @@ if __name__ == "__main__":
                     q_sixteen_to_twenty_wrong += 1
                 elif len_current_question >= 21: 
                     q_over_twenty_wrong += 1
-                    
+
                 if len_current_gold_text <= 5: 
                     a_one_to_five_wrong += 1
                 elif len_current_gold_text >= 6 & len_current_gold_text <= 10:
@@ -1304,27 +1395,36 @@ if __name__ == "__main__":
                     a_over_twenty_wrong += 1
                 elif len_current_gold_text == 0:
                     a_zero_wrong += 1
-                
+
         assert len(df) == num_apa_right+num_dimana_right+num_kapan_right+num_siapa_right+\
                             num_bagaimana_right+num_kenapa_right+num_berapa_right+num_others_right+\
                             num_apa_wrong+num_dimana_wrong+num_kapan_wrong+num_siapa_wrong+\
                             num_bagaimana_wrong+num_kenapa_wrong+num_berapa_wrong+num_others_wrong
-                    
+
         assert len(df) == under_hundred_right+_101_to_150_right+_151_to_200_right+_201_to_250_right+\
                             _251_to_300_right+_over_301_right+\
                             under_hundred_wrong+_101_to_150_wrong+_151_to_200_wrong+_201_to_250_wrong+\
                             _251_to_300_wrong+_over_301_wrong
-        
+
         assert len(df) == q_one_to_five_right+q_six_to_ten_right+q_eleven_to_fifteen_right+q_sixteen_to_twenty_right+\
                             q_over_twenty_right+\
                             q_one_to_five_wrong+q_six_to_ten_wrong+q_eleven_to_fifteen_wrong+q_sixteen_to_twenty_wrong+\
                             q_over_twenty_wrong
-        
+
         assert len(df) == a_one_to_five_right+a_six_to_ten_right+a_eleven_to_fifteen_right+a_sixteen_to_twenty_right+\
                             a_over_twenty_right+a_zero_right+\
                             a_one_to_five_wrong+a_six_to_ten_wrong+a_eleven_to_fifteen_wrong+a_sixteen_to_twenty_wrong+\
                             a_over_twenty_wrong+a_zero_wrong
-            
+        
+        assert denominator_answer_type == num_Person_right + num_NORP_right + num_Facility_right + num_Organization_right + num_Geo_Political_Entity_right + \
+                                num_Location_right + num_Product_right + num_Event_right + num_Work_of_Art_right + num_Law_right + \
+                                num_Language_right + num_Date_right + num_Time_right + num_Percent_right + num_Money_right + \
+                                num_Quantity_right + num_Ordinal_right + num_Cardinal_right + num_null_right + num_REG_right + \
+                                num_Person_wrong + num_NORP_wrong + num_Facility_wrong + num_Organization_wrong + num_Geo_Political_Entity_wrong + \
+                                num_Location_wrong + num_Product_wrong + num_Event_wrong + num_Work_of_Art_wrong + num_Law_wrong + \
+                                num_Language_wrong + num_Date_wrong + num_Time_wrong + num_Percent_wrong + num_Money_wrong + \
+                                num_Quantity_wrong + num_Ordinal_wrong + num_Cardinal_wrong + num_null_wrong + num_REG_wrong
+        
         print("--- Bagian tentang question type ---")
         print(f"-- Bagian tentang question type yang terprediksi BENAR --")
         print(f"Banyak pertanyaan APA: {num_apa_right}, sebesar: {round((num_apa_right/len(df) * 100), 2)} %")
@@ -1356,7 +1456,7 @@ if __name__ == "__main__":
         print(f"Banyak pertanyaan BERAPA yang terpediksi benar sebesar: {round((num_berapa_right/(num_berapa_right+num_berapa_wrong) * 100), 2)} %")
         print(f"Banyak pertanyaan LAINNYA yang terpediksi benar sebesar: {round((num_others_right/(num_others_right+num_others_wrong) * 100), 2)} %")
         print()
-        
+
         print("--- Bagian tentang panjang context ---")
         print(f"-- Bagian tentang panjang context yang terprediksi BENAR --")
         print(f"Panjang konteks < 100: {under_hundred_right}, sebesar: {round((under_hundred_right/len(df) * 100), 2)} %")
@@ -1382,7 +1482,7 @@ if __name__ == "__main__":
         print(f"Panjang konteks 251 <= x <= 300 yang terprediksi benar sebesar: {(_251_to_300_right+_251_to_300_wrong) and round((_251_to_300_right/(_251_to_300_right+_251_to_300_wrong) * 100), 2)} %")
         print(f"Panjang konteks > 300 yang terprediksi benar sebesar: {(_over_301_right+_over_301_wrong) and round((_over_301_right/(_over_301_right+_over_301_wrong) * 100), 2)} %")
         print()
-        
+
         print("--- Bagian tentang panjang question ---")
         print(f"-- Bagian tentang panjang question yang terprediksi BENAR --")
         print(f"Panjang question 1 <= x <= 5: {q_one_to_five_right}, sebesar: {round((q_one_to_five_right/len(df) * 100), 2)} %")
@@ -1405,7 +1505,7 @@ if __name__ == "__main__":
         print(f"Panjang question 16 <= x <= 20 yang terprediksi benar sebesar: {(q_sixteen_to_twenty_right+q_sixteen_to_twenty_wrong) and round((q_sixteen_to_twenty_right/(q_sixteen_to_twenty_right+q_sixteen_to_twenty_wrong) * 100), 2)} %")
         print(f"Panjang question > 20 yang terprediksi benar sebesar: {round((q_over_twenty_right+q_over_twenty_wrong) and (q_over_twenty_right/(q_over_twenty_right+q_over_twenty_wrong) * 100), 2)} %")
         print()
-        
+
         print("--- Bagian tentang panjang gold answer ---")
         print(f"-- Bagian tentang panjang gold answer yang terprediksi BENAR --")
         print(f"Panjang question 1 <= x <= 5: {a_one_to_five_right}, sebesar: {round((a_one_to_five_right/len(df) * 100), 2)} %")
@@ -1428,6 +1528,80 @@ if __name__ == "__main__":
         print(f"Panjang question 16 <= x <= 20 yang terprediksi benar sebesar: {(a_sixteen_to_twenty_right+a_sixteen_to_twenty_wrong) and round((a_sixteen_to_twenty_right/(a_sixteen_to_twenty_right+a_sixteen_to_twenty_wrong) * 100), 2)} %")
         print(f"Panjang question > 20 yang terprediksi benar sebesar: {round((a_over_twenty_right+a_over_twenty_wrong) and (a_over_twenty_right/(a_over_twenty_right+a_over_twenty_wrong) * 100), 2)} %")
         print()
+        
+        print("--- Bagian tentang answer type ---")
+        print(f"-- Bagian tentang answer type yang terprediksi BENAR --")
+        print(f"Banyak answer type Person sebanyak: {num_Person_right}, sekitar {num_Person_right/denominator_answer_type * 100} %")
+        print(f"Banyak answer type NORP sebanyak: {num_NORP_right}, sekitar {num_NORP_right/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Facility sebanyak: {num_Facility_right}, sekitar {num_Facility_right/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Organization sebanyak: {num_Organization_right}, sekitar {num_Organization_right/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Geo-Political Entity sebanyak: {num_Geo_Political_Entity_right}, sekitar {num_Geo_Political_Entity_right/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Location sebanyak: {num_Location_right}, sekitar {num_Location_right/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Product sebanyak: {num_Product_right}, sekitar {num_Product_right/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Event sebanyak: {num_Event_right}, sekitar {num_Event_right/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Work of Art sebanyak: {num_Work_of_Art_right}, sekitar {num_Work_of_Art_right/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Law sebanyak: {num_Law_right}, sekitar {num_Law_right/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Language sebanyak: {num_Language_right}, sekitar {num_Language_right/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Date sebanyak: {num_Date_right}, sekitar {num_Date_right/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Time sebanyak: {num_Time_right}, sekitar {num_Time_right/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Percent sebanyak: {num_Percent_right}, sekitar {num_Percent_right/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Money sebanyak: {num_Money_right}, sekitar {num_Money_right/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Quantity sebanyak: {num_Quantity_right}, sekitar {num_Quantity_right/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Ordinal sebanyak: {num_Ordinal_right}, sekitar {num_Ordinal_right/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Cardinal sebanyak: {num_Cardinal_right}, sekitar {num_Cardinal_right/denominator_answer_type * 100} %")
+        print(f"Banyak answer type REG sebanyak: {num_REG_right}, sekitar {num_REG_right/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Null sebanyak: {num_null_right}, sekitar {num_null_right/denominator_answer_type * 100} %")
+        print()
+        print(f"-- Bagian tentang answer type yang terprediksi SALAH --")
+        print(f"Banyak answer type Person sebanyak: {num_Person_wrong}, sekitar {num_Person_wrong/denominator_answer_type * 100} %")
+        print(f"Banyak answer type NORP sebanyak: {num_NORP_wrong}, sekitar {num_NORP_wrong/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Facility sebanyak: {num_Facility_wrong}, sekitar {num_Facility_wrong/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Organization sebanyak: {num_Organization_wrong}, sekitar {num_Organization_wrong/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Geo-Political Entity sebanyak: {num_Geo_Political_Entity_wrong}, sekitar {num_Geo_Political_Entity_wrong/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Location sebanyak: {num_Location_wrong}, sekitar {num_Location_wrong/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Product sebanyak: {num_Product_wrong}, sekitar {num_Product_wrong/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Event sebanyak: {num_Event_wrong}, sekitar {num_Event_wrong/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Work of Art sebanyak: {num_Work_of_Art_wrong}, sekitar {num_Work_of_Art_wrong/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Law sebanyak: {num_Law_wrong}, sekitar {num_Law_wrong/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Language sebanyak: {num_Language_wrong}, sekitar {num_Language_wrong/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Date sebanyak: {num_Date_wrong}, sekitar {num_Date_wrong/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Time sebanyak: {num_Time_wrong}, sekitar {num_Time_wrong/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Percent sebanyak: {num_Percent_wrong}, sekitar {num_Percent_wrong/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Money sebanyak: {num_Money_wrong}, sekitar {num_Money_wrong/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Quantity sebanyak: {num_Quantity_wrong}, sekitar {num_Quantity_wrong/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Ordinal sebanyak: {num_Ordinal_wrong}, sekitar {num_Ordinal_wrong/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Cardinal sebanyak: {num_Cardinal_wrong}, sekitar {num_Cardinal_wrong/denominator_answer_type * 100} %")
+        print(f"Banyak answer type REG sebanyak: {num_REG_wrong}, sekitar {num_REG_wrong/denominator_answer_type * 100} %")
+        print(f"Banyak answer type Null sebanyak: {num_null_wrong}, sekitar {num_null_wrong/denominator_answer_type * 100} %")
+        print()
+        print(f"-- Presentase kebenaran --")
+        print(f"Banyak answer type Person yang terprediksi benar sebesar: {(num_Person_wrong) and (round((num_Person_right/(num_Person_right+num_Person_wrong) * 100), 2))} %")
+        print(f"Banyak answer type NORP yang terprediksi benar sebesar: {(num_NORP_wrong) and (round((num_NORP_right/(num_NORP_right+num_NORP_wrong) * 100), 2))} %")
+        print(f"Banyak answer type Facility yang terprediksi benar sebesar: {(num_Facility_wrong) and (round((num_Facility_right/(num_Facility_right+num_Facility_wrong) * 100), 2))} %")
+        print(f"Banyak answer type Organization yang terprediksi benar sebesar: {(num_Organization_wrong) and (round((num_Organization_right/(num_Organization_right+num_Organization_wrong) * 100), 2))} %")
+        print(f"Banyak answer type Geo-Political Entity yang terprediksi benar sebesar: {(num_Geo_Political_Entity_wrong) and (round((num_Geo_Political_Entity_right/(num_Geo_Political_Entity_right+num_Geo_Political_Entity_wrong) * 100), 2))} %")
+        print(f"Banyak answer type Location yang terprediksi benar sebesar: {(num_Location_wrong) and (round((num_Location_right/(num_Location_right+num_Location_wrong) * 100), 2))} %")
+        print(f"Banyak answer type Product yang terprediksi benar sebesar: {(num_Product_wrong) and (round((num_Product_right/(num_Product_right+num_Product_wrong) * 100), 2))} %")
+        print(f"Banyak answer type Event yang terprediksi benar sebesar: {(num_Event_wrong) and (round((num_Event_right/(num_Event_right+num_Event_wrong) * 100), 2))} %")
+        print(f"Banyak answer type Work of Art yang terprediksi benar sebesar: {(num_Work_of_Art_wrong) and (round((num_Work_of_Art_right/(num_Work_of_Art_right+num_Work_of_Art_wrong) * 100), 2))} %")
+        print(f"Banyak answer type Law yang terprediksi benar sebesar: {(num_Law_wrong) and (round((num_Law_right/(num_Law_right+num_Law_wrong) * 100), 2))} %")
+        print(f"Banyak answer type Language yang terprediksi benar sebesar: {(num_Language_wrong) and (round((num_Language_right/(num_Language_right+num_Language_wrong) * 100), 2))} %")
+        print(f"Banyak answer type Date yang terprediksi benar sebesar: {(num_Date_wrong) and (round((num_Date_right/(num_Date_right+num_Date_wrong) * 100), 2))} %")
+        print(f"Banyak answer type Time yang terprediksi benar sebesar: {(num_Time_wrong) and (round((num_Time_right/(num_Time_right+num_Time_wrong) * 100), 2))} %")
+        print(f"Banyak answer type Percent yang terprediksi benar sebesar: {(num_Percent_wrong) and (round((num_Percent_right/(num_Percent_right+num_Percent_wrong) * 100), 2))} %")
+        print(f"Banyak answer type Money yang terprediksi benar sebesar: {(num_Money_wrong) and (round((num_Money_right/(num_Money_right+num_Money_wrong) * 100), 2))} %")
+        print(f"Banyak answer type Quantity yang terprediksi benar sebesar: {(num_Quantity_wrong) and (round((num_Quantity_right/(num_Quantity_right+num_Quantity_wrong) * 100), 2))} %")
+        print(f"Banyak answer type Ordinal yang terprediksi benar sebesar: {(num_Ordinal_wrong) and (round((num_Ordinal_right/(num_Ordinal_right+num_Ordinal_wrong) * 100), 2))} %")
+        print(f"Banyak answer type Cardinal yang terprediksi benar sebesar: {(num_Cardinal_wrong) and (round((num_Cardinal_right/(num_Cardinal_right+num_Cardinal_wrong) * 100), 2))} %")
+        print(f"Banyak answer type REG yang terprediksi benar sebesar: {(num_REG_wrong) and (round((num_REG_right/(num_REG_right+num_REG_wrong) * 100), 2))} %")
+        print(f"Banyak answer type Null yang terprediksi benar sebesar: {(num_null_wrong) and (round((num_null_right/(num_null_right+num_null_wrong) * 100), 2))} %")
+        print()
+        
+        # TODO
+        print("--- Bagian tentang reasoning type ---")
+        print(f"-- Bagian tentang reasoning type yang terprediksi BENAR --")
+        print(f"-- Bagian tentang reasoning type yang terprediksi SALAH --")
+        print(f"-- Presentase kebenaran --")
     
     general_evaluation(filtering_result)
 
