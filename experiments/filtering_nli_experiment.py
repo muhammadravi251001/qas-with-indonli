@@ -1732,6 +1732,8 @@ if __name__ == "__main__":
         num_msr_wrong = 0
         num_aoi_wrong = 0
 
+        NUM_REASONING_TYPE_ANNOTATED = 100
+
         # Cek semua properti EDA, yang berhasil berapa, yang gagal berapa?
         for i in range(len(df)):
 
@@ -1967,7 +1969,7 @@ if __name__ == "__main__":
                                 num_Language_wrong + num_Date_wrong + num_Time_wrong + num_Percent_wrong + num_Money_wrong + \
                                 num_Quantity_wrong + num_Ordinal_wrong + num_Cardinal_wrong + num_null_wrong + num_REG_wrong
         
-        assert 100 == num_wm_right + num_wm_right + num_wm_right + num_wm_right + num_wm_right + \
+        assert NUM_REASONING_TYPE_ANNOTATED == num_wm_right + num_wm_right + num_wm_right + num_wm_right + num_wm_right + \
                     num_wm_wrong + num_wm_wrong + num_wm_wrong + num_wm_wrong + num_wm_wrong
         
         print("--- Bagian tentang question type ---")
@@ -2142,21 +2144,20 @@ if __name__ == "__main__":
         print(f"Banyak answer type Null yang terprediksi benar sebesar: {(num_null_wrong) and (round((num_null_right/(num_null_right+num_null_wrong) * 100), 2))} %")
         print()
         
-        # TODO
         print("--- Bagian tentang reasoning type ---")
         print(f"-- Bagian tentang reasoning type yang terprediksi BENAR --")
-        print(f"Banyak reasoning type berjenis WM sebanyak: {num_wm_right}, sebesar: {round((num_wm_right/len(df) * 100), 2)} %")
-        print(f"Banyak reasoning type berjenis PP sebanyak: {num_pp_right}, sebesar: {round((num_pp_right/len(df) * 100), 2)} %")
-        print(f"Banyak reasoning type berjenis SSR sebanyak: {num_ssr_right}, sebesar: {round((num_ssr_right/len(df) * 100), 2)} %")
-        print(f"Banyak reasoning type berjenis MSR sebanyak: {num_msr_right}, sebesar: {round((num_msr_right/len(df) * 100), 2)} %")
-        print(f"Banyak reasoning type berjenis AoI sebanyak: {num_aoi_right}, sebesar: {round((num_aoi_right/len(df) * 100), 2)} %")
+        print(f"Banyak reasoning type berjenis WM sebanyak: {num_wm_right}, sebesar: {round((num_wm_right/NUM_REASONING_TYPE_ANNOTATED * 100), 2)} %")
+        print(f"Banyak reasoning type berjenis PP sebanyak: {num_pp_right}, sebesar: {round((num_pp_right/NUM_REASONING_TYPE_ANNOTATED * 100), 2)} %")
+        print(f"Banyak reasoning type berjenis SSR sebanyak: {num_ssr_right}, sebesar: {round((num_ssr_right/NUM_REASONING_TYPE_ANNOTATED * 100), 2)} %")
+        print(f"Banyak reasoning type berjenis MSR sebanyak: {num_msr_right}, sebesar: {round((num_msr_right/NUM_REASONING_TYPE_ANNOTATED * 100), 2)} %")
+        print(f"Banyak reasoning type berjenis AoI sebanyak: {num_aoi_right}, sebesar: {round((num_aoi_right/NUM_REASONING_TYPE_ANNOTATED * 100), 2)} %")
         print()
         print(f"-- Bagian tentang reasoning type yang terprediksi SALAH --")
-        print(f"Banyak reasoning type berjenis WM sebanyak: {num_wm_wrong}, sebesar: {round((num_wm_wrong/len(df) * 100), 2)} %")
-        print(f"Banyak reasoning type berjenis PP sebanyak: {num_pp_wrong}, sebesar: {round((num_pp_wrong/len(df) * 100), 2)} %")
-        print(f"Banyak reasoning type berjenis SSR sebanyak: {num_ssr_wrong}, sebesar: {round((num_ssr_wrong/len(df) * 100), 2)} %")
-        print(f"Banyak reasoning type berjenis MSR sebanyak: {num_msr_wrong}, sebesar: {round((num_msr_wrong/len(df) * 100), 2)} %")
-        print(f"Banyak reasoning type berjenis AoI sebanyak: {num_aoi_wrong}, sebesar: {round((num_aoi_wrong/len(df) * 100), 2)} %")
+        print(f"Banyak reasoning type berjenis WM sebanyak: {num_wm_wrong}, sebesar: {round((num_wm_wrong/NUM_REASONING_TYPE_ANNOTATED * 100), 2)} %")
+        print(f"Banyak reasoning type berjenis PP sebanyak: {num_pp_wrong}, sebesar: {round((num_pp_wrong/NUM_REASONING_TYPE_ANNOTATED * 100), 2)} %")
+        print(f"Banyak reasoning type berjenis SSR sebanyak: {num_ssr_wrong}, sebesar: {round((num_ssr_wrong/NUM_REASONING_TYPE_ANNOTATED * 100), 2)} %")
+        print(f"Banyak reasoning type berjenis MSR sebanyak: {num_msr_wrong}, sebesar: {round((num_msr_wrong/NUM_REASONING_TYPE_ANNOTATED * 100), 2)} %")
+        print(f"Banyak reasoning type berjenis AoI sebanyak: {num_aoi_wrong}, sebesar: {round((num_aoi_wrong/NUM_REASONING_TYPE_ANNOTATED * 100), 2)} %")
         print()
         print(f"-- Presentase kebenaran --")
         print(f"Banyak reasoning type berjenis WM yang terprediksi benar sebesar: {(num_wm_wrong) and (round((num_wm_right/(num_wm_right+num_wm_wrong) * 100), 2))} %")
