@@ -203,8 +203,8 @@ if __name__ == "__main__":
     # ## Fungsi utilitas untuk komputasi metrik
     def compute_metrics(eval_pred):
         predictions = eval_pred.predictions
-        labels = eval_pred.label_ids
         predictions = np.argmax(predictions, axis=1)
+        labels = eval_pred.label_ids
         
         acc_result = accuracy.compute(predictions=predictions, references=labels)
         f1_result = f1.compute(predictions=predictions, references=labels, average="weighted")

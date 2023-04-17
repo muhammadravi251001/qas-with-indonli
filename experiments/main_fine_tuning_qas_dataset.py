@@ -165,8 +165,8 @@ if __name__ == "__main__":
                                             "answer_end": eval(df_train["answer"][i][0])['answer_end']}}, 
                                         ignore_index=True)
 
-        train_final_df = new_df_train[:-1066]
-        validation_final_df = new_df_train[-1066:]
+        train_final_df = new_df_train[:-11874]
+        validation_final_df = new_df_train[-11874:]
 
         train_dataset = Dataset.from_dict(train_final_df)
         validation_dataset = Dataset.from_dict(validation_final_df)
@@ -254,10 +254,10 @@ if __name__ == "__main__":
 
         df_train = pd.DataFrame(data_qas_id['train'])
         df_validation = pd.DataFrame(data_qas_id['validation'])
+        df_test = pd.DataFrame(data_qas_id['test'])
 
         cols = ['context', 'question', 'answer']
         new_df_train = pd.DataFrame(columns=cols)
-        df_test = pd.DataFrame(data_qas_id['test'])
 
         for i in range(len(df_train['context'])):
             answer_start = df_train['context'][i].index(df_train['label'][i])
@@ -466,34 +466,43 @@ if __name__ == "__main__":
         
         return f1
 
-    def compute_metrics(predict_result):
+    def compute_metrics(predict_result, 
+                    tokenized_data_qas_id_validation=tokenized_data_qas_id_validation, 
+                    tokenized_data_qas_id_test=tokenized_data_qas_id_test):
+    
         predictions_idx = np.argmax(predict_result.predictions, axis=2)
         denominator = len(predictions_idx[0])
         label_array = np.asarray(predict_result.label_ids)
         total_correct = 0
         f1_array = []
         
+        if len(predict_result.predictions[0]) == len(tokenized_data_qas_id_validation):
+            tokenized_data = tokenized_data_qas_id_validation
+        
+        elif len(predict_result.predictions[0]) == len(tokenized_data_qas_id_test):
+            tokenized_data = tokenized_data_qas_id_test
+
         for i in range(len(predict_result.predictions[0])):
             start_pred_idx = predictions_idx[0][i]
             end_pred_idx = predictions_idx[1][i] + 1
             start_gold_idx = label_array[0][i]
             end_gold_idx = label_array[1][i] + 1
 
-            pred_text = tokenizer.decode(tokenized_data_qas_id_validation[i]['input_ids']
+            pred_text = tokenizer.decode(tokenized_data[i]['input_ids']
                                         [start_pred_idx: end_pred_idx])
-            gold_text = tokenizer.decode(tokenized_data_qas_id_validation[i]['input_ids']
+            gold_text = tokenizer.decode(tokenized_data[i]['input_ids']
                                         [start_gold_idx: end_gold_idx])
 
             if pred_text == gold_text:
                 total_correct += 1
 
             f1 = compute_f1(pred=pred_text, gold=gold_text)
-            
+
             f1_array.append(f1)
 
         exact_match = ((total_correct / denominator) * 100.0)
         final_f1 = np.mean(f1_array) * 100.0
-        
+
         return {'exact_match': exact_match, 'f1': final_f1}
 
     # ## Mendefinisikan argumen (dataops) untuk training nanti
@@ -1185,18 +1194,18 @@ if __name__ == "__main__":
         num_REG_wrong = 0
         
         denominator_answer_type = 0
+        
+        num_wm_right = 0
+        num_pp_right = 0
+        num_ssr_right = 0
+        num_msr_right = 0
+        num_aoi_right = 0
 
-        wm_right = 0
-        pp_right = 0
-        ssr_right = 0
-        msr_right = 0
-        aoi_right = 0
-
-        wm_wrong = 0
-        pp_wrong = 0
-        ssr_wrong = 0
-        msr_wrong = 0
-        aoi_wrong = 0
+        num_wm_wrong = 0
+        num_pp_wrong = 0
+        num_ssr_wrong = 0
+        num_msr_wrong = 0
+        num_aoi_wrong = 0
 
         # Cek semua properti EDA, yang berhasil berapa, yang gagal berapa?
         for i in range(len(df)):
@@ -1207,6 +1216,7 @@ if __name__ == "__main__":
             len_current_passage = len(df["Context"][i].split())
             len_current_question = len(df["Question"][i].split())
             len_current_gold_text = len(df["Gold Answer"][i].split())
+            reasoning_type = df['Reasoning Type'][i]
 
             for answer_type in df['Answer Type'][i]:
                 denominator_answer_type += 1
@@ -1322,6 +1332,12 @@ if __name__ == "__main__":
                     a_over_twenty_right += 1
                 elif len_current_gold_text == 0:
                     a_zero_right += 1
+                    
+                if reasoning_type == "WM": num_wm_right += 1
+                elif reasoning_type == "PP": num_pp_right += 1
+                elif reasoning_type == "SSR": num_ssr_right += 1
+                elif reasoning_type == "MSR": num_msr_right += 1
+                elif reasoning_type == "AoI": num_aoi_right += 1
 
             elif (pred_answer != gold_text):
                 if 'Apa' in current_question: num_apa_wrong += 1
@@ -1390,6 +1406,12 @@ if __name__ == "__main__":
                     a_over_twenty_wrong += 1
                 elif len_current_gold_text == 0:
                     a_zero_wrong += 1
+                    
+                if reasoning_type == "WM": num_wm_wrong += 1
+                elif reasoning_type == "PP": num_pp_wrong += 1
+                elif reasoning_type == "SSR": num_ssr_wrong += 1
+                elif reasoning_type == "MSR": num_msr_wrong += 1
+                elif reasoning_type == "AoI": num_aoi_wrong += 1
 
         assert len(df) == num_apa_right+num_dimana_right+num_kapan_right+num_siapa_right+\
                             num_bagaimana_right+num_kenapa_right+num_berapa_right+num_others_right+\
@@ -1419,6 +1441,9 @@ if __name__ == "__main__":
                                 num_Location_wrong + num_Product_wrong + num_Event_wrong + num_Work_of_Art_wrong + num_Law_wrong + \
                                 num_Language_wrong + num_Date_wrong + num_Time_wrong + num_Percent_wrong + num_Money_wrong + \
                                 num_Quantity_wrong + num_Ordinal_wrong + num_Cardinal_wrong + num_null_wrong + num_REG_wrong
+        
+        assert 100 == num_wm_right + num_wm_right + num_wm_right + num_wm_right + num_wm_right + \
+                    num_wm_wrong + num_wm_wrong + num_wm_wrong + num_wm_wrong + num_wm_wrong
         
         print("--- Bagian tentang question type ---")
         print(f"-- Bagian tentang question type yang terprediksi BENAR --")
@@ -1595,8 +1620,26 @@ if __name__ == "__main__":
         # TODO
         print("--- Bagian tentang reasoning type ---")
         print(f"-- Bagian tentang reasoning type yang terprediksi BENAR --")
+        print(f"Banyak reasoning type berjenis WM sebanyak: {num_wm_right}, sebesar: {round((num_wm_right/len(df) * 100), 2)} %")
+        print(f"Banyak reasoning type berjenis PP sebanyak: {num_pp_right}, sebesar: {round((num_pp_right/len(df) * 100), 2)} %")
+        print(f"Banyak reasoning type berjenis SSR sebanyak: {num_ssr_right}, sebesar: {round((num_ssr_right/len(df) * 100), 2)} %")
+        print(f"Banyak reasoning type berjenis MSR sebanyak: {num_msr_right}, sebesar: {round((num_msr_right/len(df) * 100), 2)} %")
+        print(f"Banyak reasoning type berjenis AoI sebanyak: {num_aoi_right}, sebesar: {round((num_aoi_right/len(df) * 100), 2)} %")
+        print()
         print(f"-- Bagian tentang reasoning type yang terprediksi SALAH --")
+        print(f"Banyak reasoning type berjenis WM sebanyak: {num_wm_wrong}, sebesar: {round((num_wm_wrong/len(df) * 100), 2)} %")
+        print(f"Banyak reasoning type berjenis PP sebanyak: {num_pp_wrong}, sebesar: {round((num_pp_wrong/len(df) * 100), 2)} %")
+        print(f"Banyak reasoning type berjenis SSR sebanyak: {num_ssr_wrong}, sebesar: {round((num_ssr_wrong/len(df) * 100), 2)} %")
+        print(f"Banyak reasoning type berjenis MSR sebanyak: {num_msr_wrong}, sebesar: {round((num_msr_wrong/len(df) * 100), 2)} %")
+        print(f"Banyak reasoning type berjenis AoI sebanyak: {num_aoi_wrong}, sebesar: {round((num_aoi_wrong/len(df) * 100), 2)} %")
+        print()
         print(f"-- Presentase kebenaran --")
+        print(f"Banyak reasoning type berjenis WM yang terprediksi benar sebesar: {(num_wm_wrong) and (round((num_wm_right/(num_wm_right+num_wm_wrong) * 100), 2))} %")
+        print(f"Banyak reasoning type berjenis PP yang terprediksi benar sebesar: {(num_pp_wrong) and (round((num_pp_right/(num_pp_right+num_pp_wrong) * 100), 2))} %")
+        print(f"Banyak reasoning type berjenis SSR yang terprediksi benar sebesar: {(num_ssr_wrong) and (round((num_ssr_right/(num_ssr_right+num_ssr_wrong) * 100), 2))} %")
+        print(f"Banyak reasoning type berjenis MSR yang terprediksi benar sebesar: {(num_msr_wrong) and (round((num_msr_right/(num_msr_right+num_msr_wrong) * 100), 2))} %")
+        print(f"Banyak reasoning type berjenis AoI yang terprediksi benar sebesar: {(num_aoi_wrong) and (round((num_aoi_right/(num_aoi_right+num_aoi_wrong) * 100), 2))} %")
+        print()
     
     general_evaluation(qas_df)
 
