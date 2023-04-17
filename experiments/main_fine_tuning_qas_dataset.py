@@ -1452,8 +1452,8 @@ if __name__ == "__main__":
                                 num_Language_wrong + num_Date_wrong + num_Time_wrong + num_Percent_wrong + num_Money_wrong + \
                                 num_Quantity_wrong + num_Ordinal_wrong + num_Cardinal_wrong + num_null_wrong + num_REG_wrong
         
-        assert NUM_REASONING_TYPE_ANNOTATED == num_wm_right + num_wm_right + num_wm_right + num_wm_right + num_wm_right + \
-                    num_wm_wrong + num_wm_wrong + num_wm_wrong + num_wm_wrong + num_wm_wrong
+        assert NUM_REASONING_TYPE_ANNOTATED == num_wm_right + num_pp_right + num_ssr_right + num_msr_right + num_aoi_right + \
+                    num_wm_wrong + num_pp_wrong + num_ssr_wrong + num_msr_wrong + num_aoi_wrong
         
         print("--- Bagian tentang question type ---")
         print(f"-- Bagian tentang question type yang terprediksi BENAR --")
