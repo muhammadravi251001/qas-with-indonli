@@ -784,7 +784,7 @@ if __name__ == "__main__":
         gold_answer_array = []
         gold_hypothesis_array = []
 
-        answer_type_array = []
+        answer_types_array = []
         
         # Iterasi ini ditujukan untuk retrieve answer
         for i in tqdm(range(len(predict_result.predictions[0]))):
@@ -857,7 +857,7 @@ if __name__ == "__main__":
                     context_array.append(context_decoded)
                     pred_answer_after_filtering_array.append([pred_answer])
                     gold_answer_array.append(gold_answer)
-                    answer_type_array.append(answer=gold_answer)
+                    answer_types_array.append(assign_answer_types(answer=gold_answer))
                     pred_hypothesis_after_filtering_array.append([pred_hypothesis])
                     gold_hypothesis_array.append(gold_hypothesis)
                     label_after_filtering_array.append([predicted_label])
@@ -868,7 +868,7 @@ if __name__ == "__main__":
                     context_array.append(context_decoded)
                     pred_answer_after_filtering_array.append([pred_answer])
                     gold_answer_array.append(gold_answer)
-                    answer_type_array.append(answer=gold_answer)
+                    answer_types_array.append(assign_answer_types(answer=gold_answer))
                     pred_hypothesis_after_filtering_array.append([pred_hypothesis])
                     gold_hypothesis_array.append(gold_hypothesis)
                     label_after_filtering_array.append([predicted_label])
@@ -925,7 +925,7 @@ if __name__ == "__main__":
                                 question_array.append(question_decoded)
                                 context_array.append(context_decoded)
                                 gold_answer_array.append(gold_answer)
-                                answer_type_array.append(answer=gold_answer)
+                                answer_types_array.append(assign_answer_types(answer=gold_answer))
                                 gold_hypothesis_array.append(gold_hypothesis)
                                 
                                 pred_answer_after_filtering_array.append(pred_answer_after_filtering_array_msi_recorded)
@@ -939,7 +939,7 @@ if __name__ == "__main__":
                                 question_array.append(question_decoded)
                                 context_array.append(context_decoded)
                                 gold_answer_array.append(gold_answer)
-                                answer_type_array.append(answer=gold_answer)  
+                                answer_types_array.append(assign_answer_types(answer=gold_answer)) 
                                 gold_hypothesis_array.append(gold_hypothesis)
                                 
                                 pred_answer_after_filtering_array.append(pred_answer_after_filtering_array_msi_recorded)
@@ -963,7 +963,7 @@ if __name__ == "__main__":
                         label_after_filtering_array_msi_recorded.append(predicted_label_inside_loop)
                         
                         gold_answer_array.append(gold_answer)
-                        answer_type_array.append(answer=gold_answer)
+                        answer_types_array.append(assign_answer_types(answer=gold_answer))
                         gold_hypothesis_array.append(gold_hypothesis)
                         
                         pred_answer_after_filtering_array.append(pred_answer_after_filtering_array_msi_recorded)
@@ -985,8 +985,8 @@ if __name__ == "__main__":
                             'Gold Answer': gold_answer_array,
                             'Gold Hypothesis': gold_hypothesis_array,
                             
-                            'Answer Type': answer_type_array,
-                            'Reasoning Type:': '-' 
+                            'Answer Type': answer_types_array,
+                            'Reasoning Type': '-' 
                             })
                             
         if DATA_NAME == "Squad-ID": 
