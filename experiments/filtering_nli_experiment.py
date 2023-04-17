@@ -763,7 +763,7 @@ if __name__ == "__main__":
         return pred_hypothesis, gold_hypothesis
     
     # # Membuat kode untuk filtering answer berdasarkan label NLI: entailment (atau neutral) yang bisa menjadi hasil akhir prediksi
-    def filtering_based_on_nli(predict_result, tokenized_data, type_smoothing, type_qas, MAXIMUM_SEARCH_ITER=MAXIMUM_SEARCH_ITER):
+    def filtering_based_on_nli(predict_result, type_smoothing, type_qas, MAXIMUM_SEARCH_ITER=MAXIMUM_SEARCH_ITER):
     
     # Ekstrak dari PredictionOutput QAS
         predictions_idx = np.argsort(predict_result.predictions, axis=2)[:, :, 1 * -1]
@@ -796,6 +796,12 @@ if __name__ == "__main__":
             
             start_gold_idx = label_array[0][i]
             end_gold_idx = label_array[1][i] + 1
+
+            if len(predict_result.predictions[0]) == len(tokenized_data_qas_id_validation):
+                tokenized_data = tokenized_data_qas_id_validation
+            
+            elif len(predict_result.predictions[0]) == len(tokenized_data_qas_id_test):
+                tokenized_data = tokenized_data_qas_id_test
             
             # Retrieve answer prediksi
             pred_answer = tokenizer.decode(tokenized_data[i]['input_ids']

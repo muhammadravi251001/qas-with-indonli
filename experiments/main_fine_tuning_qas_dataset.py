@@ -608,19 +608,19 @@ if __name__ == "__main__":
         return list(set(entity_array))
 
     # ## Method untuk melihat isi PredictionOutput
-    def represent_prediction_output(predict_result, tokenized_data, assign_answer_types=assign_answer_types):
+    def represent_prediction_output(predict_result, assign_answer_types=assign_answer_types):
         
         predictions_idx = np.argmax(predict_result.predictions, axis=2)
         label_array = np.asarray(predict_result.label_ids)
-
+            
         question_array = []
         context_array = []
 
         pred_answer_array = []
         gold_answer_array = []
-
-        answer_type_array = []
-
+        
+        answer_types_array = []
+        
         for i in tqdm(range(len(predict_result.predictions[0]))):
 
             start_pred_idx = predictions_idx[0][i]
@@ -628,6 +628,12 @@ if __name__ == "__main__":
 
             start_gold_idx = label_array[0][i]
             end_gold_idx = label_array[1][i] + 1
+            
+            if len(predict_result.predictions[0]) == len(tokenized_data_qas_id_validation):
+                tokenized_data = tokenized_data_qas_id_validation
+            
+            elif len(predict_result.predictions[0]) == len(tokenized_data_qas_id_test):
+                tokenized_data = tokenized_data_qas_id_test
 
             pred_answer = tokenizer.decode(tokenized_data[i]['input_ids']
                                         [start_pred_idx: end_pred_idx], skip_special_tokens=True)
@@ -637,13 +643,14 @@ if __name__ == "__main__":
 
             pred_answer_array.append(pred_answer)
             gold_answer_array.append(gold_answer)
-            answer_type_array.append(answer=gold_answer)
-
+            
+            answer_types_array.append(assign_answer_types(answer=gold_answer))
+            
             question = []
             context = []
-
+            
             if (args.model_name) == "xlmr":
-
+                
                 start_question = tokenized_data[i]['input_ids'].index(0)
                 end_question = tokenized_data[i]['input_ids'].index(2)  + 1
                 start_context = end_question
@@ -653,9 +660,9 @@ if __name__ == "__main__":
 
                 question_decoded = tokenizer.decode(question[0], skip_special_tokens=True)
                 context_decoded = tokenizer.decode(context[0], skip_special_tokens=True)
-
+                
             else:
-
+                
                 for j in range(len(tokenized_data[i]['token_type_ids'])):
 
                     if tokenized_data[i]['token_type_ids'][j] == 0:
@@ -664,18 +671,19 @@ if __name__ == "__main__":
                     else:
                         context.append(tokenized_data[i]['input_ids'][j])
 
-                question_decoded = tokenizer.decode(question, skip_special_tokens=True)
-                context_decoded = tokenizer.decode(context, skip_special_tokens=True)
-
+            question_decoded = tokenizer.decode(question, skip_special_tokens=True)
+            context_decoded = tokenizer.decode(context, skip_special_tokens=True)
+            
             question_array.append(question_decoded)
             context_array.append(context_decoded)
-
+            
         qas_df = pd.DataFrame({'Context': context_array, 
                                 'Question': question_array, 
                                 'Prediction Answer': pred_answer_array,
                                 'Gold Answer': gold_answer_array,
-                                'Answer Type': answer_type_array,
-                                'Reasoning Type:': '-' })
+                                'Answer Type': answer_types_array,
+                                'Reasoning Type': '-'
+                            })
         
         if DATA_NAME == "Squad-ID": 
             
