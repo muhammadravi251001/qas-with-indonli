@@ -588,10 +588,19 @@ if __name__ == "__main__":
                     'kapan', 'kapankah',
                     'bagaimana', 'bagaimanakah',
                     'kenapa', 'mengapa',
-                    'berapa', 'berapakah', 'seberapa']
+                    'berapa', 'berapakah', 'seberapa',
+                
+                    'Siapa', 'Siapakah',
+                        'Apa', 'Apakah', 'Adakah',
+                        'Dimana', 'Dimanakah', 'Darimanakah',
+                        'Kapan', 'Kapankah',
+                        'Bagaimana', 'Bagaimanakah',
+                        'Kenapa', 'Mengapa',
+                        'Berapa', 'Berapakah', 'Seberapa'
+                    ]
     
     # # Retrieve model IndoNLI dari Hugging Face via Pipelines
-    tokenizer_kwargs = {'padding': True, 'truncation': True, 'max_length': MAX_LENGTH}
+    tokenizer_kwargs = {'truncation': True, 'max_length': 512}
 
     nlp_sc = pipeline(task="text-classification", model=MODEL_SC_NAME, tokenizer=MODEL_SC_NAME, 
                     device=torch.cuda.current_device(), **tokenizer_kwargs)
