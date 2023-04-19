@@ -614,28 +614,35 @@ if __name__ == "__main__":
     # # Membuat kode untuk smoothing answer dan question agar menjadi hipotesis yang natural
     def smoothing(question, pred_answer, gold_answer, type, question_word=question_word):
     
+        question = question.lower()
+        pred_answer = pred_answer.lower()
+        gold_answer = gold_answer.lower()
+        
         if type == 'replace first':
             pred_hypothesis = question.replace('?', '')
             pred_hypothesis = pred_hypothesis.replace(question.split()[0], pred_answer)
 
             gold_hypothesis = question.replace('?', '')
             gold_hypothesis = gold_hypothesis.replace(question.split()[0], gold_answer)
-        
+
         elif type == 'replace question word':
-            for i in question.split():
-                if i in question_word:
+            for i in question_word:
+                if i in question.split():
                     pred_hypothesis = question.replace('?', '')
                     pred_hypothesis = pred_hypothesis.replace(i, pred_answer)
 
                     gold_hypothesis = question.replace('?', '')
                     gold_hypothesis = gold_hypothesis.replace(i, gold_answer)
+                    break
+                
                 else:
                     pred_hypothesis = question.replace('?', '')
                     pred_hypothesis = f"{pred_hypothesis.lstrip()} adalah {pred_answer}"
 
                     gold_hypothesis = question.replace('?', '')
                     gold_hypothesis = f"{gold_hypothesis.lstrip()} adalah {gold_answer}"
-        
+                    break
+
         elif type == 'add adalah':
             pred_hypothesis = question.replace('?', '')
             pred_hypothesis = pred_hypothesis.replace(question.split()[0], '')
@@ -644,15 +651,15 @@ if __name__ == "__main__":
             gold_hypothesis = question.replace('?', '')
             gold_hypothesis = gold_hypothesis.replace(question.split()[0], '')
             gold_hypothesis = f"{gold_hypothesis} adalah {gold_answer}"
-        
+
         elif type == 'just concat answer and question':
             pred_hypothesis = f"{question} {pred_answer}"         
             gold_hypothesis = f"{question} {gold_answer}"
-            
+
         elif type == 'rule based':
             question = question.replace('kah', '')
-            for j in question.split():
-                if j in question_word:
+            for j in question_word:
+                if j in question.split():
                     if j == 'siapa' or j == 'siapakah':
                         pred_hypothesis = question.replace('?', '')
                         pred_hypothesis = pred_hypothesis.replace(j, '').lstrip()
@@ -661,6 +668,7 @@ if __name__ == "__main__":
                         gold_hypothesis = question.replace('?', '')
                         gold_hypothesis = gold_hypothesis.replace(j, '').lstrip()
                         gold_hypothesis = f"{gold_answer} merupakan {gold_hypothesis}"
+                        break
 
                     elif j == 'apa' or j == 'apakah' or j == 'adakah':
                         pred_hypothesis = question.replace('?', '')
@@ -670,6 +678,7 @@ if __name__ == "__main__":
                         gold_hypothesis = question.replace('?', '')
                         gold_hypothesis = gold_hypothesis.replace(j, '').lstrip()
                         gold_hypothesis = f"{gold_hypothesis} adalah {gold_answer}"
+                        break
 
                     elif j == 'dimana' or j == 'dimanakah':
                         pred_hypothesis = question.replace('?', '')
@@ -679,6 +688,7 @@ if __name__ == "__main__":
                         gold_hypothesis = question.replace('?', '')
                         gold_hypothesis = gold_hypothesis.replace(j, '').lstrip()
                         gold_hypothesis = f"{gold_hypothesis} di {gold_answer}"
+                        break
 
                     elif j == 'darimanakah':
                         pred_hypothesis = question.replace('?', '')
@@ -688,6 +698,7 @@ if __name__ == "__main__":
                         gold_hypothesis = question.replace('?', '')
                         gold_hypothesis = gold_hypothesis.replace(j, '').lstrip()
                         gold_hypothesis = f"{gold_hypothesis} dari {gold_answer}"
+                        break
 
                     elif j == 'kapan' or j == 'kapankah':
                         pred_hypothesis = question.replace('?', '')
@@ -697,6 +708,7 @@ if __name__ == "__main__":
                         gold_hypothesis = question.replace('?', '')
                         gold_hypothesis = gold_hypothesis.replace(j, '').lstrip()
                         gold_hypothesis = f"{gold_hypothesis} pada {gold_answer}"
+                        break
 
                     elif j == 'bagaimana' or j == 'bagaimanakah':
                         pred_hypothesis = question.replace('?', '')
@@ -706,6 +718,7 @@ if __name__ == "__main__":
                         gold_hypothesis = question.replace('?', '')
                         gold_hypothesis = gold_hypothesis.replace(j, '').lstrip()
                         gold_hypothesis = f"{gold_hypothesis} adalah {gold_answer}"
+                        break
 
                     elif j == 'kenapa' or j == 'mengapa':
                         pred_hypothesis = question.replace('?', '')
@@ -715,45 +728,54 @@ if __name__ == "__main__":
                         gold_hypothesis = question.replace('?', '')
                         gold_hypothesis = gold_hypothesis.replace(j, 'alasan').lstrip()
                         gold_hypothesis = f"{gold_hypothesis} adalah karena {gold_answer}"
+                        break
 
-                    elif j == 'berapa' or j == 'berapakah' or j == 'seberapa': 
+                    elif j == 'berapa' or j == 'berapakah' or j == 'seberapa':
                         pred_hypothesis = question.replace('?', '')
                         pred_hypothesis = pred_hypothesis.replace(j, '').lstrip()
-                        
+
                         if 'luas' in pred_hypothesis.split():
                             pred_hypothesis = pred_hypothesis.replace('luas', '')
                             pred_hypothesis = f"{pred_hypothesis} memiliki luas {pred_answer}"
-                        
+
                         elif 'jumlah' in pred_hypothesis.split():
                             pred_hypothesis = pred_hypothesis.replace('jumlah', '')
                             pred_hypothesis = f"{pred_hypothesis} berjumlah {pred_answer}"
-
+                            
+                        else: pred_hypothesis = f"{pred_hypothesis} adalah {pred_answer}"
+                            
                         gold_hypothesis = question.replace('?', '')
                         gold_hypothesis = gold_hypothesis.replace(j, '').lstrip()
-                        
+
                         if 'luas' in gold_hypothesis.split():
                             gold_hypothesis = gold_hypothesis.replace('luas', '')
                             gold_hypothesis = f"{gold_hypothesis} memiliki luas {gold_answer}"
-                        
+
                         elif 'jumlah' in gold_hypothesis.split():
                             gold_hypothesis = gold_hypothesis.replace('jumlah', '')
                             gold_hypothesis = f"{gold_hypothesis} berjumlah {gold_answer}"
-                else:
-                    pred_hypothesis = question.replace('?', '')
-                    pred_hypothesis = f"{pred_hypothesis.lstrip()} adalah {pred_answer}"
+                            
+                        else: gold_hypothesis = f"{gold_hypothesis} adalah {gold_answer}"
+                            
+                        break
+                        
+                    else:
+                        pred_hypothesis = question.replace('?', '')
+                        pred_hypothesis = f"{pred_hypothesis.lstrip()} adalah {pred_answer}"
 
-                    gold_hypothesis = question.replace('?', '')
-                    gold_hypothesis = f"{gold_hypothesis.lstrip()} adalah {gold_answer}"
+                        gold_hypothesis = question.replace('?', '')
+                        gold_hypothesis = f"{gold_hypothesis.lstrip()} adalah {gold_answer}"
+                        break
 
         elif type == 'machine generation with rule based':
             pred_hypothesis, gold_hypothesis = smoothing(question, pred_answer, gold_answer, type="rule based")
             pred_hypothesis = nlp_tg_ind(pred_hypothesis)[0]['generated_text']
             gold_hypothesis = nlp_tg_ind(gold_hypothesis)[0]['generated_text']
-        
+
         elif type == 'pure machine generation':
             pred_hypothesis = f"{question} {pred_answer}"         
             gold_hypothesis = f"{question} {gold_answer}"
-            
+
             pred_hypothesis = nlp_tg_ind(pred_hypothesis)[0]['generated_text']
             gold_hypothesis = nlp_tg_ind(gold_hypothesis)[0]['generated_text']
 
@@ -762,14 +784,14 @@ if __name__ == "__main__":
 
             pred_hypothesis = GoogleTranslator(source='id', target='en').translate(pred_hypothesis)
             gold_hypothesis = GoogleTranslator(source='id', target='en').translate(gold_hypothesis)
-            
+
             pred_hypothesis = nlp_tg_eng(pred_hypothesis)[0]['generated_text']
             gold_hypothesis = nlp_tg_eng(gold_hypothesis)[0]['generated_text']
-            
+
             pred_hypothesis = GoogleTranslator(source='en', target='id').translate(pred_hypothesis)
             gold_hypothesis = GoogleTranslator(source='en', target='id').translate(gold_hypothesis)
-        
-        return pred_hypothesis, gold_hypothesis
+
+        return pred_hypothesis.strip(), gold_hypothesis.strip()
     
     # # Membuat kode untuk filtering answer berdasarkan label NLI: entailment (atau neutral) yang bisa menjadi hasil akhir prediksi
     def filtering_based_on_nli(predict_result, type_smoothing, type_qas, MAXIMUM_SEARCH_ITER=MAXIMUM_SEARCH_ITER):
