@@ -759,13 +759,13 @@ if __name__ == "__main__":
                             
                         break
                         
-                    else:
-                        pred_hypothesis = question.replace('?', '')
-                        pred_hypothesis = f"{pred_hypothesis.lstrip()} adalah {pred_answer}"
+                else:
+                    pred_hypothesis = question.replace('?', '')
+                    pred_hypothesis = f"{pred_hypothesis.lstrip()} adalah {pred_answer}"
 
-                        gold_hypothesis = question.replace('?', '')
-                        gold_hypothesis = f"{gold_hypothesis.lstrip()} adalah {gold_answer}"
-                        break
+                    gold_hypothesis = question.replace('?', '')
+                    gold_hypothesis = f"{gold_hypothesis.lstrip()} adalah {gold_answer}"
+                    break
 
         elif type == 'machine generation with rule based':
             pred_hypothesis, gold_hypothesis = smoothing(question, pred_answer, gold_answer, type="rule based")
@@ -1286,7 +1286,6 @@ if __name__ == "__main__":
             qas_df['Reasoning Type'][450] = 'PP'
             qas_df['Reasoning Type'][602] = 'PP'
             qas_df['Reasoning Type'][640] = 'MSR'
-            qas_df['Reasoning Type'][768] = 'AoI'
         
         elif DATA_NAME == "TYDI-QA-ID":
             
