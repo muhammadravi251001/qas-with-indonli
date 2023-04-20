@@ -641,7 +641,6 @@ if __name__ == "__main__":
 
                     gold_hypothesis = question.replace('?', '')
                     gold_hypothesis = f"{gold_hypothesis.lstrip()} adalah {gold_answer}"
-                    break
 
         elif type == 'add adalah':
             pred_hypothesis = question.replace('?', '')
@@ -765,7 +764,6 @@ if __name__ == "__main__":
 
                     gold_hypothesis = question.replace('?', '')
                     gold_hypothesis = f"{gold_hypothesis.lstrip()} adalah {gold_answer}"
-                    break
 
         elif type == 'machine generation with rule based':
             pred_hypothesis, gold_hypothesis = smoothing(question, pred_answer, gold_answer, type="rule based")
