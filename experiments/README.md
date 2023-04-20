@@ -135,6 +135,10 @@ However, you can try some of these flags for your experiments, namely: `-tq`, `-
 
 `-msi` stands for `MAXIMUM_SEARCH_ITER`, in this flag, you can experimenting how much your QAS system search for entailment label (or neutral label, it depends on your choice in `TYPE_QAS`) from your QAS dataset, you can choose any integer to fill in this flag.
 
+`-va` stands for `VARIATION`, in this flag, you can experimenting what variation your QAS system from your QAS dataset, you can choose 0, 1, 2 to fill in this flag. Variation 1 means you use the discrete label only, variation 2 means you use the score label only, and then, variation 3 means you use the score label but in the end you take the highest confidence to be your final predicted answer.
+
+`-th` stands for `THRESHOLD`, in this flag, you can experimenting about numbers that pass the criteria for variation 2, score label.
+
 ## Location of predictions
 
 The predictions will be stored in `python\results\{NAME}-{TIME_NOW}`. And then this code automatically push Trainer to `{USER_that_passed_by_TOKEN}/fine-tuned-{NAME}`.
