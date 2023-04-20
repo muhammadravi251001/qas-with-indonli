@@ -176,7 +176,7 @@ if __name__ == "__main__":
 
         train_dataset = Dataset.from_dict(train_final_df)
         validation_dataset = Dataset.from_dict(validation_final_df)
-        test_dataset = Dataset.from_dict(df_test)
+        test_dataset = Dataset.from_dict(new_df_test)
 
         data_qas_id = DatasetDict({"train": train_dataset, "validation": validation_dataset, "test": test_dataset})
 
