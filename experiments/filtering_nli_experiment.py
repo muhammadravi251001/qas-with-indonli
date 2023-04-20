@@ -132,7 +132,8 @@ if __name__ == "__main__":
         Trainer,
         BertForQuestionAnswering,
         AutoTokenizer,
-        EarlyStoppingCallback, 
+        EarlyStoppingCallback,
+        AutoModelForQuestionAnswering,
         pipeline
     )
 
@@ -1159,6 +1160,10 @@ if __name__ == "__main__":
                     label_after_filtering_array_msi_recorded = []
                     for index_largest in range(MAXIMUM_SEARCH_ITER - 1):
 
+                        #pred_answer_after_filtering_array_msi_recorded = []
+                        #pred_hypothesis_after_filtering_array_msi_recorded = []
+                        #label_after_filtering_array_msi_recorded = []
+
                         # Cari di index kedua, ketiga, keempat, dan seterusnya
                         predictions_idx_inside_loop = np.argsort(predict_result.predictions, 
                                                                 axis=2)[:, :, (index_largest + 2) * -1]
@@ -1246,10 +1251,12 @@ if __name__ == "__main__":
                             max_score = 0
                             index_max_score = 0
                             
-                            for j in range(len(label_after_filtering_array)):
+                            #print(f"label_after_filtering_array[0]: {label_after_filtering_array[0]}")
+                            
+                            for j in range(len(label_after_filtering_array[0])):
                                 
-                                if label_after_filtering_array[j]['score'] > max_score:
-                                    max_score = label_after_filtering_array[j]['score']
+                                if label_after_filtering_array[0][j]['score'] > max_score:
+                                    max_score = label_after_filtering_array[0][j]['score']
                                     index_max_score = j
 
                             pred_answer_not_found_biggest = pred_answer_after_filtering_array_msi_recorded[index_max_score]
