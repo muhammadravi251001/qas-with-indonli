@@ -690,11 +690,11 @@ if __name__ == "__main__":
             # Apa (13)
             qas_df['Reasoning Type'][1283] = 'SSR'
             qas_df['Reasoning Type'][3228] = 'AoI'
-            qas_df['Reasoning Type'][4120] = 'SSR'
+            qas_df['Reasoning Type'][4120] = 'AoI'
             qas_df['Reasoning Type'][4456] = 'MSR'
             qas_df['Reasoning Type'][4959] = 'AoI'
             
-            qas_df['Reasoning Type'][5458] = 'SSR'
+            qas_df['Reasoning Type'][5458] = 'AoI'
             qas_df['Reasoning Type'][6122] = 'MSR'
             qas_df['Reasoning Type'][6151] = 'AoI'
             qas_df['Reasoning Type'][6795] = 'AoI'
@@ -707,7 +707,7 @@ if __name__ == "__main__":
             # Dimana (12)
             qas_df['Reasoning Type'][969] = 'PP'
             qas_df['Reasoning Type'][1209] = 'PP' 
-            qas_df['Reasoning Type'][1296] = 'SSR'
+            qas_df['Reasoning Type'][1296] = 'AoI'
             qas_df['Reasoning Type'][2871] = 'WM'
             qas_df['Reasoning Type'][3163] = 'AoI'
             
@@ -715,9 +715,9 @@ if __name__ == "__main__":
             qas_df['Reasoning Type'][3922] = 'PP'
             qas_df['Reasoning Type'][5462] = 'AoI'
             qas_df['Reasoning Type'][7263] = 'PP'
-            qas_df['Reasoning Type'][7319] = 'PP'
+            qas_df['Reasoning Type'][7319] = 'AoI'
             
-            qas_df['Reasoning Type'][9000] = 'PP'
+            qas_df['Reasoning Type'][9000] = 'AoI'
             qas_df['Reasoning Type'][9124] = 'PP'
             
             # Kapan (12)
@@ -727,7 +727,7 @@ if __name__ == "__main__":
             qas_df['Reasoning Type'][4636] = 'MSR'
             qas_df['Reasoning Type'][7122] = 'AoI' 
             
-            qas_df['Reasoning Type'][7445] = 'SSR'
+            qas_df['Reasoning Type'][7445] = 'AoI'
             qas_df['Reasoning Type'][7649] = 'AoI'
             qas_df['Reasoning Type'][9372] = 'SSR'
             qas_df['Reasoning Type'][10211] = 'AoI'
@@ -740,7 +740,7 @@ if __name__ == "__main__":
             qas_df['Reasoning Type'][1778] = 'AoI'
             qas_df['Reasoning Type'][2810] = 'SSR'
             qas_df['Reasoning Type'][3488] = 'WM' 
-            qas_df['Reasoning Type'][4661] = 'MSR'
+            qas_df['Reasoning Type'][4661] = 'AoI'
             qas_df['Reasoning Type'][7307] = 'WM'
             
             qas_df['Reasoning Type'][7481] = 'PP'
@@ -749,7 +749,7 @@ if __name__ == "__main__":
             qas_df['Reasoning Type'][7962] = 'PP'
             qas_df['Reasoning Type'][9634] = 'PP'
             
-            qas_df['Reasoning Type'][9976] = 'PP'
+            qas_df['Reasoning Type'][9976] = 'AoI'
             qas_df['Reasoning Type'][11349] = 'SSR'
             qas_df['Reasoning Type'][11367] = 'PP' 
             
@@ -766,7 +766,7 @@ if __name__ == "__main__":
             qas_df['Reasoning Type'][9379] = 'AoI'
             qas_df['Reasoning Type'][9946] = 'AoI' 
             
-            qas_df['Reasoning Type'][10632] = 'PP'
+            qas_df['Reasoning Type'][10632] = 'WM'
             qas_df['Reasoning Type'][10837] = 'SSR'
             
             # Bagaimana (12)
@@ -793,13 +793,13 @@ if __name__ == "__main__":
             qas_df['Reasoning Type'][1252] = 'PP'
             
             qas_df['Reasoning Type'][1857] = 'PP' 
-            qas_df['Reasoning Type'][2853] = 'PP'
+            qas_df['Reasoning Type'][2853] = 'AoI'
             qas_df['Reasoning Type'][3497] = 'SSR'
             qas_df['Reasoning Type'][4144] = 'MSR'
             qas_df['Reasoning Type'][6468] = 'MSR'
             
             qas_df['Reasoning Type'][7267] = 'SSR'
-            qas_df['Reasoning Type'][11035] = 'SSR'
+            qas_df['Reasoning Type'][11035] = 'PP'
             qas_df['Reasoning Type'][11731] = 'SSR'
             
             # Lainnya (13)
@@ -810,12 +810,12 @@ if __name__ == "__main__":
             qas_df['Reasoning Type'][6256] = 'AoI'
             
             qas_df['Reasoning Type'][6371] = 'MSR'
-            qas_df['Reasoning Type'][6672] = 'SSR'
+            qas_df['Reasoning Type'][6672] = 'AoI'
             qas_df['Reasoning Type'][7258] = 'SSR' 
             qas_df['Reasoning Type'][7562] = 'SSR'
             qas_df['Reasoning Type'][8154] = 'MSR'
             
-            qas_df['Reasoning Type'][8337] = 'SSR'
+            qas_df['Reasoning Type'][8337] = 'WM'
             qas_df['Reasoning Type'][9160] = 'AoI'
             qas_df['Reasoning Type'][11621] = 'AoI' 
         
@@ -824,17 +824,17 @@ if __name__ == "__main__":
             # Apa (14)
             qas_df['Reasoning Type'][66] = 'AoI'
             qas_df['Reasoning Type'][84] = 'AoI'
-            qas_df['Reasoning Type'][190] = 'MSR'
+            qas_df['Reasoning Type'][190] = 'AoI'
             qas_df['Reasoning Type'][207] = 'WM'
             qas_df['Reasoning Type'][214] = 'AoI'
             
             qas_df['Reasoning Type'][320] = 'SSR'
             qas_df['Reasoning Type'][322] = 'AoI'
             qas_df['Reasoning Type'][347] = 'AoI'
-            qas_df['Reasoning Type'][363] = 'PP'
+            qas_df['Reasoning Type'][363] = 'WM'
             qas_df['Reasoning Type'][372] = 'AoI'
             
-            qas_df['Reasoning Type'][490] = 'PP'
+            qas_df['Reasoning Type'][490] = 'WM'
             qas_df['Reasoning Type'][566] = 'PP'
             qas_df['Reasoning Type'][666] = 'AoI'
             qas_df['Reasoning Type'][732] = 'AoI'
@@ -885,14 +885,14 @@ if __name__ == "__main__":
             qas_df['Reasoning Type'][543] = 'AoI'
             qas_df['Reasoning Type'][551] = 'AoI'
             qas_df['Reasoning Type'][618] = 'AoI'
-            qas_df['Reasoning Type'][646] = 'MSR'
+            qas_df['Reasoning Type'][646] = 'PP'
             
             qas_df['Reasoning Type'][741] = 'MSR'
             qas_df['Reasoning Type'][751] = 'WM'
             qas_df['Reasoning Type'][775] = 'PP'
             
             # Kenapa (8)
-            qas_df['Reasoning Type'][18] = 'MSR'
+            qas_df['Reasoning Type'][18] = 'WM'
             qas_df['Reasoning Type'][19] = 'AoI'
             qas_df['Reasoning Type'][54] = 'MSR'
             qas_df['Reasoning Type'][55] = 'AoI'
@@ -938,7 +938,7 @@ if __name__ == "__main__":
             # Lainnya (14)
             qas_df['Reasoning Type'][35] = 'WM'
             qas_df['Reasoning Type'][38] = 'AoI'
-            qas_df['Reasoning Type'][98] = 'SSR'
+            qas_df['Reasoning Type'][98] = 'PP'
             qas_df['Reasoning Type'][177] = 'AoI'
             qas_df['Reasoning Type'][198] = 'AoI'
 
@@ -951,7 +951,6 @@ if __name__ == "__main__":
             qas_df['Reasoning Type'][450] = 'PP'
             qas_df['Reasoning Type'][602] = 'PP'
             qas_df['Reasoning Type'][640] = 'MSR'
-            qas_df['Reasoning Type'][768] = 'AoI'
         
         elif DATA_NAME == "TYDI-QA-ID":
             
@@ -969,13 +968,13 @@ if __name__ == "__main__":
             qas_df['Reasoning Type'][469] = 'PP' 
             
             qas_df['Reasoning Type'][474] = 'PP'
-            qas_df['Reasoning Type'][537] = 'SSR'
+            qas_df['Reasoning Type'][537] = 'PP'
             qas_df['Reasoning Type'][619] = 'MSR'
             qas_df['Reasoning Type'][624] = 'PP'
             qas_df['Reasoning Type'][808] = 'PP' 
             
             # Dimana (14)
-            qas_df['Reasoning Type'][3] = 'MSR'
+            qas_df['Reasoning Type'][3] = 'AoI'
             qas_df['Reasoning Type'][66] = 'PP'
             qas_df['Reasoning Type'][163] = 'PP'
             qas_df['Reasoning Type'][164] = 'SSR'
@@ -985,7 +984,7 @@ if __name__ == "__main__":
             qas_df['Reasoning Type'][431] = 'AoI'
             qas_df['Reasoning Type'][437] = 'WM'
             qas_df['Reasoning Type'][489] = 'AoI'
-            qas_df['Reasoning Type'][519] = 'SSR'
+            qas_df['Reasoning Type'][519] = 'MSR'
             
             qas_df['Reasoning Type'][607] = 'SSR'
             qas_df['Reasoning Type'][625] = 'PP'
@@ -993,7 +992,7 @@ if __name__ == "__main__":
             qas_df['Reasoning Type'][757] = 'WM'
             
             # Kapan (15)
-            qas_df['Reasoning Type'][57] = 'MSR' 
+            qas_df['Reasoning Type'][57] = 'SSR' 
             qas_df['Reasoning Type'][89] = 'MSR'
             qas_df['Reasoning Type'][123] = 'AoI'
             qas_df['Reasoning Type'][179] = 'AoI'
@@ -1008,7 +1007,7 @@ if __name__ == "__main__":
             qas_df['Reasoning Type'][404] = 'SSR' 
             qas_df['Reasoning Type'][429] = 'PP'
             qas_df['Reasoning Type'][484] = 'PP'
-            qas_df['Reasoning Type'][529] = 'MSR'
+            qas_df['Reasoning Type'][529] = 'SSR'
             qas_df['Reasoning Type'][824] = 'MSR'
             
             # Siapa (15)
@@ -1022,16 +1021,16 @@ if __name__ == "__main__":
             qas_df['Reasoning Type'][293] = 'AoI'
             qas_df['Reasoning Type'][361] = 'AoI'
             qas_df['Reasoning Type'][393] = 'PP'
-            qas_df['Reasoning Type'][546] = 'SSR'
+            qas_df['Reasoning Type'][546] = 'MSR'
             
             qas_df['Reasoning Type'][548] = 'PP' 
-            qas_df['Reasoning Type'][572] = 'PP'
+            qas_df['Reasoning Type'][572] = 'AoI'
             qas_df['Reasoning Type'][715] = 'PP'
             qas_df['Reasoning Type'][805] = 'PP'
             qas_df['Reasoning Type'][843] = 'PP'
             
             # Kenapa (6)
-            qas_df['Reasoning Type'][109] = 'MSR' 
+            qas_df['Reasoning Type'][109] = 'AoI' 
             qas_df['Reasoning Type'][248] = 'WM'
             qas_df['Reasoning Type'][432] = 'MSR'
             qas_df['Reasoning Type'][565] = 'SSR'
@@ -1082,7 +1081,7 @@ if __name__ == "__main__":
             qas_df['Reasoning Type'][709] = 'PP'
             qas_df['Reasoning Type'][750] = 'MSR'
             qas_df['Reasoning Type'][776] = 'SSR'
-            qas_df['Reasoning Type'][816] = 'WM'          
+            qas_df['Reasoning Type'][816] = 'WM'         
         
         assert len(predict_result.predictions[0]) == len(qas_df), "Jumlah prediksi berbeda dengan jumlah evaluasi"
         
