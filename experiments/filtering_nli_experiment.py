@@ -15,6 +15,8 @@ parser.add_argument('-t', '--token', type=str, metavar='', required=False, help=
 parser.add_argument('-msi', '--maximum_search_iter', type=int, metavar='', required=False, help="Jumlah maximum search iter Anda; Integer; choice=[all integer]; default=2", default=2)
 parser.add_argument('-tq', '--type_qas', type=str, metavar='', required=False, help="Tipe filtering QAS Anda; String; choice=[entailment only, entailment or neutral]; default=entailment or neutral", default="entailment or neutral")
 parser.add_argument('-ts', '--type_smoothing', type=str, metavar='', required=False, help="Tipe smoothing hypothesis Anda; String; choice=[replace first, replace question mark, add adalah, just concat answer and question, rule based, machine generation with rule based, pure machine generation]; default=rule based", default="rule based")
+parser.add_argument('-va', '--variation', type=int, metavar='', required=False, help="Jenis variasi filtering Anda; Integer; choice=[1, 2, 3]; default=1", default=1)
+parser.add_argument('-th', '--threshold', type=float, metavar='', required=False, help="Berapa threshold skor confidence filtering Anda; Integer; choice=[all integer]; default=0.5", default=0.5)
 args = parser.parse_args()
 
 if __name__ == "__main__":
@@ -52,6 +54,8 @@ if __name__ == "__main__":
     MAXIMUM_SEARCH_ITER = int(args.maximum_search_iter)
     TYPE_QAS = str(args.type_qas)
     TYPE_SMOOTHING = str(args.type_smoothing)
+    VARIATION = int(args.variation)
+    THRESHOLD = float(args.threshold)
         
     # Model-model dibawah dipilih karena memiliki akurasi terbaik dari eksperimen sebelumnya.
     if (args.model_name) == "indolem":
@@ -791,59 +795,62 @@ if __name__ == "__main__":
 
         return pred_hypothesis.strip(), gold_hypothesis.strip()
     
-    # # Membuat kode untuk filtering answer berdasarkan label NLI: entailment (atau neutral) yang bisa menjadi hasil akhir prediksi
-    def filtering_based_on_nli(predict_result, type_smoothing, type_qas, MAXIMUM_SEARCH_ITER=MAXIMUM_SEARCH_ITER):
+    def filtering_based_on_discrete_score_nli(predict_result, 
+                                          type_smoothing, 
+                                          type_qas, 
+                                          assign_answer_types=assign_answer_types, 
+                                          MAXIMUM_SEARCH_ITER=MAXIMUM_SEARCH_ITER):
     
-    # Ekstrak dari PredictionOutput QAS
+        # Ekstrak dari PredictionOutput QAS
         predictions_idx = np.argsort(predict_result.predictions, axis=2)[:, :, 1 * -1]
         label_array = np.asarray(predict_result.label_ids)
-        
+
         question_array = []
         context_array = []
-        
+
         pred_answer_before_filtering_array = []
         pred_answer_after_filtering_array = []
-        
+
         label_before_filtering_array = []
         label_after_filtering_array = []
-        
+
         pred_hypothesis_before_filtering_array = []
         pred_hypothesis_after_filtering_array = []
-        
+
         gold_answer_array = []
         gold_hypothesis_array = []
 
         answer_types_array = []
-        
+
         # Iterasi ini ditujukan untuk retrieve answer
         for i in tqdm(range(len(predict_result.predictions[0]))):
-            
+
             isFoundBiggest = False
-            
+
             start_pred_idx = predictions_idx[0][i]
             end_pred_idx = predictions_idx[1][i] + 1
-            
+
             start_gold_idx = label_array[0][i]
             end_gold_idx = label_array[1][i] + 1
 
             if len(predict_result.predictions[0]) == len(tokenized_data_qas_id_validation):
                 tokenized_data = tokenized_data_qas_id_validation
-            
+
             elif len(predict_result.predictions[0]) == len(tokenized_data_qas_id_test):
                 tokenized_data = tokenized_data_qas_id_test
-            
+
             # Retrieve answer prediksi
             pred_answer = tokenizer.decode(tokenized_data[i]['input_ids']
                                         [start_pred_idx: end_pred_idx], skip_special_tokens=True)
-            
+
             # Retrieve answer gold
             gold_answer = tokenizer.decode(tokenized_data[i]['input_ids']
                                         [start_gold_idx: end_gold_idx], skip_special_tokens=True)
-            
+
             question = []
             context = []
-            
-            if (args.model_name) == "xlmr":
+
+            if MODEL_NAME == 'xlm-roberta-base' or MODEL_NAME == 'xlm-roberta-large':
 
                 start_question = tokenized_data[i]['input_ids'].index(0)
                 end_question = tokenized_data[i]['input_ids'].index(2)  + 1
@@ -867,18 +874,18 @@ if __name__ == "__main__":
 
                 question_decoded = tokenizer.decode(question, skip_special_tokens=True)
                 context_decoded = tokenizer.decode(context, skip_special_tokens=True)
-            
+
             pred_hypothesis, gold_hypothesis = smoothing(question_decoded, pred_answer, gold_answer, type_smoothing)
 
             # Cek label dari answer prediksi dan context
             predicted_label = nlp_sc({'text': context_decoded, 
                                     'text_pair': pred_hypothesis}, 
                                     **tokenizer_kwargs)
-            
+
             pred_answer_before_filtering_array.append([pred_answer])
             pred_hypothesis_before_filtering_array.append([pred_hypothesis])
             label_before_filtering_array.append([predicted_label])
-            
+
             # Cek label dari answer prediksi dan context, bila labelnya entailment (atau neutral), maka answernya jadi hasil akhir
             if predicted_label['label'] == 'neutral':
                 if type_qas == 'entailment or neutral':
@@ -901,28 +908,24 @@ if __name__ == "__main__":
                     pred_hypothesis_after_filtering_array.append([pred_hypothesis])
                     gold_hypothesis_array.append(gold_hypothesis)
                     label_after_filtering_array.append([predicted_label])
-                
+
             # Cek label dari answer prediksi dan context, bila labelnya bukan entailment (atau neutral), 
             # -- maka masuk ke for-loop untuk iterasi ke argmax selanjutnya, dengan menggunakan argsort
             else:
-                
-                if predicted_label == 'neutral' and type_qas == 'entailment or neutral': continue
-                
+
+                if predicted_label['label'] == 'neutral' and type_qas == 'entailment or neutral': continue
+
                 # Bila MAXIMUM_SEARCH_ITER dibawah 2, maka continue langsung
                 if MAXIMUM_SEARCH_ITER < 2: continue
 
                 # Bila MAXIMUM_SEARCH_ITER diatas 2, maka continue langsung
-                
+
                 else:
                     # Bila bukan entailment, loop sebanyak MAXIMUM_SEARCH_ITER kali.
                     pred_answer_after_filtering_array_msi_recorded = []
                     pred_hypothesis_after_filtering_array_msi_recorded = []
                     label_after_filtering_array_msi_recorded = []
                     for index_largest in range(MAXIMUM_SEARCH_ITER - 1):
-                        
-                        #pred_answer_after_filtering_array_msi_recorded = []
-                        #pred_hypothesis_after_filtering_array_msi_recorded = []
-                        #label_after_filtering_array_msi_recorded = []
 
                         # Cari di index kedua, ketiga, keempat, dan seterusnya
                         predictions_idx_inside_loop = np.argsort(predict_result.predictions, 
@@ -934,19 +937,19 @@ if __name__ == "__main__":
                         # Retrieve answer prediksi
                         pred_answer_inside_loop = tokenizer.decode(tokenized_data[i]['input_ids']
                                                     [start_pred_idx: end_pred_idx], skip_special_tokens=True)
-                        
+
                         pred_hypothesis_inside_loop, gold_hypothesis = smoothing(
                             question_decoded, pred_answer_inside_loop, gold_answer, type_smoothing)
-                        
+
                         # Cek label dari answer prediksi dan context
                         predicted_label_inside_loop = nlp_sc({'text': context_decoded, 
                                                             'text_pair': pred_hypothesis_inside_loop}
                                                             , **tokenizer_kwargs)
-                        
+
                         pred_answer_after_filtering_array_msi_recorded.append(pred_answer_inside_loop)
                         pred_hypothesis_after_filtering_array_msi_recorded.append(pred_hypothesis_inside_loop)
                         label_after_filtering_array_msi_recorded.append(predicted_label_inside_loop)
-                        
+
                         # Bila label-nya sudah entailment (atau neutral), maka answernya jadi hasil akhir, dan break
                         if type_qas == 'entailment only':
                             if predicted_label_inside_loop['label'] == 'entailment':
@@ -956,12 +959,12 @@ if __name__ == "__main__":
                                 gold_answer_array.append(gold_answer)
                                 answer_types_array.append(assign_answer_types(answer=gold_answer))
                                 gold_hypothesis_array.append(gold_hypothesis)
-                                
+
                                 pred_answer_after_filtering_array.append(pred_answer_after_filtering_array_msi_recorded)
                                 pred_hypothesis_after_filtering_array.append(pred_hypothesis_after_filtering_array_msi_recorded)
                                 label_after_filtering_array.append(label_after_filtering_array_msi_recorded)
                                 break
-                                
+
                         elif type_qas == 'entailment or neutral':
                             if predicted_label_inside_loop['label'] == 'entailment' or predicted_label_inside_loop['label'] == 'neutral':
                                 isFoundBiggest = True
@@ -970,7 +973,7 @@ if __name__ == "__main__":
                                 gold_answer_array.append(gold_answer)
                                 answer_types_array.append(assign_answer_types(answer=gold_answer)) 
                                 gold_hypothesis_array.append(gold_hypothesis)
-                                
+
                                 pred_answer_after_filtering_array.append(pred_answer_after_filtering_array_msi_recorded)
                                 pred_hypothesis_after_filtering_array.append(pred_hypothesis_after_filtering_array_msi_recorded)
                                 label_after_filtering_array.append(label_after_filtering_array_msi_recorded)
@@ -978,286 +981,580 @@ if __name__ == "__main__":
 
                     if isFoundBiggest == False:
                         # Bila sampai iterasi terakhir, belum entailment (atau neutral) juga, maka append saja jawaban kosong
-                        
+
                         pred_answer_not_found_biggest = "" # Disini, jawaban kosong
-                        
+
                         question_array.append(question_decoded)
                         context_array.append(context_decoded)
-                        
+
                         pred_hypothesis_not_found_biggest, gold_hypothesis = smoothing(
                             question_decoded, pred_answer_not_found_biggest, gold_answer, type_smoothing)
-                        
+
                         pred_answer_after_filtering_array_msi_recorded.append(pred_answer_not_found_biggest)
                         pred_hypothesis_after_filtering_array_msi_recorded.append(pred_hypothesis_not_found_biggest)
                         label_after_filtering_array_msi_recorded.append(predicted_label_inside_loop)
-                        
+
                         gold_answer_array.append(gold_answer)
                         answer_types_array.append(assign_answer_types(answer=gold_answer))
                         gold_hypothesis_array.append(gold_hypothesis)
-                        
+
                         pred_answer_after_filtering_array.append(pred_answer_after_filtering_array_msi_recorded)
                         pred_hypothesis_after_filtering_array.append(pred_hypothesis_after_filtering_array_msi_recorded)
                         label_after_filtering_array.append(label_after_filtering_array_msi_recorded)
-        
+
         # Buat DataFrame QAS
         qas_df = pd.DataFrame({'Context': context_array, 
                             'Question': question_array, 
-                            
+
                             'Prediction Answer Before Filtering': pred_answer_before_filtering_array,
                             'Prediction Hypothesis Before Filtering': pred_hypothesis_before_filtering_array,
                             'Label Before Filtering': label_before_filtering_array,
-                                    
+
                             'Prediction Answer After Filtering': pred_answer_after_filtering_array,
                             'Prediction Hypothesis After Filtering': pred_hypothesis_after_filtering_array,
                             'Label After Filtering': label_after_filtering_array,
-                            
+
                             'Gold Answer': gold_answer_array,
                             'Gold Hypothesis': gold_hypothesis_array,
-                            
+
                             'Answer Type': answer_types_array,
                             'Reasoning Type': '-' 
                             })
-                            
-        if DATA_NAME == "Squad-ID": 
+        
+        assert len(predict_result.predictions[0]) == len(qas_df), "Jumlah prediksi berbeda dengan jumlah evaluasi"
+
+        # Return DataFrame QAS
+        return qas_df
+    
+    def filtering_based_on_prob_dist_score_nli(predict_result, 
+                                          type_smoothing, 
+                                          type_qas,
+                                          threshold,
+                                          take_largest_prob_dist,
+                                          assign_answer_types=assign_answer_types, 
+                                          MAXIMUM_SEARCH_ITER=MAXIMUM_SEARCH_ITER):
+    
+        # Ekstrak dari PredictionOutput QAS
+        predictions_idx = np.argsort(predict_result.predictions, axis=2)[:, :, 1 * -1]
+        label_array = np.asarray(predict_result.label_ids)
+
+        question_array = []
+        context_array = []
+
+        pred_answer_before_filtering_array = []
+        pred_answer_after_filtering_array = []
+
+        label_before_filtering_array = []
+        label_after_filtering_array = []
+
+        pred_hypothesis_before_filtering_array = []
+        pred_hypothesis_after_filtering_array = []
+
+        gold_answer_array = []
+        gold_hypothesis_array = []
+
+        answer_types_array = []
+
+        # Iterasi ini ditujukan untuk retrieve answer
+        for i in tqdm(range(len(predict_result.predictions[0]))):
+
+            isFoundBiggest = False
+
+            start_pred_idx = predictions_idx[0][i]
+            end_pred_idx = predictions_idx[1][i] + 1
+
+            start_gold_idx = label_array[0][i]
+            end_gold_idx = label_array[1][i] + 1
+
+            if len(predict_result.predictions[0]) == len(tokenized_data_qas_id_validation):
+                tokenized_data = tokenized_data_qas_id_validation
+
+            elif len(predict_result.predictions[0]) == len(tokenized_data_qas_id_test):
+                tokenized_data = tokenized_data_qas_id_test
+
+            # Retrieve answer prediksi
+            pred_answer = tokenizer.decode(tokenized_data[i]['input_ids']
+                                        [start_pred_idx: end_pred_idx], skip_special_tokens=True)
+
+            # Retrieve answer gold
+            gold_answer = tokenizer.decode(tokenized_data[i]['input_ids']
+                                        [start_gold_idx: end_gold_idx], skip_special_tokens=True)
+
+            question = []
+            context = []
+
+            if MODEL_NAME == 'xlm-roberta-base' or MODEL_NAME == 'xlm-roberta-large':
+
+                start_question = tokenized_data[i]['input_ids'].index(0)
+                end_question = tokenized_data[i]['input_ids'].index(2)  + 1
+                start_context = end_question
+
+                question.append(tokenized_data[i]['input_ids'][start_question: end_question])
+                context.append(tokenized_data[i]['input_ids'][start_context: ])
+
+                question_decoded = tokenizer.decode(question[0], skip_special_tokens=True)
+                context_decoded = tokenizer.decode(context[0], skip_special_tokens=True)
+
+            else:
+
+                for j in range(len(tokenized_data[i]['token_type_ids'])):
+
+                    if tokenized_data[i]['token_type_ids'][j] == 0:
+                        question.append(tokenized_data[i]['input_ids'][j])
+
+                    else:
+                        context.append(tokenized_data[i]['input_ids'][j])
+
+                question_decoded = tokenizer.decode(question, skip_special_tokens=True)
+                context_decoded = tokenizer.decode(context, skip_special_tokens=True)
+
+            pred_hypothesis, gold_hypothesis = smoothing(question_decoded, pred_answer, gold_answer, type_smoothing)
+
+            # Cek label dari answer prediksi dan context
+            predicted_label = nlp_sc({'text': context_decoded, 
+                                    'text_pair': pred_hypothesis}, 
+                                    **tokenizer_kwargs)
+
+            pred_answer_before_filtering_array.append([pred_answer])
+            pred_hypothesis_before_filtering_array.append([pred_hypothesis])
+            label_before_filtering_array.append([predicted_label])
             
+            # OTAK ATIK BAGIAN SINI TODO
+
+            # Cek label dari answer prediksi dan context, bila labelnya entailment (atau neutral), maka answernya jadi hasil akhir
+            if predicted_label['label'] == 'neutral' and predicted_label['score'] >= threshold:
+                if type_qas == 'entailment or neutral':
+                    question_array.append(question_decoded)
+                    context_array.append(context_decoded)
+                    pred_answer_after_filtering_array.append([pred_answer])
+                    gold_answer_array.append(gold_answer)
+                    answer_types_array.append(assign_answer_types(answer=gold_answer))
+                    pred_hypothesis_after_filtering_array.append([pred_hypothesis])
+                    gold_hypothesis_array.append(gold_hypothesis)
+                    label_after_filtering_array.append([predicted_label])
+
+            if predicted_label['label'] == 'entailment' and predicted_label['score'] >= threshold:
+                if type_qas == 'entailment only' or type_qas == 'entailment or neutral':
+                    question_array.append(question_decoded)
+                    context_array.append(context_decoded)
+                    pred_answer_after_filtering_array.append([pred_answer])
+                    gold_answer_array.append(gold_answer)
+                    answer_types_array.append(assign_answer_types(answer=gold_answer))
+                    pred_hypothesis_after_filtering_array.append([pred_hypothesis])
+                    gold_hypothesis_array.append(gold_hypothesis)
+                    label_after_filtering_array.append([predicted_label])
+
+            # Cek label dari answer prediksi dan context, bila labelnya bukan entailment (atau neutral), 
+            # -- maka masuk ke for-loop untuk iterasi ke argmax selanjutnya, dengan menggunakan argsort
+            else:
+
+                if predicted_label['label'] == 'neutral' and predicted_label['score'] >= threshold \
+                    and type_qas == 'entailment or neutral': continue
+
+                # Bila MAXIMUM_SEARCH_ITER dibawah 2, maka continue langsung
+                if MAXIMUM_SEARCH_ITER < 2: continue
+
+                # Bila MAXIMUM_SEARCH_ITER diatas 2, maka continue langsung
+
+                else:
+                    # Bila bukan entailment, loop sebanyak MAXIMUM_SEARCH_ITER kali.
+                    pred_answer_after_filtering_array_msi_recorded = []
+                    pred_hypothesis_after_filtering_array_msi_recorded = []
+                    label_after_filtering_array_msi_recorded = []
+                    for index_largest in range(MAXIMUM_SEARCH_ITER - 1):
+
+                        # Cari di index kedua, ketiga, keempat, dan seterusnya
+                        predictions_idx_inside_loop = np.argsort(predict_result.predictions, 
+                                                                axis=2)[:, :, (index_largest + 2) * -1]
+
+                        start_pred_idx = predictions_idx_inside_loop[0][i]
+                        end_pred_idx = predictions_idx_inside_loop[1][i] + 1
+
+                        # Retrieve answer prediksi
+                        pred_answer_inside_loop = tokenizer.decode(tokenized_data[i]['input_ids']
+                                                    [start_pred_idx: end_pred_idx], skip_special_tokens=True)
+
+                        pred_hypothesis_inside_loop, gold_hypothesis = smoothing(
+                            question_decoded, pred_answer_inside_loop, gold_answer, type_smoothing)
+
+                        # Cek label dari answer prediksi dan context
+                        predicted_label_inside_loop = nlp_sc({'text': context_decoded, 
+                                                            'text_pair': pred_hypothesis_inside_loop}
+                                                            , **tokenizer_kwargs)
+
+                        pred_answer_after_filtering_array_msi_recorded.append(pred_answer_inside_loop)
+                        pred_hypothesis_after_filtering_array_msi_recorded.append(pred_hypothesis_inside_loop)
+                        label_after_filtering_array_msi_recorded.append(predicted_label_inside_loop)
+
+                        # Bila label-nya sudah entailment (atau neutral), maka answernya jadi hasil akhir, dan break
+                        if type_qas == 'entailment only':
+                            if predicted_label_inside_loop['label'] == 'entailment' and predicted_label_inside_loop['score'] >= threshold:
+                                isFoundBiggest = True
+                                question_array.append(question_decoded)
+                                context_array.append(context_decoded)
+                                gold_answer_array.append(gold_answer)
+                                answer_types_array.append(assign_answer_types(answer=gold_answer))
+                                gold_hypothesis_array.append(gold_hypothesis)
+
+                                pred_answer_after_filtering_array.append(pred_answer_after_filtering_array_msi_recorded)
+                                pred_hypothesis_after_filtering_array.append(pred_hypothesis_after_filtering_array_msi_recorded)
+                                label_after_filtering_array.append(label_after_filtering_array_msi_recorded)
+                                break
+
+                        elif type_qas == 'entailment or neutral':
+                            if predicted_label_inside_loop['label'] == 'entailment' \
+                                    or predicted_label_inside_loop['label'] == 'neutral' \
+                                    and predicted_label_inside_loop['score'] >= threshold:
+                                isFoundBiggest = True
+                                question_array.append(question_decoded)
+                                context_array.append(context_decoded)
+                                gold_answer_array.append(gold_answer)
+                                answer_types_array.append(assign_answer_types(answer=gold_answer)) 
+                                gold_hypothesis_array.append(gold_hypothesis)
+
+                                pred_answer_after_filtering_array.append(pred_answer_after_filtering_array_msi_recorded)
+                                pred_hypothesis_after_filtering_array.append(pred_hypothesis_after_filtering_array_msi_recorded)
+                                label_after_filtering_array.append(label_after_filtering_array_msi_recorded)
+                                break
+                    
+                    if take_largest_prob_dist == False:
+                        
+                        if isFoundBiggest == False:
+                            # Bila sampai iterasi terakhir, belum entailment (atau neutral) juga, maka append saja jawaban kosong
+
+                            pred_answer_not_found_biggest = "" # Disini, jawaban kosong
+
+                            question_array.append(question_decoded)
+                            context_array.append(context_decoded)
+
+                            pred_hypothesis_not_found_biggest, gold_hypothesis = smoothing(
+                                question_decoded, pred_answer_not_found_biggest, gold_answer, type_smoothing)
+
+                            pred_answer_after_filtering_array_msi_recorded.append(pred_answer_not_found_biggest)
+                            pred_hypothesis_after_filtering_array_msi_recorded.append(pred_hypothesis_not_found_biggest)
+                            label_after_filtering_array_msi_recorded.append(predicted_label_inside_loop)
+
+                            gold_answer_array.append(gold_answer)
+                            answer_types_array.append(assign_answer_types(answer=gold_answer))
+                            gold_hypothesis_array.append(gold_hypothesis)
+
+                            pred_answer_after_filtering_array.append(pred_answer_after_filtering_array_msi_recorded)
+                            pred_hypothesis_after_filtering_array.append(pred_hypothesis_after_filtering_array_msi_recorded)
+                            label_after_filtering_array.append(label_after_filtering_array_msi_recorded)
+                    
+                    elif take_largest_prob_dist == True:
+                        
+                        if isFoundBiggest == False:
+                            # Bila sampai iterasi terakhir, belum entailment (atau neutral) juga, maka append saja jawaban kosong
+                            
+                            max_score = 0
+                            index_max_score = 0
+                            
+                            for j in range(len(label_after_filtering_array)):
+                                
+                                if label_after_filtering_array[j]['score'] > max_score:
+                                    max_score = label_after_filtering_array[j]['score']
+                                    index_max_score = j
+
+                            pred_answer_not_found_biggest = pred_answer_after_filtering_array_msi_recorded[index_max_score]
+
+                            question_array.append(question_decoded)
+                            context_array.append(context_decoded)
+
+                            pred_hypothesis_not_found_biggest, gold_hypothesis = smoothing(
+                                question_decoded, pred_answer_not_found_biggest, gold_answer, type_smoothing)
+
+                            pred_answer_after_filtering_array_msi_recorded.append(pred_answer_not_found_biggest)
+                            pred_hypothesis_after_filtering_array_msi_recorded.append(pred_hypothesis_not_found_biggest)
+                            label_after_filtering_array_msi_recorded.append(predicted_label_inside_loop)
+
+                            gold_answer_array.append(gold_answer)
+                            answer_types_array.append(assign_answer_types(answer=gold_answer))
+                            gold_hypothesis_array.append(gold_hypothesis)
+
+                            pred_answer_after_filtering_array.append(pred_answer_after_filtering_array_msi_recorded)
+                            pred_hypothesis_after_filtering_array.append(pred_hypothesis_after_filtering_array_msi_recorded)
+                            label_after_filtering_array.append(label_after_filtering_array_msi_recorded)
+                        
+
+        # Buat DataFrame QAS
+        qas_df = pd.DataFrame({'Context': context_array, 
+                            'Question': question_array, 
+
+                            'Prediction Answer Before Filtering': pred_answer_before_filtering_array,
+                            'Prediction Hypothesis Before Filtering': pred_hypothesis_before_filtering_array,
+                            'Label Before Filtering': label_before_filtering_array,
+
+                            'Prediction Answer After Filtering': pred_answer_after_filtering_array,
+                            'Prediction Hypothesis After Filtering': pred_hypothesis_after_filtering_array,
+                            'Label After Filtering': label_after_filtering_array,
+
+                            'Gold Answer': gold_answer_array,
+                            'Gold Hypothesis': gold_hypothesis_array,
+
+                            'Answer Type': answer_types_array,
+                            'Reasoning Type': '-' 
+                            })
+        
+        assert len(predict_result.predictions[0]) == len(qas_df), "Jumlah prediksi berbeda dengan jumlah evaluasi"
+
+        # Return DataFrame QAS
+        return qas_df
+    
+    # # Membuat kode untuk filtering answer berdasarkan label NLI: entailment (atau neutral) yang bisa menjadi hasil akhir prediksi
+    def filtering_based_on_nli(predict_result, type_smoothing, type_qas, variation, threshold, DATA_NAME=DATA_NAME):
+        
+        if variation == 1:
+            qas_df = filtering_based_on_discrete_score_nli(predict_result, type_smoothing, type_qas)
+            
+        elif variation == 2:
+            qas_df = filtering_based_on_prob_dist_score_nli(predict_result, type_smoothing, 
+                                                type_qas, threshold, take_largest_prob_dist=False)
+        
+        elif variation == 3:
+            qas_df = filtering_based_on_prob_dist_score_nli(predict_result, type_smoothing, 
+                                                type_qas, threshold, take_largest_prob_dist=True)
+            
+        if DATA_NAME == "Squad-ID": 
+                
             # Apa (13)
             qas_df['Reasoning Type'][1283] = 'SSR'
             qas_df['Reasoning Type'][3228] = 'AoI'
             qas_df['Reasoning Type'][4120] = 'AoI'
             qas_df['Reasoning Type'][4456] = 'MSR'
             qas_df['Reasoning Type'][4959] = 'AoI'
-            
+
             qas_df['Reasoning Type'][5458] = 'AoI'
             qas_df['Reasoning Type'][6122] = 'MSR'
             qas_df['Reasoning Type'][6151] = 'AoI'
             qas_df['Reasoning Type'][6795] = 'AoI'
             qas_df['Reasoning Type'][7119] = 'PP' 
-            
+
             qas_df['Reasoning Type'][9685] = 'WM'
             qas_df['Reasoning Type'][10043] = 'AoI'
             qas_df['Reasoning Type'][11173] = 'PP'
-            
+
             # Dimana (12)
             qas_df['Reasoning Type'][969] = 'PP'
             qas_df['Reasoning Type'][1209] = 'PP' 
             qas_df['Reasoning Type'][1296] = 'AoI'
             qas_df['Reasoning Type'][2871] = 'WM'
             qas_df['Reasoning Type'][3163] = 'AoI'
-            
+
             qas_df['Reasoning Type'][3870] = 'SSR'
             qas_df['Reasoning Type'][3922] = 'PP'
             qas_df['Reasoning Type'][5462] = 'AoI'
             qas_df['Reasoning Type'][7263] = 'PP'
             qas_df['Reasoning Type'][7319] = 'AoI'
-            
+
             qas_df['Reasoning Type'][9000] = 'AoI'
             qas_df['Reasoning Type'][9124] = 'PP'
-            
+
             # Kapan (12)
             qas_df['Reasoning Type'][3195] = 'AoI'
             qas_df['Reasoning Type'][3243] = 'AoI'
             qas_df['Reasoning Type'][4214] = 'PP'
             qas_df['Reasoning Type'][4636] = 'MSR'
             qas_df['Reasoning Type'][7122] = 'AoI' 
-            
+
             qas_df['Reasoning Type'][7445] = 'AoI'
             qas_df['Reasoning Type'][7649] = 'AoI'
             qas_df['Reasoning Type'][9372] = 'SSR'
             qas_df['Reasoning Type'][10211] = 'AoI'
             qas_df['Reasoning Type'][10424] = 'AoI' 
-            
+
             qas_df['Reasoning Type'][10700] = 'PP'
             qas_df['Reasoning Type'][11298] = 'AoI'
-            
+
             # Siapa (13)
             qas_df['Reasoning Type'][1778] = 'AoI'
             qas_df['Reasoning Type'][2810] = 'SSR'
             qas_df['Reasoning Type'][3488] = 'WM' 
             qas_df['Reasoning Type'][4661] = 'AoI'
             qas_df['Reasoning Type'][7307] = 'WM'
-            
+
             qas_df['Reasoning Type'][7481] = 'PP'
             qas_df['Reasoning Type'][7840] = 'AoI'
             qas_df['Reasoning Type'][7849] = 'AoI'
             qas_df['Reasoning Type'][7962] = 'PP'
             qas_df['Reasoning Type'][9634] = 'PP'
-            
+
             qas_df['Reasoning Type'][9976] = 'AoI'
             qas_df['Reasoning Type'][11349] = 'SSR'
             qas_df['Reasoning Type'][11367] = 'PP' 
-            
+
             # Kenapa (12)
             qas_df['Reasoning Type'][2723] = 'AoI'
             qas_df['Reasoning Type'][3348] = 'WM'
             qas_df['Reasoning Type'][4390] = 'AoI'
             qas_df['Reasoning Type'][4955] = 'AoI'
             qas_df['Reasoning Type'][5168] = 'SSR' 
-            
+
             qas_df['Reasoning Type'][5728] = 'AoI'
             qas_df['Reasoning Type'][6705] = 'AoI'
             qas_df['Reasoning Type'][7214] = 'AoI'
             qas_df['Reasoning Type'][9379] = 'AoI'
             qas_df['Reasoning Type'][9946] = 'AoI' 
-            
+
             qas_df['Reasoning Type'][10632] = 'WM'
             qas_df['Reasoning Type'][10837] = 'SSR'
-            
+
             # Bagaimana (12)
             qas_df['Reasoning Type'][353] = 'AoI'
             qas_df['Reasoning Type'][1497] = 'MSR'
             qas_df['Reasoning Type'][1883] = 'SSR'
             qas_df['Reasoning Type'][2739] = 'AoI'
             qas_df['Reasoning Type'][3690] = 'MSR'
-            
+
             qas_df['Reasoning Type'][4338] = 'AoI'
             qas_df['Reasoning Type'][4387] = 'AoI'
             qas_df['Reasoning Type'][5392] = 'WM' 
             qas_df['Reasoning Type'][5840] = 'AoI'
             qas_df['Reasoning Type'][7961] = 'AoI'
-            
+
             qas_df['Reasoning Type'][8409] = 'SSR'
             qas_df['Reasoning Type'][10870] = 'AoI'
-            
+
             # Berapa (13)
             qas_df['Reasoning Type'][818] = 'AoI' 
             qas_df['Reasoning Type'][966] = 'AoI'
             qas_df['Reasoning Type'][1035] = 'AoI'
             qas_df['Reasoning Type'][1238] = 'AoI'
             qas_df['Reasoning Type'][1252] = 'PP'
-            
+
             qas_df['Reasoning Type'][1857] = 'PP' 
             qas_df['Reasoning Type'][2853] = 'AoI'
             qas_df['Reasoning Type'][3497] = 'SSR'
             qas_df['Reasoning Type'][4144] = 'MSR'
             qas_df['Reasoning Type'][6468] = 'MSR'
-            
+
             qas_df['Reasoning Type'][7267] = 'SSR'
             qas_df['Reasoning Type'][11035] = 'PP'
             qas_df['Reasoning Type'][11731] = 'SSR'
-            
+
             # Lainnya (13)
             qas_df['Reasoning Type'][1488] = 'AoI'
             qas_df['Reasoning Type'][1571] = 'AoI'
             qas_df['Reasoning Type'][3093] = 'PP' 
             qas_df['Reasoning Type'][5552] = 'WM'
             qas_df['Reasoning Type'][6256] = 'AoI'
-            
+
             qas_df['Reasoning Type'][6371] = 'MSR'
             qas_df['Reasoning Type'][6672] = 'AoI'
             qas_df['Reasoning Type'][7258] = 'SSR' 
             qas_df['Reasoning Type'][7562] = 'SSR'
             qas_df['Reasoning Type'][8154] = 'MSR'
-            
+
             qas_df['Reasoning Type'][8337] = 'WM'
             qas_df['Reasoning Type'][9160] = 'AoI'
             qas_df['Reasoning Type'][11621] = 'AoI' 
-        
+
         elif DATA_NAME == "IDK-MRC":
-            
+
             # Apa (14)
             qas_df['Reasoning Type'][66] = 'AoI'
             qas_df['Reasoning Type'][84] = 'AoI'
             qas_df['Reasoning Type'][190] = 'AoI'
             qas_df['Reasoning Type'][207] = 'WM'
             qas_df['Reasoning Type'][214] = 'AoI'
-            
+
             qas_df['Reasoning Type'][320] = 'SSR'
             qas_df['Reasoning Type'][322] = 'AoI'
             qas_df['Reasoning Type'][347] = 'AoI'
             qas_df['Reasoning Type'][363] = 'WM'
             qas_df['Reasoning Type'][372] = 'AoI'
-            
+
             qas_df['Reasoning Type'][490] = 'WM'
             qas_df['Reasoning Type'][566] = 'PP'
             qas_df['Reasoning Type'][666] = 'AoI'
             qas_df['Reasoning Type'][732] = 'AoI'
-            
+
             # Dimana (13)
             qas_df['Reasoning Type'][61] = 'AoI'
             qas_df['Reasoning Type'][220] = 'AoI'
             qas_df['Reasoning Type'][222] = 'AoI'
             qas_df['Reasoning Type'][227] = 'AoI'
             qas_df['Reasoning Type'][294] = 'AoI'
-            
+
             qas_df['Reasoning Type'][378] = 'AoI'
             qas_df['Reasoning Type'][393] = 'MSR'
             qas_df['Reasoning Type'][394] = 'AoI'
             qas_df['Reasoning Type'][506] = 'AoI'
             qas_df['Reasoning Type'][525] = 'WM'
-            
+
             qas_df['Reasoning Type'][729] = 'WM'
             qas_df['Reasoning Type'][730] = 'AoI'
             qas_df['Reasoning Type'][763] = 'AoI'
-            
+
             # Kapan (14)
             qas_df['Reasoning Type'][88] = 'AoI'
             qas_df['Reasoning Type'][210] = 'AoI'
             qas_df['Reasoning Type'][221] = 'AoI'
             qas_df['Reasoning Type'][228] = 'WM'
             qas_df['Reasoning Type'][312] = 'SSR'
-            
+
             qas_df['Reasoning Type'][385] = 'PP'
             qas_df['Reasoning Type'][391] = 'MSR'
             qas_df['Reasoning Type'][421] = 'AoI'
             qas_df['Reasoning Type'][514] = 'AoI'
             qas_df['Reasoning Type'][533] = 'AoI'
-            
+
             qas_df['Reasoning Type'][540] = 'MSR'
             qas_df['Reasoning Type'][580] = 'AoI'
             qas_df['Reasoning Type'][657] = 'WM'
             qas_df['Reasoning Type'][809] = 'MSR'
-            
+
             # Siapa (13)
             qas_df['Reasoning Type'][23] = 'AoI'
             qas_df['Reasoning Type'][79] = 'AoI'
             qas_df['Reasoning Type'][120] = 'AoI'
             qas_df['Reasoning Type'][269] = 'AoI'
             qas_df['Reasoning Type'][425] = 'AoI'
-            
+
             qas_df['Reasoning Type'][449] = 'AoI'
             qas_df['Reasoning Type'][543] = 'AoI'
             qas_df['Reasoning Type'][551] = 'AoI'
             qas_df['Reasoning Type'][618] = 'AoI'
             qas_df['Reasoning Type'][646] = 'PP'
-            
+
             qas_df['Reasoning Type'][741] = 'MSR'
             qas_df['Reasoning Type'][751] = 'WM'
             qas_df['Reasoning Type'][775] = 'PP'
-            
+
             # Kenapa (8)
             qas_df['Reasoning Type'][18] = 'WM'
             qas_df['Reasoning Type'][19] = 'AoI'
             qas_df['Reasoning Type'][54] = 'MSR'
             qas_df['Reasoning Type'][55] = 'AoI'
             qas_df['Reasoning Type'][145] = 'AoI'
-            
+
             qas_df['Reasoning Type'][413] = 'AoI'
             qas_df['Reasoning Type'][675] = 'AoI'
             qas_df['Reasoning Type'][832] = 'AoI'
-            
+
             # Bagaimana (12)
             qas_df['Reasoning Type'][44] = 'AoI'
             qas_df['Reasoning Type'][286] = 'AoI'
             qas_df['Reasoning Type'][455] = 'AoI'
             qas_df['Reasoning Type'][535] = 'AoI'
             qas_df['Reasoning Type'][612] = 'MSR'
-            
+
             qas_df['Reasoning Type'][613] = 'AoI'
             qas_df['Reasoning Type'][649] = 'AoI'
             qas_df['Reasoning Type'][753] = 'AoI'
             qas_df['Reasoning Type'][757] = 'AoI'
             qas_df['Reasoning Type'][794] = 'SSR'
-            
+
             qas_df['Reasoning Type'][795] = 'AoI'
             qas_df['Reasoning Type'][839] = 'AoI'
-            
+
             # Berapa (13)
             qas_df['Reasoning Type'][20] = 'SSR'
             qas_df['Reasoning Type'][62] = 'MSR'
             qas_df['Reasoning Type'][104] = 'AoI'
             qas_df['Reasoning Type'][107] = 'AoI'
             qas_df['Reasoning Type'][265] = 'AoI'
-            
+
             qas_df['Reasoning Type'][434] = 'MSR'
             qas_df['Reasoning Type'][581] = 'AoI'
             qas_df['Reasoning Type'][614] = 'MSR'
@@ -1284,144 +1581,145 @@ if __name__ == "__main__":
             qas_df['Reasoning Type'][450] = 'PP'
             qas_df['Reasoning Type'][602] = 'PP'
             qas_df['Reasoning Type'][640] = 'MSR'
-        
+
         elif DATA_NAME == "TYDI-QA-ID":
-            
+
             # Apa (15)
             qas_df['Reasoning Type'][23] = 'MSR'
             qas_df['Reasoning Type'][32] = 'SSR'
             qas_df['Reasoning Type'][129] = 'PP'
             qas_df['Reasoning Type'][158] = 'MSR'
             qas_df['Reasoning Type'][193] = 'MSR'
-            
+
             qas_df['Reasoning Type'][332] = 'PP'
             qas_df['Reasoning Type'][334] = 'PP'
             qas_df['Reasoning Type'][427] = 'WM'
             qas_df['Reasoning Type'][451] = 'PP'
             qas_df['Reasoning Type'][469] = 'PP' 
-            
+
             qas_df['Reasoning Type'][474] = 'PP'
             qas_df['Reasoning Type'][537] = 'PP'
             qas_df['Reasoning Type'][619] = 'MSR'
             qas_df['Reasoning Type'][624] = 'PP'
             qas_df['Reasoning Type'][808] = 'PP' 
-            
+
             # Dimana (14)
             qas_df['Reasoning Type'][3] = 'AoI'
             qas_df['Reasoning Type'][66] = 'PP'
             qas_df['Reasoning Type'][163] = 'PP'
             qas_df['Reasoning Type'][164] = 'SSR'
             qas_df['Reasoning Type'][296] = 'AoI'
-            
+
             qas_df['Reasoning Type'][371] = 'MSR'
             qas_df['Reasoning Type'][431] = 'AoI'
             qas_df['Reasoning Type'][437] = 'WM'
             qas_df['Reasoning Type'][489] = 'AoI'
             qas_df['Reasoning Type'][519] = 'MSR'
-            
+
             qas_df['Reasoning Type'][607] = 'SSR'
             qas_df['Reasoning Type'][625] = 'PP'
             qas_df['Reasoning Type'][668] = 'WM'
             qas_df['Reasoning Type'][757] = 'WM'
-            
+
             # Kapan (15)
             qas_df['Reasoning Type'][57] = 'SSR' 
             qas_df['Reasoning Type'][89] = 'MSR'
             qas_df['Reasoning Type'][123] = 'AoI'
             qas_df['Reasoning Type'][179] = 'AoI'
             qas_df['Reasoning Type'][228] = 'SSR'
-            
+
             qas_df['Reasoning Type'][253] = 'SSR' 
             qas_df['Reasoning Type'][279] = 'PP'
             qas_df['Reasoning Type'][280] = 'AoI'
             qas_df['Reasoning Type'][340] = 'MSR'
             qas_df['Reasoning Type'][386] = 'SSR'
-            
+
             qas_df['Reasoning Type'][404] = 'SSR' 
             qas_df['Reasoning Type'][429] = 'PP'
             qas_df['Reasoning Type'][484] = 'PP'
             qas_df['Reasoning Type'][529] = 'SSR'
             qas_df['Reasoning Type'][824] = 'MSR'
-            
+
             # Siapa (15)
             qas_df['Reasoning Type'][1] = 'AoI'
             qas_df['Reasoning Type'][12] = 'PP'
             qas_df['Reasoning Type'][30] = 'AoI'
             qas_df['Reasoning Type'][63] = 'SSR'
             qas_df['Reasoning Type'][138] = 'MSR'
-            
+
             qas_df['Reasoning Type'][247] = 'MSR' 
             qas_df['Reasoning Type'][293] = 'AoI'
             qas_df['Reasoning Type'][361] = 'AoI'
             qas_df['Reasoning Type'][393] = 'PP'
             qas_df['Reasoning Type'][546] = 'MSR'
-            
+
             qas_df['Reasoning Type'][548] = 'PP' 
             qas_df['Reasoning Type'][572] = 'AoI'
             qas_df['Reasoning Type'][715] = 'PP'
             qas_df['Reasoning Type'][805] = 'PP'
             qas_df['Reasoning Type'][843] = 'PP'
-            
+
             # Kenapa (6)
             qas_df['Reasoning Type'][109] = 'AoI' 
             qas_df['Reasoning Type'][248] = 'WM'
             qas_df['Reasoning Type'][432] = 'MSR'
             qas_df['Reasoning Type'][565] = 'SSR'
             qas_df['Reasoning Type'][597] = 'AoI'
-            
+
             qas_df['Reasoning Type'][771] = 'MSR'
-            
+
             # Bagaimana (5)
             qas_df['Reasoning Type'][93] = 'AoI'
             qas_df['Reasoning Type'][133] = 'SSR'
             qas_df['Reasoning Type'][151] = 'PP'
             qas_df['Reasoning Type'][312] = 'AoI'
             qas_df['Reasoning Type'][390] = 'PP' 
-            
+
             # Berapa (15)
             qas_df['Reasoning Type'][54] = 'MSR'
             qas_df['Reasoning Type'][127] = 'SSR'
             qas_df['Reasoning Type'][178] = 'MSR'
             qas_df['Reasoning Type'][185] = 'AoI'
             qas_df['Reasoning Type'][205] = 'WM' 
-            
+
             qas_df['Reasoning Type'][241] = 'PP'
             qas_df['Reasoning Type'][346] = 'PP'
             qas_df['Reasoning Type'][350] = 'WM'
             qas_df['Reasoning Type'][418] = 'PP'
             qas_df['Reasoning Type'][430] = 'WM' 
-            
+
             qas_df['Reasoning Type'][512] = 'MSR'
             qas_df['Reasoning Type'][596] = 'PP'
             qas_df['Reasoning Type'][634] = 'PP'
             qas_df['Reasoning Type'][690] = 'SSR'
             qas_df['Reasoning Type'][756] = 'SSR'
-            
+
             # Lainnya (15)
             qas_df['Reasoning Type'][80] = 'PP'
             qas_df['Reasoning Type'][116] = 'MSR'
             qas_df['Reasoning Type'][165] = 'AoI'
             qas_df['Reasoning Type'][319] = 'AoI'
             qas_df['Reasoning Type'][388] = 'MSR' 
-            
+
             qas_df['Reasoning Type'][498] = 'MSR'
             qas_df['Reasoning Type'][507] = 'SSR'
             qas_df['Reasoning Type'][582] = 'PP'
             qas_df['Reasoning Type'][593] = 'AoI'
             qas_df['Reasoning Type'][595] = 'MSR' 
-            
+
             qas_df['Reasoning Type'][702] = 'PP'
             qas_df['Reasoning Type'][709] = 'PP'
             qas_df['Reasoning Type'][750] = 'MSR'
             qas_df['Reasoning Type'][776] = 'SSR'
-            qas_df['Reasoning Type'][816] = 'WM'  
-        
-        assert len(predict_result.predictions[0]) == len(qas_df), "Jumlah prediksi berbeda dengan jumlah evaluasi"
-        
-        # Return DataFrame QAS
+            qas_df['Reasoning Type'][816] = 'WM'
+            
         return qas_df
     
-    filtering_result = filtering_based_on_nli(predict_result, type_smoothing=TYPE_SMOOTHING, type_qas=TYPE_QAS)
+    filtering_result = filtering_based_on_nli(predict_result, 
+                                              type_smoothing=TYPE_SMOOTHING, 
+                                              type_qas=TYPE_QAS,
+                                              variation=VARIATION,
+                                              threshold=THRESHOLD)
 
     # ## Simpan prediksi pada CSV
     filtering_result.to_csv(f'{OUTPUT_DIR}/output_df.csv')
