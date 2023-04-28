@@ -99,6 +99,7 @@ if __name__ == "__main__":
     import collections
     import string
     import contextlib
+    import gc
 
     import numpy as np
     import pandas as pd
@@ -581,6 +582,9 @@ if __name__ == "__main__":
         compute_metrics=compute_metrics,
         callbacks=[EarlyStoppingCallback(early_stopping_patience=3)]
     )
+
+    gc.collect()
+    torch.cuda.empty_cache()
 
     trainer_qa.train()
 
