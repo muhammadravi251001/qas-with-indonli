@@ -10,45 +10,45 @@ python main_training_indonli.py -m xlmr -d translated -e 10 -sa max -bs 8 -ga 16
 python main_training_indonli.py -m xlmr -d augmented -e 10 -sa max -bs 8 -ga 16
 
 # Baseline
-python main_fine_tuning_qas_dataset.py -m indolem -d squadid -e 10 -sa max -wi False -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m indolem -d idkmrc -e 10 -sa max -wi False -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m indolem -d tydiqaid -e 10 -sa max -wi False -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m indonlu -d squadid -e 10 -sa max -wi False -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m indonlu -d idkmrc -e 10 -sa max -wi False -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m indonlu -d tydiqaid -e 10 -sa max -wi False -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m xlmr -d squadid -e 10 -sa max -wi False -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m xlmr -d idkmrc -e 10 -sa max -wi False -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m xlmr -d tydiqaid -e 10 -sa max -wi False -bs 8 -ga 16
+python main_fine_tuning_qas_dataset.py -m indolem -d squadid -e 10 -sa max -wi False -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m indolem -d idkmrc -e 10 -sa max -wi False -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m indolem -d tydiqaid -e 10 -sa max -wi False -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m indonlu -d squadid -e 10 -sa max -wi False -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m indonlu -d idkmrc -e 10 -sa max -wi False -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m indonlu -d tydiqaid -e 10 -sa max -wi False -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m xlmr -d squadid -e 10 -sa max -wi False -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m xlmr -d idkmrc -e 10 -sa max -wi False -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m xlmr -d tydiqaid -e 10 -sa max -wi False -bs 32 -ga 4
 
 # Alur 1, WITHOUT freeze
-python main_fine_tuning_qas_dataset.py -m indolem -d squadid -e 10 -sa max -wi True -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m indolem -d idkmrc -e 10 -sa max  -wi True -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m indolem -d tydiqaid -e 10 -sa max -wi True -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m indonlu -d squadid -e 10 -sa max -wi True -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m indonlu -d idkmrc -e 10 -sa max -wi True -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m indonlu -d tydiqaid -e 10 -sa max -wi True -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m xlmr -d squadid -e 10 -sa max -wi True -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m xlmr -d idkmrc -e 10 -sa max -wi True -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m xlmr -d tydiqaid -e 10 -sa max -wi True -bs 8 -ga 16
+python main_fine_tuning_qas_dataset.py -m indolem -d squadid -e 10 -sa max -wi True -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m indolem -d idkmrc -e 10 -sa max  -wi True -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m indolem -d tydiqaid -e 10 -sa max -wi True -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m indonlu -d squadid -e 10 -sa max -wi True -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m indonlu -d idkmrc -e 10 -sa max -wi True -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m indonlu -d tydiqaid -e 10 -sa max -wi True -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m xlmr -d squadid -e 10 -sa max -wi True -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m xlmr -d idkmrc -e 10 -sa max -wi True -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m xlmr -d tydiqaid -e 10 -sa max -wi True -bs 32 -ga 4
 
 # Alur 1, WITH freeze
-python main_fine_tuning_qas_dataset.py -m indolem -d squadid -e 10 -sa max -wi True -fr True -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m indolem -d idkmrc -e 10 -sa max  -wi True -fr True -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m indolem -d tydiqaid -e 10 -sa max -wi True -fr True -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m indonlu -d squadid -e 10 -sa max -wi True -fr True -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m indonlu -d idkmrc -e 10 -sa max -wi True -fr True -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m indonlu -d tydiqaid -e 10 -sa max -wi True -fr True -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m xlmr -d squadid -e 10 -sa max -wi True -fr True -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m xlmr -d idkmrc -e 10 -sa max -wi True -fr True -bs 8 -ga 16
-python main_fine_tuning_qas_dataset.py -m xlmr -d tydiqaid -e 10 -sa max -wi True -fr True -bs 8 -ga 16
+python main_fine_tuning_qas_dataset.py -m indolem -d squadid -e 10 -sa max -wi True -fr True -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m indolem -d idkmrc -e 10 -sa max  -wi True -fr True -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m indolem -d tydiqaid -e 10 -sa max -wi True -fr True -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m indonlu -d squadid -e 10 -sa max -wi True -fr True -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m indonlu -d idkmrc -e 10 -sa max -wi True -fr True -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m indonlu -d tydiqaid -e 10 -sa max -wi True -fr True -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m xlmr -d squadid -e 10 -sa max -wi True -fr True -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m xlmr -d idkmrc -e 10 -sa max -wi True -fr True -bs 32 -ga 4
+python main_fine_tuning_qas_dataset.py -m xlmr -d tydiqaid -e 10 -sa max -wi True -fr True -bs 32 -ga 4
 
 # Alur 2
-python filtering_nli_experiment.py -m indolem -d squadid -e 10 -sa max -bs 8 -ga 16
-python filtering_nli_experiment.py -m indolem -d idkmrc -e 10 -sa max -bs 8 -ga 16
-python filtering_nli_experiment.py -m indolem -d tydiqaid -e 10 -sa max -bs 8 -ga 16
-python filtering_nli_experiment.py -m indonlu -d squadid -e 10 -sa max -bs 8 -ga 16
-python filtering_nli_experiment.py -m indonlu -d idkmrc -e 10 -sa max -bs 8 -ga 16
-python filtering_nli_experiment.py -m indonlu -d tydiqaid -e 10 -sa max -bs 8 -ga 16
-python filtering_nli_experiment.py -m xlmr -d squadid -e 10 -sa max -bs 8 -ga 16
-python filtering_nli_experiment.py -m xlmr -d idkmrc -e 10 -sa max -bs 8 -ga 16
-python filtering_nli_experiment.py -m xlmr -d tydiqaid -e 10 -sa max -bs 8 -ga 16
+python filtering_nli_experiment.py -m indolem -d squadid -e 10 -sa max -bs 32 -ga 4
+python filtering_nli_experiment.py -m indolem -d idkmrc -e 10 -sa max -bs 32 -ga 4
+python filtering_nli_experiment.py -m indolem -d tydiqaid -e 10 -sa max -bs 32 -ga 4
+python filtering_nli_experiment.py -m indonlu -d squadid -e 10 -sa max -bs 32 -ga 4
+python filtering_nli_experiment.py -m indonlu -d idkmrc -e 10 -sa max -bs 32 -ga 4
+python filtering_nli_experiment.py -m indonlu -d tydiqaid -e 10 -sa max -bs 32 -ga 4
+python filtering_nli_experiment.py -m xlmr -d squadid -e 10 -sa max -bs 32 -ga 4
+python filtering_nli_experiment.py -m xlmr -d idkmrc -e 10 -sa max -bs 32 -ga 4
+python filtering_nli_experiment.py -m xlmr -d tydiqaid -e 10 -sa max -bs 32 -ga 4
