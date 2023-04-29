@@ -1,0 +1,22 @@
+# Training IndoNLI
+Basic IndoLEM: https://huggingface.co/muhammadravi251001/fine-tuned-IndoNLI-Basic-with-indobert-base-uncased-LR-1e-05
+Translated IndoLEM: https://huggingface.co/muhammadravi251001/fine-tuned-IndoNLI-Translated-with-indobert-base-uncased-LR-1e-05
+Augmented IndoLEM: https://huggingface.co/muhammadravi251001/fine-tuned-IndoNLI-Augmented-with-indobert-base-uncased-LR-1e-05
+Basic IndoNLU: https://huggingface.co/muhammadravi251001/fine-tuned-IndoNLI-Basic-with-indobert-large-p2-LR-1e-05
+Translated IndoNLU: https://huggingface.co/muhammadravi251001/fine-tuned-IndoNLI-Translated-with-indobert-large-p2-LR-1e-05
+Augmented IndoNLU: https://huggingface.co/muhammadravi251001/fine-tuned-IndoNLI-Augmented-with-indobert-large-p2-LR-1e-05
+Basic XLM-RoBERTa-large: https://huggingface.co/muhammadravi251001/fine-tuned-IndoNLI-Basic-with-xlm-roberta-large-LR-1e-05
+Translated XLM-RoBERTa-large: https://huggingface.co/muhammadravi251001/fine-tuned-IndoNLI-Translated-with-xlm-roberta-large-LR-1e-05
+Augmented XLM-RoBERTa-large: https://huggingface.co/muhammadravi251001/fine-tuned-IndoNLI-Augmented-with-xlm-roberta-large-LR-1e-05
+
+# Baseline
+# TODO
+
+# Alur 1, WITHOUT freeze
+# TODO
+
+# Alur 1, WITH freeze
+# TODO
+
+# Alur 2
+# TODO
