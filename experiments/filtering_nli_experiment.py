@@ -110,7 +110,6 @@ if __name__ == "__main__":
     from nusacrowd import NusantaraConfigHelper
     from datetime import datetime
     from tqdm import tqdm
-    from IPython.display import display
     from deep_translator import GoogleTranslator
     from huggingface_hub import HfApi
     
