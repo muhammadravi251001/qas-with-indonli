@@ -57,14 +57,7 @@ if __name__ == "__main__":
     VARIATION = int(args.variation)
     THRESHOLD = float(args.threshold)
         
-    # Model-model dibawah dipilih karena memiliki akurasi terbaik dari eksperimen sebelumnya.
-    if (args.model_name) == "indolem":
-        MODEL_SC_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-indobert-base-uncased"
-    elif (args.model_name) == "indonlu":
-        MODEL_SC_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-indobert-large-p2"
-    elif (args.model_name) == "xlmr":
-        MODEL_SC_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-xlm-roberta-base"
-    else: MODEL_SC_NAME = str(args.model_name)
+    MODEL_SC_NAME = "muhammadravi251001/fine-tuned-IndoNLI-Augmented-with-xlm-roberta-large-LR-1e-05"
 
     print("Program filtering NLI mulai...")
     print(f"Mulai filtering NLI dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, gradient_accumulation: {GRADIENT_ACCUMULATION}, model_sc: {MODEL_SC_NAME}, tq: {TYPE_QAS}, ts: {TYPE_SMOOTHING}, msi: {MAXIMUM_SEARCH_ITER}, dan token: {HUB_TOKEN}")

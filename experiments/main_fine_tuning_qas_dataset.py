@@ -51,15 +51,7 @@ if __name__ == "__main__":
     if (args.with_ittl) == False:
         MODEL_SC_NAME = None
     else:
-        
-    # Model-model dibawah dipilih karena memiliki akurasi terbaik dari eksperimen sebelumnya.
-        if (args.model_name) == "indolem":
-            MODEL_SC_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-indobert-base-uncased"
-        elif (args.model_name) == "indonlu":
-            MODEL_SC_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-indobert-large-p2"
-        elif (args.model_name) == "xlmr":
-            MODEL_SC_NAME = "afaji/fine-tuned-IndoNLI-Translated-with-xlm-roberta-base"
-        else: MODEL_SC_NAME = str(args.model_name)
+        MODEL_SC_NAME = "muhammadravi251001/fine-tuned-IndoNLI-Augmented-with-xlm-roberta-large-LR-1e-05"
 
     print("Program fine-tuning dataset QA mulai...")
     print(f"Mulai fine-tuning dataset QA dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, gradient_accumulation: {GRADIENT_ACCUMULATION}, freeze: {FREEZE}, model_sc: {MODEL_SC_NAME}, dan token: {HUB_TOKEN}")
