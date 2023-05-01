@@ -583,7 +583,8 @@ if __name__ == "__main__":
     trainer_qa.save_model(MODEL_DIR)
 
     # ## Assign answer type untuk evaluasi nanti
-    nlp_ner = pipeline(task="ner", model=MODEL_NER_NAME, tokenizer=MODEL_NER_NAME)
+    nlp_ner = pipeline(task="ner", model=MODEL_NER_NAME, 
+                       tokenizer=AutoTokenizer.from_pretrained(MODEL_NER_NAME, use_fast=False))
 
     def assign_answer_types(answer, nlp=nlp_ner):
     
