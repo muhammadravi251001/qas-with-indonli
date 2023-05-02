@@ -667,8 +667,8 @@ if __name__ == "__main__":
                     else:
                         context.append(tokenized_data[i]['input_ids'][j])
 
-            question_decoded = tokenizer.decode(question, skip_special_tokens=True)
-            context_decoded = tokenizer.decode(context, skip_special_tokens=True)
+                question_decoded = tokenizer.decode(question, skip_special_tokens=True)
+                context_decoded = tokenizer.decode(context, skip_special_tokens=True)
             
             question_array.append(question_decoded)
             context_array.append(context_decoded)
