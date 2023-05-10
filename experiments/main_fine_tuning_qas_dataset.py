@@ -584,7 +584,7 @@ if __name__ == "__main__":
 
     # ## Assign answer type untuk evaluasi nanti
     nlp_ner = pipeline(task="ner", model=MODEL_NER_NAME, 
-                       tokenizer=AutoTokenizer.from_pretrained(MODEL_NER_NAME, use_fast=False))
+                       tokenizer=MODEL_NER_NAME)
 
     def assign_answer_types(answer, nlp=nlp_ner):
     
