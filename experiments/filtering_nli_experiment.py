@@ -499,6 +499,7 @@ if __name__ == "__main__":
     OUTPUT_DIR = f'{QA}/output/'
     METRIC_RESULT_DIR = f'{QA}/metric-result/'
     REPO_NAME = f'fine-tuned-{NAME}'[:96]
+    REPO_NAME = REPO_NAME.replace(" ", "-")
 
     training_args_qa = TrainingArguments(
         
@@ -2501,6 +2502,8 @@ if __name__ == "__main__":
         general_evaluation(filtering_result)
         f.close()
 
+    def zero_div_prevent(a, b): return b and (a / b)
+
     ## Breakdown evaluasi, melakukan evaluasi lebih dalam lagi
     def breakdown_evaluation(df, TYPE_QAS):
     
@@ -2883,55 +2886,67 @@ if __name__ == "__main__":
         
         print("-- Pada pengecekan filtering awal: --")
         if TYPE_QAS == 'entailment only':
-            accept_right = (exist_true_answer_label_entailment) \
-                / (exist_true_answer_label_entailment + exist_true_answer_label_neutral + exist_true_answer_label_contradiction)
-            reject_wrong = (exist_false_answer_label_neutral + exist_false_answer_label_contradiction) \
-                / (exist_false_answer_label_entailment + exist_false_answer_label_neutral + exist_false_answer_label_contradiction)
+            
+            accept_right = zero_div_prevent((exist_true_answer_label_entailment), \
+                (exist_true_answer_label_entailment + exist_true_answer_label_neutral + exist_true_answer_label_contradiction))
+            
+            reject_wrong = zero_div_prevent((exist_false_answer_label_neutral + exist_false_answer_label_contradiction), \
+                (exist_false_answer_label_entailment + exist_false_answer_label_neutral + exist_false_answer_label_contradiction))
+            
             print(f"Berhasil menerima {round(accept_right * 100, 2)} % jawaban yang benar (answer exist)")
             print(f"Berhasil menolak {round(reject_wrong * 100, 2)} % jawaban yang salah (answer exist)") 
             print()
             
-            no_exist_accept_right = (no_exist_true_answer_label_entailment) \
-                / (no_exist_true_answer_label_entailment + no_exist_true_answer_label_neutral + no_exist_true_answer_label_contradiction)
-            no_exist_reject_wrong = (no_exist_false_answer_label_neutral + no_exist_false_answer_label_contradiction) \
-                / (no_exist_false_answer_label_entailment + no_exist_false_answer_label_neutral + no_exist_false_answer_label_contradiction)
+            no_exist_accept_right = zero_div_prevent((no_exist_true_answer_label_entailment), \
+                (no_exist_true_answer_label_entailment + no_exist_true_answer_label_neutral + no_exist_true_answer_label_contradiction))
+            
+            no_exist_reject_wrong = zero_div_prevent((no_exist_false_answer_label_neutral + no_exist_false_answer_label_contradiction), \
+                (no_exist_false_answer_label_entailment + no_exist_false_answer_label_neutral + no_exist_false_answer_label_contradiction))
+            
             print(f"Berhasil menerima {round(no_exist_accept_right * 100, 2)} % jawaban yang benar (answer DO NOT exist)")
             print(f"Berhasil menolak {round(no_exist_reject_wrong * 100, 2)} % jawaban yang salah (answer DO NOT exist)") 
             print()
             
         elif TYPE_QAS == 'entailment or neutral':
-            accept_right = (exist_true_answer_label_entailment + exist_true_answer_label_neutral) \
-                / (exist_true_answer_label_entailment + exist_true_answer_label_neutral + exist_true_answer_label_contradiction)
-            reject_wrong = (exist_false_answer_label_contradiction) \
-                / (exist_false_answer_label_entailment + exist_false_answer_label_neutral + exist_false_answer_label_contradiction)
+            
+            accept_right = zero_div_prevent((exist_true_answer_label_entailment + exist_true_answer_label_neutral), \
+                (exist_true_answer_label_entailment + exist_true_answer_label_neutral + exist_true_answer_label_contradiction))
+            
+            reject_wrong = zero_div_prevent((exist_false_answer_label_contradiction), \
+                (exist_false_answer_label_entailment + exist_false_answer_label_neutral + exist_false_answer_label_contradiction))
+            
             print(f"Berhasil menerima {round(accept_right * 100, 2)} % jawaban yang benar (answer exist)")
             print(f"Berhasil menolak {round(reject_wrong * 100, 2)} % jawaban yang salah (answer exist)") 
             print()
             
-            no_exist_accept_right = (no_exist_true_answer_label_entailment + no_exist_true_answer_label_neutral) \
-                / (no_exist_true_answer_label_entailment + no_exist_true_answer_label_neutral + no_exist_true_answer_label_contradiction)
-            no_exist_reject_wrong = (no_exist_false_answer_label_contradiction) \
-                / (no_exist_false_answer_label_entailment + no_exist_false_answer_label_neutral + no_exist_false_answer_label_contradiction)
+            no_exist_accept_right = zero_div_prevent((no_exist_true_answer_label_entailment + no_exist_true_answer_label_neutral), \
+                (no_exist_true_answer_label_entailment + no_exist_true_answer_label_neutral + no_exist_true_answer_label_contradiction))
+            
+            no_exist_reject_wrong = zero_div_prevent((no_exist_false_answer_label_contradiction), \
+                (no_exist_false_answer_label_entailment + no_exist_false_answer_label_neutral + no_exist_false_answer_label_contradiction))
+           
             print(f"Berhasil menerima {round(no_exist_accept_right * 100, 2)} % jawaban yang benar (answer DO NOT exist)")
             print(f"Berhasil menolak {round(no_exist_reject_wrong * 100, 2)} % jawaban yang salah (answer DO NOT exist)") 
             print()
             
         print("-- Setelah pengecekan filtering berdasarkan hasil akhir MSI: --")
-        accept_right_after_filtering = (filtered_out_right_answer_to_filtered_in_right_answer + filtered_out_wrong_answer_to_filtered_in_right_answer) \
-            / (filtered_out_right_answer_to_filtered_in_right_answer + filtered_out_wrong_answer_to_filtered_in_right_answer + filtered_out_right_answer_to_filtered_out_right_answer + filtered_out_wrong_answer_to_filtered_out_right_answer)
         
-        reject_wrong_after_filtering = (filtered_out_right_answer_to_filtered_out_wrong_answer + filtered_out_wrong_answer_to_filtered_out_wrong_answer) \
-        / (filtered_out_right_answer_to_filtered_out_wrong_answer + filtered_out_wrong_answer_to_filtered_out_wrong_answer + filtered_out_right_answer_to_filtered_in_wrong_answer + filtered_out_wrong_answer_to_filtered_in_wrong_answer)
+        accept_right_after_filtering = zero_div_prevent((filtered_out_right_answer_to_filtered_in_right_answer + filtered_out_wrong_answer_to_filtered_in_right_answer), \
+            (filtered_out_right_answer_to_filtered_in_right_answer + filtered_out_wrong_answer_to_filtered_in_right_answer + filtered_out_right_answer_to_filtered_out_right_answer + filtered_out_wrong_answer_to_filtered_out_right_answer))
+        
+        
+        reject_wrong_after_filtering = zero_div_prevent((filtered_out_right_answer_to_filtered_out_wrong_answer + filtered_out_wrong_answer_to_filtered_out_wrong_answer), \
+            (filtered_out_right_answer_to_filtered_out_wrong_answer + filtered_out_wrong_answer_to_filtered_out_wrong_answer + filtered_out_right_answer_to_filtered_in_wrong_answer + filtered_out_wrong_answer_to_filtered_in_wrong_answer))
         
         print(f"Berhasil menerima {round(accept_right_after_filtering * 100, 2)} % jawaban yang benar (answer exist)")
         print(f"Berhasil menolak {round(reject_wrong_after_filtering * 100, 2)} % jawaban yang salah (answer exist)") 
         print()
         
-        no_exist_accept_right_after_filtering = (filtered_out_right_answer_to_filtered_in_right_answer_unanswered + filtered_out_wrong_answer_to_filtered_in_right_answer_unanswered) \
-            / (filtered_out_right_answer_to_filtered_in_right_answer_unanswered + filtered_out_wrong_answer_to_filtered_in_right_answer_unanswered + filtered_out_right_answer_to_filtered_out_right_answer_unanswered + filtered_out_wrong_answer_to_filtered_out_right_answer_unanswered)
+        no_exist_accept_right_after_filtering = zero_div_prevent((filtered_out_right_answer_to_filtered_in_right_answer_unanswered + filtered_out_wrong_answer_to_filtered_in_right_answer_unanswered), \
+            (filtered_out_right_answer_to_filtered_in_right_answer_unanswered + filtered_out_wrong_answer_to_filtered_in_right_answer_unanswered + filtered_out_right_answer_to_filtered_out_right_answer_unanswered + filtered_out_wrong_answer_to_filtered_out_right_answer_unanswered))
         
-        no_exist_reject_wrong_after_filtering = (filtered_out_right_answer_to_filtered_out_wrong_answer_unanswered + filtered_out_wrong_answer_to_filtered_out_wrong_answer_unanswered) \
-        / (filtered_out_right_answer_to_filtered_out_wrong_answer_unanswered + filtered_out_wrong_answer_to_filtered_out_wrong_answer_unanswered + filtered_out_right_answer_to_filtered_in_wrong_answer_unanswered + filtered_out_wrong_answer_to_filtered_in_wrong_answer_unanswered)
+        no_exist_reject_wrong_after_filtering = zero_div_prevent((filtered_out_right_answer_to_filtered_out_wrong_answer_unanswered + filtered_out_wrong_answer_to_filtered_out_wrong_answer_unanswered), \
+            (filtered_out_right_answer_to_filtered_out_wrong_answer_unanswered + filtered_out_wrong_answer_to_filtered_out_wrong_answer_unanswered + filtered_out_right_answer_to_filtered_in_wrong_answer_unanswered + filtered_out_wrong_answer_to_filtered_in_wrong_answer_unanswered))
         
         print(f"Berhasil menerima {round(no_exist_accept_right_after_filtering * 100, 2)} % jawaban yang benar (answer DO NOT exist)")
         print(f"Berhasil menolak {round(no_exist_reject_wrong_after_filtering * 100, 2)} % jawaban yang salah (answer DO NOT exist)") 
