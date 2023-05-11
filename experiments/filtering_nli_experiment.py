@@ -7,7 +7,7 @@ parser.add_argument('-m', '--model_name', type=str, metavar='', required=True, h
 parser.add_argument('-d', '--data_name', type=str, metavar='', required=True, help="Nama dataset Anda; String; choice=[squadid, idkmrc, tydiqaid]")
 parser.add_argument('-t', '--token', type=str, metavar='', required=False, help="Token Hugging Face Anda; String; choice=[all string token]; default=(TOKEN_HF_muhammadravi251001)", default="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")
 parser.add_argument('-msi', '--maximum_search_iter', type=int, metavar='', required=False, help="Jumlah maximum search iter Anda; Integer; choice=[all integer]; default=2", default=2)
-parser.add_argument('-tq', '--type_qas', type=str, metavar='', required=False, help="Tipe filtering QAS Anda; String; choice=[entailment_only, entailment_or_neutral]; default=entailment or neutral", default="entailment_or_neutral")
+parser.add_argument('-tq', '--type_qas', type=str, metavar='', required=False, help="Tipe filtering QAS Anda; String; choice=[entailment_only, entailment_or_neutral]; default=entailment_or_neutral", default="entailment_or_neutral")
 parser.add_argument('-ts', '--type_smoothing', type=str, metavar='', required=False, help="Tipe smoothing hypothesis Anda; String; choice=[replace_first, replace_question_mark, add_adalah, just_concat_answer_and_question, rule_based, machine_generation_with_rule_based, pure_machine_generation, machine_generation_with_translation]; default=rule_based", default="rule_based")
 parser.add_argument('-va', '--variation', type=int, metavar='', required=False, help="Jenis variasi filtering Anda; Integer; choice=[1, 2, 3]; default=1", default=1)
 parser.add_argument('-th', '--threshold', type=float, metavar='', required=False, help="Berapa threshold skor confidence filtering Anda; Integer; choice=[all integer]; default=0.5", default=0.5)
@@ -471,12 +471,6 @@ if __name__ == "__main__":
 
     # ## Mendefinisikan argumen (dataops) untuk training nanti
     TIME_NOW = str(datetime.now()).replace(":", "-").replace(" ", "_").replace(".", "_")
-    
-    if (re.findall(r'.*/(.*)$', MODEL_NAME) == []): 
-        NAME = f'FilteringNLI-{DATA_NAME}-with-{str(MODEL_NAME)}'
-    else:
-        new_name = re.findall(r'.*/(.*)$', MODEL_NAME)[0]
-        NAME = f'FilteringNLI-{DATA_NAME}-with-{str(new_name)}'
 
     if TYPE_QAS == "entailment_only": TQ_CODE = "TQ1"
     elif TYPE_QAS == "entailment_or_neutral": TQ_CODE = "TQ2"
@@ -494,7 +488,7 @@ if __name__ == "__main__":
     VARIATION_CODE = f"VA{VARIATION}"
     THRESHOLD_CODE = f"TH{THRESHOLD}"
 
-    NAME = f'{NAME}-{TQ_CODE}-{TS_CODE}-{MSI_CODE}-{VARIATION_CODE}-{THRESHOLD_CODE}'
+    NAME = f'FilteringNLI-{args.model_name}-{args.data_name}-{TQ_CODE}-{TS_CODE}-{MSI_CODE}-{VARIATION_CODE}-{THRESHOLD_CODE}'
     
     QA = f'./results/{NAME}-{TIME_NOW}'
     CHECKPOINT_DIR = f'{QA}/checkpoint/'
@@ -601,14 +595,14 @@ if __name__ == "__main__":
         pred_answer = pred_answer.lower()
         gold_answer = gold_answer.lower()
         
-        if type == 'replace first':
+        if type == 'replace_first':
             pred_hypothesis = question.replace('?', '')
             pred_hypothesis = pred_hypothesis.replace(question.split()[0], pred_answer)
 
             gold_hypothesis = question.replace('?', '')
             gold_hypothesis = gold_hypothesis.replace(question.split()[0], gold_answer)
 
-        elif type == 'replace question word':
+        elif type == 'replace_question_word':
             for i in question_word:
                 if i in question.split():
                     pred_hypothesis = question.replace('?', '')
@@ -625,7 +619,7 @@ if __name__ == "__main__":
                     gold_hypothesis = question.replace('?', '')
                     gold_hypothesis = f"{gold_hypothesis.lstrip()} adalah {gold_answer}"
 
-        elif type == 'add adalah':
+        elif type == 'add_adalah':
             pred_hypothesis = question.replace('?', '')
             pred_hypothesis = pred_hypothesis.replace(question.split()[0], '')
             pred_hypothesis = f"{pred_hypothesis} adalah {pred_answer}"
@@ -634,14 +628,18 @@ if __name__ == "__main__":
             gold_hypothesis = gold_hypothesis.replace(question.split()[0], '')
             gold_hypothesis = f"{gold_hypothesis} adalah {gold_answer}"
 
-        elif type == 'just concat answer and question':
+        elif type == 'just_concat_answer_and_question':
             pred_hypothesis = f"{question} {pred_answer}"         
             gold_hypothesis = f"{question} {gold_answer}"
 
-        elif type == 'rule based':
+        elif type == 'rule_based':
+            
             question = question.replace('kah', '')
+            
             for j in question_word:
+                
                 if j in question.split():
+                    
                     if j == 'siapa' or j == 'siapakah':
                         pred_hypothesis = question.replace('?', '')
                         pred_hypothesis = pred_hypothesis.replace(j, '').lstrip()
@@ -748,20 +746,20 @@ if __name__ == "__main__":
                     gold_hypothesis = question.replace('?', '')
                     gold_hypothesis = f"{gold_hypothesis.lstrip()} adalah {gold_answer}"
 
-        elif type == 'machine generation with rule based':
-            pred_hypothesis, gold_hypothesis = smoothing(question, pred_answer, gold_answer, type="rule based")
+        elif type == 'machine_generation_with_rule_based':
+            pred_hypothesis, gold_hypothesis = smoothing(question, pred_answer, gold_answer, type="rule_based")
             pred_hypothesis = nlp_tg_ind(pred_hypothesis)[0]['generated_text']
             gold_hypothesis = nlp_tg_ind(gold_hypothesis)[0]['generated_text']
 
-        elif type == 'pure machine generation':
+        elif type == 'pure_machine_generation':
             pred_hypothesis = f"{question} {pred_answer}"         
             gold_hypothesis = f"{question} {gold_answer}"
 
             pred_hypothesis = nlp_tg_ind(pred_hypothesis)[0]['generated_text']
             gold_hypothesis = nlp_tg_ind(gold_hypothesis)[0]['generated_text']
 
-        elif type == 'machine generation with translation':
-            pred_hypothesis, gold_hypothesis = smoothing(question, pred_answer, gold_answer, type="rule based")
+        elif type == 'machine_generation_with_translation':
+            pred_hypothesis, gold_hypothesis = smoothing(question, pred_answer, gold_answer, type="rule_based")
 
             pred_hypothesis = GoogleTranslator(source='id', target='en').translate(pred_hypothesis)
             gold_hypothesis = GoogleTranslator(source='id', target='en').translate(gold_hypothesis)
@@ -867,7 +865,7 @@ if __name__ == "__main__":
 
             # Cek label dari answer prediksi dan context, bila labelnya entailment (atau neutral), maka answernya jadi hasil akhir
             if predicted_label['label'] == 'neutral':
-                if type_qas == 'entailment or neutral':
+                if type_qas == 'entailment_or_neutral':
                     question_array.append(question_decoded)
                     context_array.append(context_decoded)
                     pred_answer_after_filtering_array.append([pred_answer])
@@ -878,7 +876,7 @@ if __name__ == "__main__":
                     label_after_filtering_array.append([predicted_label])
 
             if predicted_label['label'] == 'entailment':
-                if type_qas == 'entailment only' or type_qas == 'entailment or neutral':
+                if type_qas == 'entailment_only' or type_qas == 'entailment_or_neutral':
                     question_array.append(question_decoded)
                     context_array.append(context_decoded)
                     pred_answer_after_filtering_array.append([pred_answer])
@@ -892,7 +890,7 @@ if __name__ == "__main__":
             # -- maka masuk ke for-loop untuk iterasi ke argmax selanjutnya, dengan menggunakan argsort
             else:
 
-                if predicted_label['label'] == 'neutral' and type_qas == 'entailment or neutral': continue
+                if predicted_label['label'] == 'neutral' and type_qas == 'entailment_or_neutral': continue
 
                 # Bila MAXIMUM_SEARCH_ITER dibawah 2, maka continue langsung
                 if MAXIMUM_SEARCH_ITER < 2: continue
@@ -930,7 +928,7 @@ if __name__ == "__main__":
                         label_after_filtering_array_msi_recorded.append(predicted_label_inside_loop)
 
                         # Bila label-nya sudah entailment (atau neutral), maka answernya jadi hasil akhir, dan break
-                        if type_qas == 'entailment only':
+                        if type_qas == 'entailment_only':
                             if predicted_label_inside_loop['label'] == 'entailment':
                                 isFoundBiggest = True
                                 question_array.append(question_decoded)
@@ -944,7 +942,7 @@ if __name__ == "__main__":
                                 label_after_filtering_array.append(label_after_filtering_array_msi_recorded)
                                 break
 
-                        elif type_qas == 'entailment or neutral':
+                        elif type_qas == 'entailment_or_neutral':
                             if predicted_label_inside_loop['label'] == 'entailment' or predicted_label_inside_loop['label'] == 'neutral':
                                 isFoundBiggest = True
                                 question_array.append(question_decoded)
@@ -1102,7 +1100,7 @@ if __name__ == "__main__":
 
             # Cek label dari answer prediksi dan context, bila labelnya entailment (atau neutral), maka answernya jadi hasil akhir
             if predicted_label['label'] == 'neutral' and predicted_label['score'] >= threshold:
-                if type_qas == 'entailment or neutral':
+                if type_qas == 'entailment_or_neutral':
                     question_array.append(question_decoded)
                     context_array.append(context_decoded)
                     pred_answer_after_filtering_array.append([pred_answer])
@@ -1113,7 +1111,7 @@ if __name__ == "__main__":
                     label_after_filtering_array.append([predicted_label])
 
             if predicted_label['label'] == 'entailment' and predicted_label['score'] >= threshold:
-                if type_qas == 'entailment only' or type_qas == 'entailment or neutral':
+                if type_qas == 'entailment_only' or type_qas == 'entailment_or_neutral':
                     question_array.append(question_decoded)
                     context_array.append(context_decoded)
                     pred_answer_after_filtering_array.append([pred_answer])
@@ -1128,7 +1126,7 @@ if __name__ == "__main__":
             else:
 
                 if predicted_label['label'] == 'neutral' and predicted_label['score'] >= threshold \
-                    and type_qas == 'entailment or neutral': continue
+                    and type_qas == 'entailment_or_neutral': continue
 
                 # Bila MAXIMUM_SEARCH_ITER dibawah 2, maka continue langsung
                 if MAXIMUM_SEARCH_ITER < 2: continue
@@ -1170,7 +1168,7 @@ if __name__ == "__main__":
                         label_after_filtering_array_msi_recorded.append(predicted_label_inside_loop)
 
                         # Bila label-nya sudah entailment (atau neutral), maka answernya jadi hasil akhir, dan break
-                        if type_qas == 'entailment only':
+                        if type_qas == 'entailment_only':
                             if predicted_label_inside_loop['label'] == 'entailment' and predicted_label_inside_loop['score'] >= threshold:
                                 isFoundBiggest = True
                                 question_array.append(question_decoded)
@@ -1184,7 +1182,7 @@ if __name__ == "__main__":
                                 label_after_filtering_array.append(label_after_filtering_array_msi_recorded)
                                 break
 
-                        elif type_qas == 'entailment or neutral':
+                        elif type_qas == 'entailment_or_neutral':
                             if predicted_label_inside_loop['label'] == 'entailment' \
                                     or predicted_label_inside_loop['label'] == 'neutral' \
                                     and predicted_label_inside_loop['score'] >= threshold:
@@ -1748,7 +1746,7 @@ if __name__ == "__main__":
             # Terprediksi dengan label yang salah, padahal hasil answernya benar -> False negative
             # Terprediksi dengan label yang salah, dan hasil answernya salah -> True negative
             
-            if type_qas == 'entailment only':
+            if type_qas == 'entailment_only':
             
                 if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering == 'entailment'):
                     true_positive_after_filtering += 1
@@ -1768,7 +1766,7 @@ if __name__ == "__main__":
                 elif (pred_answer_before_filtering != gold_text) and (pred_label_before_filtering != 'entailment'):
                     true_negative_before_filtering += 1
             
-            elif type_qas == 'entailment or neutral':
+            elif type_qas == 'entailment_or_neutral':
             
                 if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering == 'entailment' 
                                                                 or pred_label_after_filtering == 'neutral'):
@@ -2496,8 +2494,8 @@ if __name__ == "__main__":
     ## Breakdown evaluasi, melakukan evaluasi lebih dalam lagi
     def breakdown_evaluation(df, TYPE_QAS):
     
-        if TYPE_QAS == 'entailment only': compatible_label = ['entailment']
-        elif TYPE_QAS == 'entailment or neutral': compatible_label = ['entailment', 'neutral']
+        if TYPE_QAS == 'entailment_only': compatible_label = ['entailment']
+        elif TYPE_QAS == 'entailment_or_neutral': compatible_label = ['entailment', 'neutral']
 
         exist_true_answer_label_entailment = 0
         exist_true_answer_label_neutral = 0
@@ -2590,7 +2588,7 @@ if __name__ == "__main__":
                     and (pred_answer_before_filtering != ""): 
                 exist_true_answer_label_neutral += 1
 
-                if (TYPE_QAS == 'entailment only'):
+                if (TYPE_QAS == 'entailment_only'):
 
                     filtered_score_labels_before_filtering.append(pred_prob_dist_before_filtering)
 
@@ -2603,7 +2601,7 @@ if __name__ == "__main__":
                     elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                             : filtered_out_right_answer_to_filtered_out_wrong_answer += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
 
-                elif (TYPE_QAS == 'entailment or neutral'):
+                elif (TYPE_QAS == 'entailment_or_neutral'):
                     if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering in compatible_label) \
                             : filtered_in_right_answer_to_filtered_in_right_answer += 1
                     elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering in compatible_label) \
@@ -2647,7 +2645,7 @@ if __name__ == "__main__":
                     and (pred_answer_before_filtering != ""):
                 exist_false_answer_label_neutral += 1
 
-                if (TYPE_QAS == 'entailment only'):
+                if (TYPE_QAS == 'entailment_only'):
 
                     filtered_score_labels_before_filtering.append(pred_prob_dist_before_filtering)
 
@@ -2660,7 +2658,7 @@ if __name__ == "__main__":
                     elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                             : filtered_out_wrong_answer_to_filtered_out_wrong_answer += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
 
-                elif (TYPE_QAS == 'entailment or neutral'):
+                elif (TYPE_QAS == 'entailment_or_neutral'):
                     if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering in compatible_label) \
                             : filtered_in_wrong_answer_to_filtered_in_right_answer += 1
                     elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering in compatible_label) \
@@ -2704,7 +2702,7 @@ if __name__ == "__main__":
                     and (pred_answer_before_filtering == ""): 
                 no_exist_true_answer_label_neutral += 1
 
-                if (TYPE_QAS == 'entailment only'):
+                if (TYPE_QAS == 'entailment_only'):
 
                     filtered_score_labels_before_filtering.append(pred_prob_dist_before_filtering)
 
@@ -2717,7 +2715,7 @@ if __name__ == "__main__":
                     elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                             : filtered_out_right_answer_to_filtered_out_wrong_answer_unanswered += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
 
-                elif (TYPE_QAS == 'entailment or neutral'):
+                elif (TYPE_QAS == 'entailment_or_neutral'):
                     if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering in compatible_label) \
                             : filtered_in_right_answer_to_filtered_in_right_answer_unanswered += 1
                     elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering in compatible_label) \
@@ -2761,7 +2759,7 @@ if __name__ == "__main__":
                     and (pred_answer_before_filtering == ""):
                 no_exist_false_answer_label_neutral += 1
 
-                if (TYPE_QAS == 'entailment only'):
+                if (TYPE_QAS == 'entailment_only'):
 
                     filtered_score_labels_before_filtering.append(pred_prob_dist_before_filtering)
 
@@ -2774,7 +2772,7 @@ if __name__ == "__main__":
                     elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering not in compatible_label) \
                             : filtered_out_wrong_answer_to_filtered_out_wrong_answer_unanswered += 1; filtered_score_labels_after_filtering.append(pred_prob_dist_after_filtering)
 
-                elif (TYPE_QAS == 'entailment or neutral'):
+                elif (TYPE_QAS == 'entailment_or_neutral'):
                     if (pred_answer_after_filtering == gold_text) and (pred_label_after_filtering in compatible_label) \
                             : filtered_in_wrong_answer_to_filtered_in_right_answer_unanswered += 1
                     elif (pred_answer_after_filtering != gold_text) and (pred_label_after_filtering in compatible_label) \
@@ -2874,7 +2872,7 @@ if __name__ == "__main__":
         print()
         
         print("-- Pada pengecekan filtering awal: --")
-        if TYPE_QAS == 'entailment only':
+        if TYPE_QAS == 'entailment_only':
             
             accept_right = zero_div_prevent((exist_true_answer_label_entailment), \
                 (exist_true_answer_label_entailment + exist_true_answer_label_neutral + exist_true_answer_label_contradiction))
@@ -2896,7 +2894,7 @@ if __name__ == "__main__":
             print(f"Berhasil menolak {round(no_exist_reject_wrong * 100, 2)} % jawaban yang salah (answer DO NOT exist)") 
             print()
             
-        elif TYPE_QAS == 'entailment or neutral':
+        elif TYPE_QAS == 'entailment_or_neutral':
             
             accept_right = zero_div_prevent((exist_true_answer_label_entailment + exist_true_answer_label_neutral), \
                 (exist_true_answer_label_entailment + exist_true_answer_label_neutral + exist_true_answer_label_contradiction))
