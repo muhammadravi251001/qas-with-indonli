@@ -5,16 +5,10 @@ from distutils.util import strtobool
 parser = argparse.ArgumentParser(description="Program untuk fine-tuning dataset QA")
 parser.add_argument('-m', '--model_name', type=str, metavar='', required=True, help="Nama model Anda; String; choice=[indolem, indonlu, xlmr, your model choice]")
 parser.add_argument('-d', '--data_name', type=str, metavar='', required=True, help="Nama dataset Anda; String; choice=[squadid, idkmrc, tydiqaid]")
-parser.add_argument('-e', '--epoch', type=int, metavar='', required=True, help="Jumlah epoch Anda; Integer; choice=[all integer]")
-parser.add_argument('-sa', '--sample', type=str, metavar='', required=True, help="Jumlah sampling data Anda; Integer; choice=[max, all integer]")
-parser.add_argument('-l', '--learn_rate', type=str, metavar='', required=False, help="Jumlah learning rate Anda; Float; choice=[all float]; default=1e-5", default=1e-5)
-parser.add_argument('-se', '--seed', type=int, metavar='', required=False, help="Jumlah seed Anda; Integer; choice=[all integer]; default=42", default=42)
-parser.add_argument('-bs', '--batch_size', type=int, metavar='', required=False, help="Jumlah batch-size Anda; Integer; choice=[all integer]; default=16", default=16)
-parser.add_argument('-ga', '--gradient_accumulation', type=int, metavar='', required=False, help="Jumlah gradient accumulation Anda; Integer; choice=[all integer]; default=8", default=8)
 parser.add_argument('-t', '--token', type=str, metavar='', required=False, help="Token Hugging Face Anda; String; choice=[all string token]; default=(TOKEN_HF_muhammadravi251001)", default="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")
 parser.add_argument('-msi', '--maximum_search_iter', type=int, metavar='', required=False, help="Jumlah maximum search iter Anda; Integer; choice=[all integer]; default=2", default=2)
-parser.add_argument('-tq', '--type_qas', type=str, metavar='', required=False, help="Tipe filtering QAS Anda; String; choice=[entailment only, entailment or neutral]; default=entailment or neutral", default="entailment or neutral")
-parser.add_argument('-ts', '--type_smoothing', type=str, metavar='', required=False, help="Tipe smoothing hypothesis Anda; String; choice=[replace first, replace question mark, add adalah, just concat answer and question, rule based, machine generation with rule based, pure machine generation]; default=rule based", default="rule based")
+parser.add_argument('-tq', '--type_qas', type=str, metavar='', required=False, help="Tipe filtering QAS Anda; String; choice=[entailment_only, entailment_or_neutral]; default=entailment or neutral", default="entailment_or_neutral")
+parser.add_argument('-ts', '--type_smoothing', type=str, metavar='', required=False, help="Tipe smoothing hypothesis Anda; String; choice=[replace_first, replace_question_mark, add_adalah, just_concat_answer_and_question, rule_based, machine_generation_with_rule_based, pure_machine_generation, machine_generation_with_translation]; default=rule_based", default="rule based")
 parser.add_argument('-va', '--variation', type=int, metavar='', required=False, help="Jenis variasi filtering Anda; Integer; choice=[1, 2, 3]; default=1", default=1)
 parser.add_argument('-th', '--threshold', type=float, metavar='', required=False, help="Berapa threshold skor confidence filtering Anda; Integer; choice=[all integer]; default=0.5", default=0.5)
 args = parser.parse_args()
@@ -23,34 +17,35 @@ if __name__ == "__main__":
 
     base_model = ["indolem", "indonlu", "xlmr"]
     
-    # Otak-atik dulu hasil HF dari Pak Aji untuk IndoNLU dan XLMR
-    if (args.model_name) in base_model:
-        if (args.model_name) == "indolem":
-            #MODEL_NAME = "afaji/fine-tuned-DatasetQAS-IDK-MRC-with-indobert-base-uncased-without-ITTL-without-freeze-LR-1e-05"
-            MODEL_NAME = "indolem/indobert-base-uncased"
-        elif (args.model_name) == "indonlu":
-            MODEL_NAME = "indobenchmark/indobert-large-p2"
-        elif (args.model_name) == "xlmr":
-            MODEL_NAME = "xlm-roberta-large"
-    else: MODEL_NAME = str(args.model_name)
-    
-    if (args.data_name) == "squadid":
+    if args.model_name == "indolem" and args.data_name == "squadid": 
+        MODEL_NAME = "muhammadravi251001/fine-tuned-DatasetQAS-Squad-ID-with-indobert-base-uncased-without-ITTL-without-freeze-LR-1e-05"
         DATA_NAME = "Squad-ID"
-    elif (args.data_name) == "idkmrc":
+    elif args.model_name == "indolem" and args.data_name == "idkmrc": 
+        MODEL_NAME = "muhammadravi251001/fine-tuned-DatasetQAS-IDK-MRC-with-indobert-base-uncased-without-ITTL-without-freeze-LR-1e-05"
         DATA_NAME = "IDK-MRC"
-    elif (args.data_name) == "tydiqaid":
+    elif args.model_name == "indolem" and args.data_name == "tydiqaid": 
+        MODEL_NAME = "muhammadravi251001/fine-tuned-DatasetQAS-TYDI-QA-ID-with-indobert-base-uncased-without-ITTL-without-freeze-LR-1e-05"
+        DATA_NAME = "TYDI-QA-ID"
+    elif args.model_name == "indonlu" and args.data_name == "squadid": 
+        MODEL_NAME = "muhammadravi251001/fine-tuned-DatasetQAS-Squad-ID-with-indobert-large-p2-without-ITTL-without-freeze-LR-1e-05"
+        DATA_NAME = "Squad-ID"
+    elif args.model_name == "indonlu" and args.data_name == "idkmrc": 
+        MODEL_NAME = "muhammadravi251001/fine-tuned-DatasetQAS-IDK-MRC-with-indobert-large-p2-without-ITTL-without-freeze-LR-1e-05"
+        DATA_NAME = "IDK-MRC"
+    elif args.model_name == "indonlu" and args.data_name == "tydiqaid": 
+        MODEL_NAME = "muhammadravi251001/fine-tuned-DatasetQAS-TYDI-QA-ID-with-indobert-large-p2-without-ITTL-without-freeze-LR-1e-05"
+        DATA_NAME = "TYDI-QA-ID"
+    elif args.model_name == "xlmr" and args.data_name == "squadid": 
+        MODEL_NAME = "muhammadravi251001/fine-tuned-DatasetQAS-Squad-ID-with-xlm-roberta-large-without-ITTL-without-freeze-LR-1e-05"
+        DATA_NAME = "Squad-ID"
+    elif args.model_name == "xlmr" and args.data_name == "idkmrc": 
+        MODEL_NAME = "muhammadravi251001/fine-tuned-DatasetQAS-IDK-MRC-with-xlm-roberta-large-without-ITTL-without-freeze-LR-1e-05"
+        DATA_NAME = "IDK-MRC"
+    elif args.model_name == "xlmr" and args.data_name == "tydiqaid": 
+        MODEL_NAME = "muhammadravi251001/fine-tuned-DatasetQAS-TYDI-QA-ID-with-xlm-roberta-large-without-ITTL-without-freeze-LR-1e-05"
         DATA_NAME = "TYDI-QA-ID"
 
-    if (args.sample) == "max":
-        SAMPLE = sys.maxsize
-    else: SAMPLE = int(args.sample)
-
-    EPOCH = int(args.epoch)
-    LEARNING_RATE = float(args.learn_rate)
-    SEED = int(args.seed)
     HUB_TOKEN = str(args.token)
-    BATCH_SIZE = int(args.batch_size)
-    GRADIENT_ACCUMULATION = int(args.gradient_accumulation)
     MAXIMUM_SEARCH_ITER = int(args.maximum_search_iter)
     TYPE_QAS = str(args.type_qas)
     TYPE_SMOOTHING = str(args.type_smoothing)
@@ -60,18 +55,10 @@ if __name__ == "__main__":
     MODEL_SC_NAME = "muhammadravi251001/fine-tuned-IndoNLI-Augmented-with-xlm-roberta-large-LR-1e-05"
 
     print("Program filtering NLI mulai...")
-    print(f"Mulai filtering NLI dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, gradient_accumulation: {GRADIENT_ACCUMULATION}, model_sc: {MODEL_SC_NAME}, tq: {TYPE_QAS}, ts: {TYPE_SMOOTHING}, msi: {MAXIMUM_SEARCH_ITER}, dan token: {HUB_TOKEN}")
+    print(f"Mulai filtering NLI dengan model: {MODEL_NAME} dan data: {DATA_NAME}, tq: {TYPE_QAS}, ts: {TYPE_SMOOTHING}, msi: {MAXIMUM_SEARCH_ITER}, variation: {VARIATION}, threshold: {THRESHOLD}, dan token: {HUB_TOKEN}")
 
     # ## Mendefinisikan hyperparameter
-    MODEL_NAME = MODEL_NAME
-    MODEL_SC_NAME = MODEL_SC_NAME
-    EPOCH = EPOCH
-    SAMPLE = SAMPLE
-    LEARNING_RATE = LEARNING_RATE
     HUB_TOKEN = HUB_TOKEN
-    SEED = SEED
-    BATCH_SIZE = BATCH_SIZE
-    GRADIENT_ACCUMULATION = GRADIENT_ACCUMULATION
     MAXIMUM_SEARCH_ITER =  MAXIMUM_SEARCH_ITER
 
     if HUB_TOKEN == "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": USER = "muhammadravi251001"
@@ -86,6 +73,7 @@ if __name__ == "__main__":
     WARMUP_RATIO = 0.06
     WEIGHT_DECAY = 0.0
     EVAL_STEPS_RATIO = 0.5
+    SAMPLE = sys.maxsize
 
     import os
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -489,9 +477,24 @@ if __name__ == "__main__":
     else:
         new_name = re.findall(r'.*/(.*)$', MODEL_NAME)[0]
         NAME = f'FilteringNLI-{DATA_NAME}-with-{str(new_name)}'
-    
-    NAME = f'{NAME}-LR-{LEARNING_RATE}'
-    NAME = f'{NAME}-{TYPE_QAS}-{TYPE_SMOOTHING}'
+
+    if TYPE_QAS == "entailment_only": TQ_CODE = "TQ1"
+    elif TYPE_QAS == "entailment_or_neutral": TQ_CODE = "TQ2"
+
+    if TYPE_SMOOTHING == "replace_first": TS_CODE = "TS1"
+    elif TYPE_SMOOTHING == "replace_question_mark": TS_CODE = "TS2"
+    elif TYPE_SMOOTHING == "add_adalah": TS_CODE = "TS3"
+    elif TYPE_SMOOTHING == "just_concat_answer_and_question": TS_CODE = "TS4"
+    elif TYPE_SMOOTHING == "rule_based": TS_CODE = "TS5"
+    elif TYPE_SMOOTHING == "machine_generation_with_rule_based": TS_CODE = "TS6"
+    elif TYPE_SMOOTHING == "pure_machine_generation": TS_CODE = "TS7"
+    elif TYPE_SMOOTHING == "machine_generation_with_translation": TS_CODE = "TS8"
+
+    MSI_CODE = f"MS{MAXIMUM_SEARCH_ITER}"
+    VARIATION_CODE = f"VA{VARIATION}"
+    THRESHOLD_CODE = f"TH{THRESHOLD}"
+
+    NAME = f'{NAME}-{TQ_CODE}-{TS_CODE}-{MSI_CODE}-{VARIATION_CODE}-{THRESHOLD_CODE}'
     
     QA = f'./results/{NAME}-{TIME_NOW}'
     CHECKPOINT_DIR = f'{QA}/checkpoint/'
@@ -499,7 +502,6 @@ if __name__ == "__main__":
     OUTPUT_DIR = f'{QA}/output/'
     METRIC_RESULT_DIR = f'{QA}/metric-result/'
     REPO_NAME = f'fine-tuned-{NAME}'[:96]
-    REPO_NAME = REPO_NAME.replace(" ", "-")
 
     training_args_qa = TrainingArguments(
         
@@ -507,7 +509,6 @@ if __name__ == "__main__":
         output_dir=CHECKPOINT_DIR,
         overwrite_output_dir=True,
         save_strategy='steps',
-        save_total_limit=EPOCH,
         
         # Log
         report_to='tensorboard',
@@ -516,24 +517,12 @@ if __name__ == "__main__":
         logging_steps=LOGGING_STEPS,
         
         # Train
-        num_train_epochs=EPOCH,
-        weight_decay=WEIGHT_DECAY,
-        per_device_train_batch_size=BATCH_SIZE,
-        per_device_eval_batch_size=BATCH_SIZE,
-        gradient_accumulation_steps=GRADIENT_ACCUMULATION,
-        learning_rate=LEARNING_RATE,
         warmup_ratio=WARMUP_RATIO,
         bf16=False,
         dataloader_num_workers=cpu_count(),
         
         # Miscellaneous
         evaluation_strategy='steps',
-        save_steps=int((tokenized_data_qas_id_train.num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * EVAL_STEPS_RATIO),
-        eval_steps=int((tokenized_data_qas_id_train.num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * EVAL_STEPS_RATIO),
-        seed=SEED,
-        #hub_token=HUB_TOKEN,
-        #push_to_hub=True,
-        #hub_model_id=REPO_NAME,
         load_best_model_at_end=True,
         metric_for_best_model='f1',
     )
@@ -585,12 +574,12 @@ if __name__ == "__main__":
                     'berapa', 'berapakah', 'seberapa',
                 
                     'Siapa', 'Siapakah',
-                        'Apa', 'Apakah', 'Adakah',
-                        'Dimana', 'Dimanakah', 'Darimanakah',
-                        'Kapan', 'Kapankah',
-                        'Bagaimana', 'Bagaimanakah',
-                        'Kenapa', 'Mengapa',
-                        'Berapa', 'Berapakah', 'Seberapa'
+                    'Apa', 'Apakah', 'Adakah',
+                    'Dimana', 'Dimanakah', 'Darimanakah',
+                    'Kapan', 'Kapankah',
+                    'Bagaimana', 'Bagaimanakah',
+                    'Kenapa', 'Mengapa',
+                    'Berapa', 'Berapakah', 'Seberapa'
                     ]
     
     # # Retrieve model IndoNLI dari Hugging Face via Pipelines
@@ -2968,6 +2957,14 @@ if __name__ == "__main__":
     with open(f'{METRIC_RESULT_DIR}/breakdown_evaluation_results.txt', "w") as f, contextlib.redirect_stdout(f):
         breakdown_evaluation(filtering_result, TYPE_QAS=TYPE_QAS)
         f.close()
+
+    def parameter():
+        print("Filtering NLI dengan model: {MODEL_NAME} dan data: {DATA_NAME}, tq: {TYPE_QAS}, ts: {TYPE_SMOOTHING}, msi: {MAXIMUM_SEARCH_ITER}, variation: {VARIATION}, threshold: {THRESHOLD}")
+
+    os.makedirs(os.path.dirname(METRIC_RESULT_DIR), exist_ok=True)
+    with open(f'{METRIC_RESULT_DIR}/parameter.txt', "w") as f, contextlib.redirect_stdout(f):
+        parameter()
+        f.close()
     
     # # Upload folder ke Hugging Face
     api = HfApi()
@@ -2990,5 +2987,5 @@ if __name__ == "__main__":
         path_in_repo="results/evaluation",
     )
 
-    print(f"Selesai filtering NLI dengan model: {MODEL_NAME} dan data: {DATA_NAME}, dengan epoch: {EPOCH}, sample: {SAMPLE}, LR: {LEARNING_RATE}, seed: {SEED}, batch_size: {BATCH_SIZE}, gradient_accumulation: {GRADIENT_ACCUMULATION}, model_sc: {MODEL_SC_NAME}, tq: {TYPE_QAS}, ts: {TYPE_SMOOTHING}, msi: {MAXIMUM_SEARCH_ITER}, dan token: {HUB_TOKEN}")
+    print(f"Selesai filtering NLI dengan model: {MODEL_NAME} dan data: {DATA_NAME}, tq: {TYPE_QAS}, ts: {TYPE_SMOOTHING}, msi: {MAXIMUM_SEARCH_ITER}, variation: {VARIATION}, threshold: {THRESHOLD}, dan token: {HUB_TOKEN}")
     print("Program filtering NLI selesai!")

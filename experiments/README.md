@@ -112,26 +112,26 @@ Please, check the arguments that can be passed to this code; the datatype, argum
 python filtering_nli_experiment.py -h
 ```
 
-To run this filtering QAS based on NLI experiments, you just only do this, you optionally need to passing arguments to {--learn-rate, --seed, --token, --batch_size, etc} if you don't want using the default value provided:
+To run this filtering QAS based on NLI experiments, you just only do this, you optionally need to passing arguments to if you don't want using the default value provided:
 ```
-python filtering_nli_experiment.py -m indolem -d squadid -e 10 -sa max
-python filtering_nli_experiment.py -m indolem -d idkmrc -e 10 -sa max
-python filtering_nli_experiment.py -m indolem -d tydiqaid -e 10 -sa max
+python filtering_nli_experiment.py -m indolem -d squadid 
+python filtering_nli_experiment.py -m indolem -d idkmrc
+python filtering_nli_experiment.py -m indolem -d tydiqaid
 
-python filtering_nli_experiment.py -m indonlu -d squadid -e 10 -sa max
-python filtering_nli_experiment.py -m indonlu -d idkmrc -e 10 -sa max
-python filtering_nli_experiment.py -m indonlu -d tydiqaid -e 10 -sa max
+python filtering_nli_experiment.py -m indonlu -d squadid
+python filtering_nli_experiment.py -m indonlu -d idkmrc
+python filtering_nli_experiment.py -m indonlu -d tydiqaid
 
-python filtering_nli_experiment.py -m xlmr -d squadid -e 10 -sa max
-python filtering_nli_experiment.py -m xlmr -d idkmrc -e 10 -sa max
-python filtering_nli_experiment.py -m xlmr -d tydiqaid -e 10 -sa max
+python filtering_nli_experiment.py -m xlmr -d squadid
+python filtering_nli_experiment.py -m xlmr -d idkmrc
+python filtering_nli_experiment.py -m xlmr -d tydiqaid
 ```
 
-However, you can try some of these flags for your experiments, namely: `-tq`, `-ts`, and `-msi`. 
+However, you can try some of these flags for your experiments, namely: `-tq`, `-ts`, `-msi`, `-va`, and `-th`.
 
-`-tq` stands for `TYPE_QAS`, in this flag, you can experimenting how should your QAS system filtering based on NLI, whether you choose `entailment only` or `entailment or neutral`. 
+`-tq` stands for `TYPE_QAS`, in this flag, you can experimenting how should your QAS system filtering based on NLI, whether you choose `entailment_only` or `entailment_or_neutral`. 
 
-`-ts` stands for `TYPE_SMOOTHING`, in this flag, you can experimenting how should your smoothing system, to get your hypothesis as natural as possible from your answer and question from your QAS dataset, you can choose: `replace first, replace question word, add adalah, just concat answer and question, rule based, machine generation with rule based, pure machine generation, machine generation with translation`. 
+`-ts` stands for `TYPE_SMOOTHING`, in this flag, you can experimenting how should your smoothing system, to get your hypothesis as natural as possible from your answer and question from your QAS dataset, you can choose: `replace_first, replace_question_word, add_adalah, just_concat answer_and_question, rule_based, machine_generation_with_rule_based, pure_machine_generation, machine_generation_with_translation`. 
 
 `-msi` stands for `MAXIMUM_SEARCH_ITER`, in this flag, you can experimenting how much your QAS system search for entailment label (or neutral label, it depends on your choice in `TYPE_QAS`) from your QAS dataset, you can choose any integer to fill in this flag.
 
