@@ -2956,34 +2956,62 @@ if __name__ == "__main__":
         breakdown_evaluation(filtering_result, TYPE_QAS=TYPE_QAS)
         f.close()
 
-    def parameter():
-        print("Filtering NLI dengan model: {MODEL_NAME} dan data: {DATA_NAME}, tq: {TYPE_QAS}, ts: {TYPE_SMOOTHING}, msi: {MAXIMUM_SEARCH_ITER}, variation: {VARIATION}, threshold: {THRESHOLD}")
+    def parameter(MODEL_NAME, DATA_NAME, TYPE_QAS, TYPE_SMOOTHING, MAXIMUM_SEARCH_ITER, VARIATION, THRESHOLD):
+        print(f"Filtering NLI ")
+        print(f"Model: {MODEL_NAME}")
+        print(f"Data: {DATA_NAME}")
+        print(f"Type QAS: {TYPE_QAS}")
+        print(f"Type Smoothing: {TYPE_SMOOTHING}")
+        print(f"MSI: {MAXIMUM_SEARCH_ITER}")
+        print(f"Variation: {VARIATION}")
+        print(f"Threshold: {THRESHOLD}")
+
 
     os.makedirs(os.path.dirname(METRIC_RESULT_DIR), exist_ok=True)
     with open(f'{METRIC_RESULT_DIR}/parameter.txt', "w") as f, contextlib.redirect_stdout(f):
-        parameter()
+        parameter(MODEL_NAME, DATA_NAME, TYPE_QAS, TYPE_SMOOTHING, MAXIMUM_SEARCH_ITER, VARIATION, THRESHOLD)
         f.close()
     
     # # Upload folder ke Hugging Face
     api = HfApi()
 
-    create_repo(f"{USER}/{REPO_NAME}", token=HUB_TOKEN)
+    try:
+        
+        api.upload_folder(
+            folder_path=f"{OUTPUT_DIR}",
+            repo_id=f"{USER}/{REPO_NAME}",
+            repo_type="model",
+            token=HUB_TOKEN,
+            path_in_repo="results/output",
+        )
 
-    api.upload_folder(
-        folder_path=f"{OUTPUT_DIR}",
-        repo_id=f"{USER}/{REPO_NAME}",
-        repo_type="model",
-        token=HUB_TOKEN,
-        path_in_repo="results/output",
-    )
+        api.upload_folder(
+            folder_path=f"{METRIC_RESULT_DIR}",
+            repo_id=f"{USER}/{REPO_NAME}",
+            repo_type="model",
+            token=HUB_TOKEN,
+            path_in_repo="results/evaluation",
+        )
+    
+    except:
 
-    api.upload_folder(
-        folder_path=f"{METRIC_RESULT_DIR}",
-        repo_id=f"{USER}/{REPO_NAME}",
-        repo_type="model",
-        token=HUB_TOKEN,
-        path_in_repo="results/evaluation",
-    )
+        create_repo(f"{USER}/{REPO_NAME}", token=HUB_TOKEN)
+        
+        api.upload_folder(
+            folder_path=f"{OUTPUT_DIR}",
+            repo_id=f"{USER}/{REPO_NAME}",
+            repo_type="model",
+            token=HUB_TOKEN,
+            path_in_repo="results/output",
+        )
+
+        api.upload_folder(
+            folder_path=f"{METRIC_RESULT_DIR}",
+            repo_id=f"{USER}/{REPO_NAME}",
+            repo_type="model",
+            token=HUB_TOKEN,
+            path_in_repo="results/evaluation",
+        )
 
     print(f"Selesai filtering NLI dengan model: {MODEL_NAME} dan data: {DATA_NAME}, tq: {TYPE_QAS}, ts: {TYPE_SMOOTHING}, msi: {MAXIMUM_SEARCH_ITER}, variation: {VARIATION}, threshold: {THRESHOLD}, dan token: {HUB_TOKEN}")
     print("Program filtering NLI selesai!")
