@@ -111,7 +111,7 @@ if __name__ == "__main__":
     from datetime import datetime
     from tqdm import tqdm
     from deep_translator import GoogleTranslator
-    from huggingface_hub import HfApi
+    from huggingface_hub import HfApi, create_repo
     
     from datasets import (
         load_dataset, 
@@ -2971,6 +2971,8 @@ if __name__ == "__main__":
     
     # # Upload folder ke Hugging Face
     api = HfApi()
+
+    create_repo(f"{USER}/{REPO_NAME}", token=HUB_TOKEN)
 
     api.upload_folder(
         folder_path=f"{OUTPUT_DIR}",
