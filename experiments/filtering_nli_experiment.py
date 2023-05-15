@@ -2966,7 +2966,6 @@ if __name__ == "__main__":
         print(f"Variation: {VARIATION}")
         print(f"Threshold: {THRESHOLD}")
 
-
     os.makedirs(os.path.dirname(METRIC_RESULT_DIR), exist_ok=True)
     with open(f'{METRIC_RESULT_DIR}/parameter.txt', "w") as f, contextlib.redirect_stdout(f):
         parameter(MODEL_NAME, DATA_NAME, TYPE_QAS, TYPE_SMOOTHING, MAXIMUM_SEARCH_ITER, VARIATION, THRESHOLD)
