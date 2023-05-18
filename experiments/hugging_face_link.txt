@@ -21,7 +21,7 @@ IDK-MRC XLM-RoBERTa-large: https://huggingface.co/muhammadravi251001/fine-tuned-
 TyDi-QA-ID XLM-RoBERTa-large: https://huggingface.co/muhammadravi251001/fine-tuned-DatasetQAS-TYDI-QA-ID-with-xlm-roberta-large-without-ITTL-without-freeze-LR-1e-05
 
 # Alur 1, WITHOUT freeze
-(X) SQuAD-ID IndoLEM: https://huggingface.co/muhammadravi251001/fine-tuned-DatasetQAS-Squad-ID-with-indobert-base-uncased-with-ITTL-without-freeze-LR-1e-05
+SQuAD-ID IndoLEM: https://huggingface.co/muhammadravi251001/fine-tuned-DatasetQAS-Squad-ID-with-indobert-base-uncased-with-ITTL-without-freeze-LR-1e-05
 IDK-MRC IndoLEM: https://huggingface.co/muhammadravi251001/fine-tuned-DatasetQAS-IDK-MRC-with-indobert-base-uncased-with-ITTL-without-freeze-LR-1e-05
 TyDi-QA-ID IndoLEM: https://huggingface.co/muhammadravi251001/fine-tuned-DatasetQAS-TYDI-QA-ID-with-indobert-base-uncased-with-ITTL-without-freeze-LR-1e-05
 (X) SQuAD-ID IndoNLU: https://huggingface.co/muhammadravi251001/fine-tuned-DatasetQAS-Squad-ID-with-indobert-large-p2-with-ITTL-without-freeze-LR-1e-05
@@ -32,7 +32,7 @@ IDK-MRC XLM-RoBERTa-large: https://huggingface.co/muhammadravi251001/fine-tuned-
 TyDi-QA-ID XLM-RoBERTa-large: https://huggingface.co/muhammadravi251001/fine-tuned-DatasetQAS-TYDI-QA-ID-with-xlm-roberta-large-with-ITTL-without-freeze-LR-1e-05
 
 # Alur 1, WITH freeze
-(X) SQuAD-ID IndoLEM: https://huggingface.co/muhammadravi251001/fine-tuned-DatasetQAS-Squad-ID-with-indobert-base-uncased-with-ITTL-with-freeze-LR-1e-05
+SQuAD-ID IndoLEM: https://huggingface.co/muhammadravi251001/fine-tuned-DatasetQAS-Squad-ID-with-indobert-base-uncased-with-ITTL-with-freeze-LR-1e-05
 IDK-MRC IndoLEM: https://huggingface.co/muhammadravi251001/fine-tuned-DatasetQAS-IDK-MRC-with-indobert-base-uncased-with-ITTL-with-freeze-LR-1e-05
 TyDi-QA-ID IndoLEM: https://huggingface.co/muhammadravi251001/fine-tuned-DatasetQAS-TYDI-QA-ID-with-indobert-base-uncased-with-ITTL-with-freeze-LR-1e-05
 (X) SQuAD-ID IndoNLU: https://huggingface.co/muhammadravi251001/fine-tuned-DatasetQAS-Squad-ID-with-indobert-large-p2-with-ITTL-with-freeze-LR-1e-05
@@ -44,12 +44,10 @@ TyDi-QA-ID XLM-RoBERTa-large: https://huggingface.co/muhammadravi251001/fine-tun
 
 # Running script for remaining code:
 # (X)
-python main_fine_tuning_qas_dataset.py -m indolem -d squadid -e 10 -sa max -wi True -bs 2 -ga 64
-python main_fine_tuning_qas_dataset.py -m indonlu -d squadid -e 10 -sa max -wi True -bs 2 -ga 64
-python main_fine_tuning_qas_dataset.py -m xlmr -d squadid -e 10 -sa max -wi True -bs 2 -ga 64
-python main_fine_tuning_qas_dataset.py -m indolem -d squadid -e 10 -sa max -wi True -fr True -bs 2 -ga 64
-python main_fine_tuning_qas_dataset.py -m indonlu -d squadid -e 10 -sa max -wi True -fr True -bs 2 -ga 64
-python main_fine_tuning_qas_dataset.py -m xlmr -d squadid -e 10 -sa max -wi True -fr True -bs 2 -ga 64
+python main_fine_tuning_qas_dataset.py -m xlmr -d squadid -e 10 -sa max -wi True -bs 1 -ga 128
+python main_fine_tuning_qas_dataset.py -m xlmr -d squadid -e 10 -sa max -wi True -fr True -bs 1 -ga 128
+python main_fine_tuning_qas_dataset.py -m indonlu -d squadid -e 10 -sa max -wi True -bs 1 -ga 128
+python main_fine_tuning_qas_dataset.py -m indonlu -d squadid -e 10 -sa max -wi True -fr True -bs 1 -ga 128
 
 # Alur 2
 # TODO
