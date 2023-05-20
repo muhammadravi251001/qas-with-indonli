@@ -2,19 +2,38 @@
 \chapter{\babDua}
 \label{bab:2}
 %-----------------------------------------------------------------------------%
-Bab kedua ini menjelaskan mengenai studi literatur yang telah penulis telusuri dan kaji untuk penelitian ini. Sub-bab 2.1 menjelaskan mengenai \emph{natural language processing}, bidang luas yang menjadi domain penelitian ini. Sub-bab 2.2 menjelaskan tentang sistem tanya jawab, \emph{question answering task}, bidang khusus yang menjadi domain penelitian ini. Sub-bab 2.3 menjelaskan tentang \emph{natural language inference}, salah satu alat (\emph{tools}) eksperimen untuk meningkatkan performa dari sistem tanya jawab. Sub-bab 2.4 menjelaskan tentang IndoNLI, \emph{dataset natural language inference} berbahasa Indonesia. Sub-bab 2.5 menjelaskan tentang \emph{dataset} sistem tanya jawab, \emph{dataset} tersebut ada yang berbahasa Indonesia maupun berbahasa Inggris. Sub-bab 2.6 menjelaskan tentang \emph{transformer}, salah satu arsitektur model kecerdasan buatan terbaru untuk dapat memprediksi suatu jawaban. Sub-bab 2.7 dan sub-bab 2.8 menjelaskan tentang \emph{intermediate-task transfer learning} dan \emph{task recasting}, yaitu metode-metode eksperimen yang akan dilakukan pada penelitian ini.
+Bab kedua ini menjelaskan mengenai studi literatur yang telah penulis telusuri dan kaji untuk penelitian ini. Sub-bab 2.1 menjelaskan mengenai \emph{natural language processing}, bidang luas yang menjadi domain penelitian ini. Sub-bab 2.2 menjelaskan tentang sistem tanya jawab, \emph{question answering task}, bidang khusus yang menjadi domain penelitian ini. Sub-bab 2.3 menjelaskan tentang \emph{dataset} sistem tanya jawab, \emph{dataset} tersebut ada yang berbahasa Indonesia maupun berbahasa Inggris. Sub-bab 2.4 menjelaskan tentang \emph{natural language inference}, salah satu alat (\emph{tools}) eksperimen untuk meningkatkan performa dari sistem tanya jawab. Sub-bab 2.5 menjelaskan tentang IndoNLI, \emph{dataset natural language inference} berbahasa Indonesia. Sub-bab 2.6 menjelaskan tentang \emph{transformer}, salah satu arsitektur model kecerdasan buatan terbaru untuk dapat memprediksi suatu jawaban. Sub-bab 2.7 menjelaskan tentang arsitektur model yang digunakan pada penelitian ini. Sub-bab 2.8 menjelaskan tentang eksplorasi \emph{dataset} yang akan digunakan. Sub-bab 2.9 dan sub-bab 2.10 menjelaskan tentang \emph{intermediate-task transfer learning} dan \emph{task recasting}, yaitu metode-metode eksperimen yang akan dilakukan pada penelitian ini. Terakhir, sub-bab 2.11 menjelaskan tentang metrik evaluasi yang digunakan pada penelitian ini.
 
 %-----------------------------------------------------------------------------%
 \section{\emph{Natural Language Processing}}
 %-----------------------------------------------------------------------------%
 \emph{Natural Language Processing} (NLP), atau bila diterjemahkan menjadi Pemrosesan Bahasa Alami, merupakan salah satu bidang konsentrasi pada permasalahan kecerdasan buatan (\emph{artificial intelligence}) yang berfokus untuk melakukan analisis teks dengan menggunakan bantuan komputer \citep{article-nlp}. NLP menggunakan pengetahuan terkait bagaimana manusia memahami dan menggunakan bahasa atau linguistik, setelah itu baru manusia “mengajarkan” cara berbahasa tersebut kepada komputer. NLP muncul untuk memudahkan pekerjaan manusia untuk dapat berkomunikasi dengan komputer dalam bahasa alami/manusia \citep{nlp-state-of-the-art}. Pengembangan dan riset di bidang NLP setidaknya dapat dikategorisasi menjadi lima bidang, yaitu: \emph{natural language understanding (NLU), natural language generation (NLG), speech or voice recognition, machine translation, spelling correction and grammar checking}. 
 
-Aplikasi dari NLP ini mencakup penerjemahan bahasa yang bukan hanya sekadar menerjemahkan kata secara langsung, namun tetap menjaga makna, tata bahasa, gramatikal kalimat tetap utuh dan sesuai dengan bahasa aslinya (\emph{machine translation}). Kedua, mengkategorisasikan suatu kalimat dengan label yang ada, misal untuk mendeteksi suatu kalimat itu memiliki makna yang positif, negatif, atau netral (\emph{text categorization}). Ketiga, mendeteksi suatu pesan merupakan \emph{spam} atau bukan (\emph{spam detection & filtering}). Keempat, mengekstrak suatu informasi dari sebuah data teks (\emph{information retrieval}). Kelima, sistem dialog (\emph{system dialogue}), bagian ini sering digunakan pada \emph{chatbot} yang otomatis menjawab pesan dari manusia dengan bahasa manusia; dan masih banyak lagi pengaplikasian yang bisa dilakukan oleh tugas (\emph{task}) NLP ini.
+Aplikasi dari NLP ini mencakup penerjemahan bahasa yang bukan hanya sekadar menerjemahkan kata secara langsung, namun tetap menjaga makna, tata bahasa, gramatikal kalimat tetap utuh dan sesuai dengan bahasa aslinya (\emph{machine translation}). Kedua, mengkategorisasikan suatu kalimat dengan label yang ada, misal untuk mendeteksi suatu kalimat itu memiliki makna yang positif, negatif, atau netral (\emph{text categorization}). Ketiga, mendeteksi suatu pesan merupakan \emph{spam} atau bukan (\emph{spam detection \& filtering}). Keempat, mengekstrak suatu informasi dari sebuah data teks (\emph{information retrieval}). Kelima, sistem dialog (\emph{system dialogue}), bagian ini sering digunakan pada \emph{chatbot} yang otomatis menjawab pesan dari manusia dengan bahasa manusia; dan masih banyak lagi pengaplikasian yang bisa dilakukan oleh tugas (\emph{task}) NLP ini.
 
 %-----------------------------------------------------------------------------%
 \section{Sistem Tanya Jawab (\emph{Question Answering System})}
 %-----------------------------------------------------------------------------%
-Sistem tanya jawab merupakan sistem yang dirancang untuk memenuhi kebutuhan informasi manusia yang mungkin muncul dalam situasi seperti berbicara dengan asisten virtual, berinteraksi dengan pencarian mesin (\emph{search engine}), atau sekedar menanyakan data di basis data (\emph{database}) saja \citep{daniel2007speech}. Salah satu paradigma pencarian jawaban dari suatu sistem tanya jawab ini adalah dengan berbasis pencarian informasi (\emph{information-retrieval-based}). Arti dari berbasis pencarian informasi di atas adalah: mesin diberikan suatu informasi (nanti disebut sebagai konteks) dan suatu pertanyaan, dan mesin sistem tanya jawab menggunakan metode pencarian informasi untuk menentukan bagian teks yang relevan dengan pertanyaan yang diberikan, dengan menggunakan algoritma dari \emph{machine reading comprehension} (MRC) mesin sistem tanya jawab dapat menemukan jawaban dari bagian teks tersebut dengan mengambil kalimat (\emph{span of text}) yang kemungkinan besar menjadi jawabannya; mesin sistem tanya jawab dengan berbasis pencarian informasi ini bergantung pada kumpulan teks yang besar agar mesin menjadi lebih akurat. 
+
+\begin{figure}[h]
+\vspace{3pt}
+\hrule
+\vspace{3pt}
+
+\textbf{\emph{Context}}: Otranto adalah kota dan komune yang terletak di  \colorbox{BurntOrange}{provinsi Lecce} (\colorbox{ForestGreen}{Apulia, Italia}). Otranto berada di pantai timur semenanjung Salento. Selat Otranto menghubungkan Laut Adriatik dengan Laut Ionia. Pelabuhan kota ini kecil dan terdapat sedikit perdagangan.\\
+
+\textbf{\emph{Question}}: \colorbox{BurntOrange}{Dimanakah letak Lecce ?}\\
+
+\textbf{\emph{Answer}}:  \colorbox{ForestGreen}{Apulia, Italia}
+
+\vspace{3pt}
+\hrule
+\vspace{3pt}
+\centering
+\caption{Contoh dari \emph{question answering task} dari data \citep{putri-oh-2022-idk}.}
+\end{figure}
+
+Sistem tanya jawab merupakan salah satu tugas (\emph{task}) dari domain \emph{Natural Language Processing} (NLP). Sistem tanya jawab adalah sistem yang dirancang untuk memenuhi kebutuhan informasi manusia yang mungkin muncul dalam situasi seperti berbicara dengan asisten virtual, berinteraksi dengan pencarian mesin (\emph{search engine}), atau sekedar menanyakan data di basis data (\emph{database}) saja \citep{daniel2007speech}. Salah satu paradigma pencarian jawaban dari suatu sistem tanya jawab ini adalah dengan berbasis pencarian informasi (\emph{information-retrieval-based}). Arti dari berbasis pencarian informasi di atas adalah: mesin diberikan suatu informasi (nanti disebut sebagai konteks) dan suatu pertanyaan, dan mesin sistem tanya jawab menggunakan metode pencarian informasi untuk menentukan bagian teks yang relevan dengan pertanyaan yang diberikan, dengan menggunakan algoritma dari \emph{machine reading comprehension} (MRC) mesin sistem tanya jawab dapat menemukan jawaban dari bagian teks tersebut dengan mengambil kalimat (\emph{span of text}) yang kemungkinan besar menjadi jawabannya; mesin sistem tanya jawab dengan berbasis pencarian informasi ini bergantung pada kumpulan teks yang besar agar mesin menjadi lebih akurat. 
 
 Jenis-jenis tugas (\emph{task}) yang dapat diselesaikan oleh suatu sistem tanya jawab, antara lain: \emph{factoid question answering} dimana pertanyaan dapat dijawab dengan fakta sederhana yang dapat dituliskan dalam teks pendek, lalu \emph{long-form question answering} dimana pertanyaan dapat dijawab dengan kalimat yang panjang, biasanya pertanyaan “mengapa”; kemudian \emph{community question answering} dimana pasangan tanya jawab didapatkan dari suatu komunitas seperti Quora, dan lain sebagainya. Tugas-tugas yang dapat diselesaikan oleh sistem tanya jawab bisa bertambah varian dan ragamnya seiring dengan pesatnya riset dan pengembangan di bidang NLP.
 
@@ -54,6 +73,46 @@ Alur pengumpulan data dilakukan dalam alur sebagai berikut: penerjemahan \emph{d
 %-----------------------------------------------------------------------------%
 \section{\emph{Natural Language Inference}}
 %-----------------------------------------------------------------------------%
+
+\begin{figure}[h]
+\vspace{3pt}
+\hrule
+\vspace{3pt}
+
+\textbf{\emph{Premise}}: Selanjutnya, dua pemain Arsenal yang dirasa Ian Wright kurang sip adalah di sektor serang. Mereka adalah Willian dan Alexandre Lacazette, yang disebutnya buntu.\\
+
+\textbf{\emph{Hypothesis}}: Alexandre Lacazette tidak memiliki performa yang baik sebagai penyerang.\\
+
+\textbf{\emph{Label}}:  \emph{Entailment}
+
+\vspace{3pt}
+\hrule
+\vspace{3pt}
+
+\textbf{\emph{Premise}}: Seakan tak bisa dipisahkan, dua sahabat itu sama-sama sedang menggarap proyek musik.\\
+
+\textbf{\emph{Hypothesis}}: Dua sahabat itu selalu bersama-sama.\\
+
+\textbf{\emph{Label}}:  \emph{Neutral}
+
+\vspace{3pt}
+\hrule
+\vspace{3pt}
+
+\textbf{\emph{Premise}}: Meskipun trikomoniasis adalah penyakit yang sangat umum, penyakit ini seringkali sulit diketahui.\\
+
+\textbf{\emph{Hypothesis}}: Trikomoniasis bukanlah penyakit yang umum.\\
+
+\textbf{\emph{Label}}:  \emph{Contradiction}
+
+\vspace{5pt}
+\hrule
+\vspace{5pt}
+
+\centering
+\caption{Contoh dari \emph{natural language inference} dari data IndoNLI \citep{mahendra-etal-2021-indonli}.}
+\end{figure}
+
 \emph{Natural Language Inference} atau disingkat dengan NLI merupakan suatu tugas semantik (\emph{semantic task}) pada domain NLP yang bertujuan untuk mengkarakterisasi dan memanfaatkan relasi antar dua kalimat, untuk menyelesaikan hal tersebut, model membutuhkan kemampuan untuk mengurai semantik kalimat dan penalaran logis (\emph{commonsense}) yang baik \citep{bowman-etal-2015-large}. Permasalahan NLI ini dapat diselesaikan dengan berbagai teknik, seperti: menggunakan logika simbolis (\emph{symbolic logic}), menggunakan logika pengetahuan umum (\emph{knowledge-based}), dan yang paling baru adalah dengan menggunakan \emph{neural networks}. 
 
 Sekarang, NLI sudah dijadikan menjadi tolak ukur (\emph{benchmark}) dalam bidang representasi semantik dari suatu kalimat. Sudah banyak korpus pengujian NLI ini, antara lain seperti: \emph{Stanford Natural Language} Inference (SNLI), \emph{Multi-Genre Natural Language Inference} (MultiNLI) yang dapat digunakan sebagai bahan pengujian dari suatu sistem NLI. MultiNLI merupakan korpus yang lebih baru dibandingkan dengan SNLI dengan penambahan ragam genre tema kalimat \citep{williams-etal-2018-broad}. Pengaplikasian NLI ini masih relevan dengan permasalahan sistem tanya jawab, NLI dapat diaplikasikan sebagai \emph{intermediate task transfer learning}, validasi prediksi jawaban, dan bisa juga menghasilkan (\emph{generate}) prediksi jawaban dengan melakukan pra proses (\emph{preprocess}) terlebih dahulu.
@@ -68,6 +127,13 @@ Alur pengumpulan data IndoNLI mengikuti protokol pengumpulan data \emph{Multi-Ge
 %-----------------------------------------------------------------------------%
 \section{\emph{Transformer}}
 %-----------------------------------------------------------------------------%
+
+\begin{figure}[h]
+\includegraphics[scale=0.5]{assets/pics/transformers.png}
+\centering
+\caption{Simplifikasi konsep dari \emph{transformer}.\\\hspace{\textwidth}Referensi gambar: \url{https://towardsdatascience.com/transformers-an-overview-of-the-most-novel-ai-architecture-cdd7961eef84}.}
+\end{figure}
+
 \emph{Transformer} merupakan tipe arsitektur \emph{artificial neural networks} yang digunakan untuk memecahkan masalah transformasi dari urutan masukan (\emph{input}) menjadi urutan keluaran (\emph{output}) dalam suatu aplikasi \emph{deep learning} \citep{transformers-self-attention-to-the-rescue}. Keberadaan Transformer dianggap sebagai solusi dari permasalahan-permasalahan pada \emph{recurrent neural network} (RNN) dan \emph{long short-term memory} (LSTM), yang berkaitan dengan \emph{vanishing \& exploding gradient problem} pada RNN dan keterkaitan antar kata (\emph{relationship between words}) pada LSTM. Cara \emph{Transformer} mengatasi masalah-masalah tersebut adalah dengan menggunakan \emph{self-attention}. \emph{Self-attention} merupakan mekanisme perhatian (\emph{attention}) yang menghubungkan posisi yang berbeda dari suatu urutan untuk menghitung representasi urutan tersebut \citep{DBLP:journals/corr/VaswaniSPUJGKP17}; sederhananya \emph{self-attention} merupakan mekanisme yang mempelajari keterkaitan antar kata (\emph{relationship between words}) yang gagal diatasi oleh LSTM. 
 
 Kemudian, alasan mengapa \emph{Transformer} dapat mengatasi \emph{vanishing \& exploding gradient problem}, adalah karena \emph{Transformer} tidak bergantung pada perulangan (\emph{recurrent}) seperti yang dilakukan pada RNN, namun \emph{Transformer} bergantung kepada mekanisme perhatian (\emph{attention}) sepenuhnya, sehingga \emph{Transformer} dapat terhindar dari perkalian angka-angka gradien kecil maupun besar yang dapat menyebabkan \emph{vanishing \& exploding gradient problem}. Kemudian, \emph{Transformer} memungkinkan paralelisasi yang lebih signifikan dari arsitektur-arsitektur lainnya. Hal tersebut yang membuat \emph{Transformer} menjadi \emph{state-of-the-art} model dari perkembangan arsitektur \emph{artificial neural networks} sampai saat ini.
@@ -80,6 +146,13 @@ Pada bagian ini, akan dipaparkan berbagai macam arsitektur model yang akan digun
 %-----------------------------------------------------------------------------%
 \subsection{BERT}
 %-----------------------------------------------------------------------------%
+
+\begin{figure}[h]
+\includegraphics[scale=0.5]{assets/pics/bert.png}
+\centering
+\caption{Perbedaan arsitektur antara BERT-\emph{base} dan BERT-\emph{large}.\\\hspace{\textwidth}Referensi gambar: \url{https://www.turing.com/kb/how-bert-nlp-optimization-model-works}.}
+\end{figure}
+
 BERT yang merupakan singkatan dari \emph{Bidirectional Encoder Representations from Transformers} merupakan salah satu model yang dikembangkan oleh Google dan secara spesifik bertujuan sebagai representasi suatu bahasa atau dalam kata lain sebagai \emph{language representation models}. BERT sengaja dirancang untuk belajar representasi bahasa secara dua arah, yaitu: kiri ke kanan, dan kanan ke kiri. BERT dapat digunakan sebagai model untuk menjawab pertanyaan (\emph{question answering task}), inferensi bahasa, dan lain-lain \citep{devlin-etal-2019-bert}. Untuk jumlah komponen dalam model BERT itu sendiri, dapat dipaparkan sebagai berikut: untuk jenis BERT-\emph{base}, \emph{layer}-nya sebanyak 12 \emph{layer}, \emph{hidden-size} sebanyak 768, dan banyaknya \emph{self-attention heads} sebanyak 12, dan terakhir, banyaknya parameter sebanyak 110 juta parameter; kemudian untuk jenis BERT-\emph{large}, \emph{layer}-nya sebanyak 24 \emph{layer}, \emph{hidden-size} sebanyak 1024, dan banyaknya \emph{self-attention heads} sebanyak 16, dan terakhir, banyaknya parameter sebanyak 340 juta parameter. BERT sendiri secara orisinil dilatih dengan bahasa Inggris saja, namun, untuk kepentingan penelitian ini, kita menggunakan IndoBERT, yaitu BERT yang dilatih dengan bahasa Indonesia \citep{koto2020indolem}.
 
 Arsitektur dari model BERT itu sendiri mengusung arsitektur \emph{multi-layer bidirectional Transformer encoder}, yaitu: model yang memiliki beberapa \emph{layer} dan bersifat dua arah (\emph{bidirectional}), hal tersebut berbeda dengan kebanyakan arsitektur model yang biasanya bersifat satu arah (\emph{directional}). Menurut 
@@ -109,6 +182,13 @@ Namun, menurut \citet{exploratory-data-analysis} bila dirunut kembali, ada beber
 %-----------------------------------------------------------------------------%
 \section{\emph{Intermediate-Task Transfer Learning}}
 %-----------------------------------------------------------------------------%
+
+\begin{figure}[h]
+\includegraphics[scale=0.5]{assets/pics/ittl.png}
+\centering
+\caption{Alur kerja dari \emph{Intermediate-Task Transfer Learning}.\\\hspace{\textwidth}Referensi gambar: \url{https://towardsdatascience.com/intermediate-deep-learning-with-transfer-learning-f1aba5a814f}.}
+\end{figure}
+
 \emph{Intermediate-Task Transfer Learning} merupakan teknik peningkatan performa dengan melakukan \emph{fine-tuning} dengan \emph{dataset} tugas lain (\emph{intermediate task}) pada model \emph{Transformer}, lalu model yang sudah dilakukan \emph{fine-tuning} tersebut akan dilakukan \emph{fine-tuning} kembali untuk tugas tujuannya (\emph{target task}) \citep{pruksachatkun-etal-2020-intermediate}. Harapannya, dengan logis, bila suatu model sudah dilatih pada tugas lain, model tersebut cenderung akan memberikan hasil yang baik bila model yang sudah dilatih tersebut dilatih kembali di tugas yang berbeda, namun masih dalam lingkup domain \emph{task} yang relevan. Teknik \emph{Intermediate-Task Transfer Learning} ini memanfaatkan kelebihan yang terdapat pada arsitektur \emph{Transformer} yang sudah dilatih pada \emph{dataset} yang sangat besar; seharusnya kinerja \emph{Transformer} dapat ditingkatkan dengan melatih model lebih lanjut pada tugas perantara (\emph{intermediate task}) yang memiliki data yang lebih kaya, beragam, dan berkualitas; sebelum melakukan penyempurnaan model pada tugas target (\emph{target task}) via \emph{transfer learning}. 
 
 Namun, menurut \citet{pruksachatkun-etal-2020-intermediate}, masih belum mengetahui kapan dan bagaimana cara tugas perantara (\emph{intermediate task}) mempengaruhi dan bermanfaat bagi tugas target (\emph{target task}). Untuk mengetahui hal tersebut, studi \citet{pruksachatkun-etal-2020-intermediate} menemukan beberapa hal menarik, antara lain: \emph{intermediate task} membutuhkan inferensi tingkat tinggi (\emph{high-level inference}) dan kemampuan penalaran (\emph{reasoning abilities}) yang baik agar dapat bermanfaat bagi tugas targetnya, kemudian kinerja dari tugas target sangat berkorelasi dengan kemampuan inferensi tingkat yang lebih tinggi seperti pengelompokan penyebutan kata dalam teks yang mengacu pada entitas dunia nyata yang sama \citep{coference-resolution}.
