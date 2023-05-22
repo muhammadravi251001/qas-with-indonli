@@ -32,7 +32,7 @@ args = parser.parse_args()
 Pengambilan parameter untuk \emph{training sequence classification task} menggunakan bantuan \emph{library} dari \texttt{argparse}. Penulis gunakan \texttt{argparse} agar dapat menjalankan eksperimen via \emph{terminal} bukan dengan satu-satu menjalankan via \emph{notebook}. Parameter yang dapat digunakan dalam \emph{training sequence classification task} ini meliputi: nama model, nama \emph{dataset}, jumlah \emph{epoch}, jumlah sampel data, jumlah \emph{learn rate}, jumlah \emph{seed}, jumlah \emph{batch size}, jumlah \emph{gradient accumulation}, dan token akun Hugging Face agar dapat otomatis \emph{push} ke akun Hugging Face-nya. Untuk pilihan isi dari masing-masing parameternya, sudah penulis sertakan pada setiap baris kode di bagian \texttt{choice}.
 
 %-----------------------------------------------------------------------------%
-\subsection{Pemilihan \emph{hyperparameter}}
+\subsection{Pemilihan \emph{hyperparameter} untuk \emph{sequence classification task}}
 %-----------------------------------------------------------------------------%
 Selain dari \emph{hyperparameter} yang dapat diatur pada pengambilan parameter di atas, terdapat beberapa \emph{hyperparameter} permanen untuk penelitian ini, berikut \emph{hyperparameter} yang tidak bisa diubah-ubah via \texttt{argparse}.
 
@@ -127,9 +127,9 @@ tokenized_data_indonli_validation = Dataset.from_dict(tokenized_data_indonli["va
 Pada tahap ini, akan dijalankan  \emph{preprocess} dan tokenisasi \emph{dataset} IndoNLI. Tokenisasi dijalankan dengan melakukan tokenisasi bagian \texttt{premise} dan \texttt{hypothesis} saja, dengan menggunakan \emph{hyperparameter} yang sebelumnya sudah ditentukan.
 
 %-----------------------------------------------------------------------------%
-\subsection{Mengimpor model \emph{question answering}}
+\subsection{Mengimpor model \emph{sequence classification}}
 %-----------------------------------------------------------------------------%
-\begin{lstlisting}[language=Python, caption=Mengimpor model \emph{question answering}]
+\begin{lstlisting}[language=Python, caption=Mengimpor model \emph{sequence classification}]
 id2label = {0: 'entailment', 1: 'neutral', 2: 'contradiction'}
 label2id = {'entailment': 0, 'neutral': 1, 'contradiction': 2}
 
@@ -141,7 +141,7 @@ model_sc = AutoModelForSequenceClassification.from_pretrained(
 Pada tahapan ini, penulis menyuplai banyak label sebanyak 3, karena hasil label dari permasalahan NLI di IndoNLI memiliki tiga label akhir, yaitu: \emph{entailment}, \emph{neutral}, \emph{contradiction}. Kemudian, tidak lupa juga menyuplai \texttt{id2label} dan \texttt{label2id}.
 
 %-----------------------------------------------------------------------------%
-\subsection{Perancangan metrik komputasi untuk penilaian}
+\subsection{Perancangan metrik komputasi untuk penilaian \emph{sequence classification task}}
 %-----------------------------------------------------------------------------%
 \begin{lstlisting}[language=Python, caption=Perancangan metrik komputasi untuk penilaian \emph{sequence classification task}]
 accuracy = evaluate.load('accuracy')
@@ -226,7 +226,7 @@ training_args_sc = TrainingArguments(
 )
 \end{lstlisting}
 
-Pada tahap ini, penulis merancang \emph{training arguments} agar jalannya eksperimen sesuai parameter yang telah disuplai sebelumnya. \texttt{STEP} disesuaikan dengan rumus: \texttt{BATCH SIZE $\times$ GRADIENT ACCUMULATION $\times$ EVAL STEPS RATIO} ditujukan agar model melakukan evaluasi setiap \texttt{EVAL STEPS RATIO} agar dapat melakukan \emph{early callback} nantinya untuk efisiensi \emph{training}. Pemilihan \emph{best model} dipilih ke metrik skor F1, karena metrik F1 dapat mengatasi permasalahn \emph{label imbalance}.
+Pada tahap ini, penulis merancang \emph{training arguments} agar jalannya eksperimen sesuai parameter yang telah disuplai sebelumnya. \texttt{STEP} disesuaikan dengan rumus: \texttt{BATCH SIZE $\times$ GRADIENT ACCUMULATION $\times$ EVAL STEPS RATIO} ditujukan agar model melakukan evaluasi setiap \texttt{EVAL STEPS RATIO} agar dapat melakukan \emph{early callback} nantinya untuk efisiensi \emph{training}. Pemilihan \emph{best model} dipilih ke metrik skor F1, karena metrik F1 dapat mengatasi permasalahan \emph{label imbalance}.
 
 %-----------------------------------------------------------------------------%
 \subsection{Melakukan \emph{training} dan prediksi jawaban \emph{sequence classification}}
@@ -244,9 +244,11 @@ trainer_sc = Trainer(
 )
 
 trainer_sc.train()
+
+predict_result = trainer_sc.predict(tokenized_data_indonli_validation)
 \end{lstlisting}
 
-Pada tahap ini, dilakukan \emph{training} dengan menggunakan data \emph{train} dan data \emph{validation} sebagai parameter \emph{training}-nya. Penulis juga melakukan \emph{early callback} dengan \emph{patience} sebesar 3, yang artinya model akan berhenti \emph{training} bila tiga hasil evaluasi setelahnya memiliki nilai metrik yang lebih kecil dibanding sebelumnya; hal tersebut dilakukan untuk efisiensi waktu dan \emph{resource} \emph{training}-nya.
+Pada tahap ini, dilakukan \emph{training} dengan menggunakan data \emph{train} dan data \emph{validation} sebagai parameter \emph{training}-nya. Penulis juga melakukan \emph{early callback} dengan \emph{patience} sebesar 3, yang artinya model akan berhenti \emph{training} bila tiga hasil evaluasi setelahnya memiliki nilai metrik yang lebih kecil dibanding sebelumnya; hal tersebut dilakukan untuk efisiensi waktu dan \emph{resource} \emph{training}-nya. Dan, terakhir, dilakukan prediksi terhadap data \emph{validation}, dengan menggunakan fungsi \texttt{predict}.
 
 %-----------------------------------------------------------------------------%
 \subsection{Representasi prediksi jawaban \emph{sequence classification}}
@@ -328,106 +330,1287 @@ Pada tahapan ini, sederhananya, penulis hanya melakukan \emph{push} hasil eksper
 %-----------------------------------------------------------------------------%
 \section{\emph{Training} \emph{Baseline} model \emph{Question Answering Task}}
 %-----------------------------------------------------------------------------%
+Pada sub-bab ini, akan dijelaskan mengenai \emph{training} model pada tugas \emph{question answering task} dalam belajar tiga \emph{dataset} sistem tanya jawab yang penulis lakukan pada pada penelitian ini.
 
 %-----------------------------------------------------------------------------%
-\subsection{Pengambilan parameter}
+\subsection{Pengambilan parameter untuk \emph{training question answering task}}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Pengambilan parameter untuk \emph{training question answering task}]
+parser = argparse.ArgumentParser(description="Program untuk fine-tuning dataset QA")
+parser.add_argument('-m', '--model_name', type=str, metavar='', required=True, help="Nama model Anda; String; choice=[indolem, indonlu, xlmr, your model choice]")
+parser.add_argument('-d', '--data_name', type=str, metavar='', required=True, help="Nama dataset Anda; String; choice=[squadid, idkmrc, tydiqaid]")
+parser.add_argument('-e', '--epoch', type=int, metavar='', required=True, help="Jumlah epoch Anda; Integer; choice=[all integer]")
+parser.add_argument('-sa', '--sample', type=str, metavar='', required=True, help="Jumlah sampling data Anda; Integer; choice=[max, all integer]")
+parser.add_argument('-l', '--learn_rate', type=str, metavar='', required=False, help="Jumlah learning rate Anda; Float; choice=[all float]; default=1e-5", default=1e-5)
+parser.add_argument('-se', '--seed', type=int, metavar='', required=False, help="Jumlah seed Anda; Integer; choice=[all integer]; default=42", default=42)
+parser.add_argument('-bs', '--batch_size', type=int, metavar='', required=False, help="Jumlah batch-size Anda; Integer; choice=[all integer]; default=16", default=16)
+parser.add_argument('-ga', '--gradient_accumulation', type=int, metavar='', required=False, help="Jumlah gradient accumulation Anda; Integer; choice=[all integer]; default=8", default=8)
+parser.add_argument('-t', '--token', type=str, metavar='', required=False, help="Token Hugging Face Anda; String; choice=[all string token]; default=(TOKEN_HF_muhammadravi251001)", default="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")
+parser.add_argument('-wi', '--with_ittl', type=lambda x: bool(strtobool(x)), metavar='', required=False, help="Dengan ITTL atau tidak?; Boolean; choice=[True, False]; default=False", default=False)
+parser.add_argument('-fr', '--freeze', type=lambda x: bool(strtobool(x)), metavar='', required=False, help="Dengan ITTL, apa mau freeze layer BERT?; Boolean; choice=[True, False]; default=False", default=False)
+args = parser.parse_args()
+\end{lstlisting}
+
+Pengambilan parameter untuk \emph{training baseline question answering task} menggunakan bantuan \emph{library} dari \texttt{argparse}. Penulis gunakan \texttt{argparse} agar dapat menjalankan eksperimen via \emph{terminal} bukan dengan satu-satu menjalankan via \emph{notebook}. Parameter yang dapat digunakan dalam \emph{training baseline question answering task} ini meliputi: nama model, nama \emph{dataset}, jumlah \emph{epoch}, jumlah sampel data, jumlah \emph{learn rate}, jumlah \emph{seed}, jumlah \emph{batch size}, jumlah \emph{gradient accumulation}, pilihan apakah mau melakukan \emph{intermediate task transfer learning}, pilihan apakah mau melakukan \emph{freezing layer}, dan token akun Hugging Face agar dapat otomatis \emph{push} ke akun Hugging Face-nya. Untuk pilihan isi dari masing-masing parameternya, sudah penulis sertakan pada setiap baris kode di bagian \texttt{choice}.
+
+%-----------------------------------------------------------------------------%
+\subsection{Pemilihan \emph{hyperparameter} untuk \emph{question answering task}}
+%-----------------------------------------------------------------------------%
+Selain dari \emph{hyperparameter} yang dapat diatur pada pengambilan parameter di atas, terdapat beberapa \emph{hyperparameter} permanen untuk penelitian ini, berikut \emph{hyperparameter} yang tidak bisa diubah-ubah via \texttt{argparse}.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{||c | c||} 
+ \hline
+ \emph{Hyperparameter} & Nilai \\ [0.5ex] 
+ \hline\hline
+ MAX LENGTH & 512 \\ 
+ STRIDE & 128 \\
+ LOGGING STEPS & 50 \\
+ WARMUP RATIO & 0.0 \\
+ WEIGHT DECAY & 0.0 \\ 
+ EVAL STEPS RATIO & 0.5 \\ [1ex] 
+ \hline\hline
+\end{tabular}
+\caption{Tabel \emph{hyperparameter} pada \emph{training question answering} sistem tanya jawab}
+\end{table}
 
 %-----------------------------------------------------------------------------%
 \subsection{Mengimpor \emph{dataset} sistem tanya jawab}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Mengimpor \emph{dataset} sistem tanya jawab]
+if (DATA_NAME == "Squad-ID"):
+    conhelps = NusantaraConfigHelper()
+    data_qas_id = conhelps.filtered(lambda x: 'squad_id' in x.dataset_name)[0].load_dataset()
+
+    df_train = pd.DataFrame(data_qas_id['train'])
+    df_test = pd.DataFrame(data_qas_id['validation'])
+
+    cols = ['context', 'question', 'answer']
+    new_df_test = pd.DataFrame(columns=cols)
+
+    for i in tqdm(range(len(df_test['context']))):
+        new_df_test = new_df_test.append({'context': df_test["context"][i], 
+                                        'question': df_test["question"][i], 
+                                        'answer': {"text": eval(df_test["answer"][i][0])['text'], 
+                                        "answer_start": eval(df_test["answer"][i][0])['answer_start'], 
+                                        "answer_end": eval(df_test["answer"][i][0])['answer_end']}}, 
+                                    ignore_index=True)
+
+    cols = ['context', 'question', 'answer']
+    new_df_train = pd.DataFrame(columns=cols)
+
+    for i in tqdm(range(len(df_train['context']))):
+        new_df_train = new_df_train.append({'context': df_train["context"][i], 
+                                        'question': df_train["question"][i], 
+                                        'answer': {"text": eval(df_train["answer"][i][0])['text'], 
+                                        "answer_start": eval(df_train["answer"][i][0])['answer_start'], 
+                                        "answer_end": eval(df_train["answer"][i][0])['answer_end']}}, 
+                                    ignore_index=True)
+
+    train_final_df = new_df_train[:-11874]
+    validation_final_df = new_df_train[-11874:]
+
+    train_dataset = Dataset.from_dict(train_final_df)
+    validation_dataset = Dataset.from_dict(validation_final_df)
+    test_dataset = Dataset.from_dict(new_df_test)
+
+    data_qas_id = DatasetDict({"train": train_dataset, "validation": validation_dataset, "test": test_dataset})
+
+elif (DATA_NAME == "IDK-MRC"):
+    conhelps = NusantaraConfigHelper()
+    data_qas_id = conhelps.filtered(lambda x: 'idk_mrc' in x.dataset_name)[0].load_dataset()
+
+    df_train = pd.DataFrame(data_qas_id['train'])
+    df_validation = pd.DataFrame(data_qas_id['validation'])
+    df_test = pd.DataFrame(data_qas_id['test'])
+
+    cols = ['context', 'question', 'answer']
+    new_df_train = pd.DataFrame(columns=cols)
+
+    for i in tqdm(range(len(df_train['context']))):
+        for j in df_train["qas"][i]:
+            if len(j['answers']) != 0:
+                new_df_train = new_df_train.append({'context': df_train["context"][i], 
+                                                    'question': j['question'], 
+                                                    'answer': {"text": j['answers'][0]['text'], 
+                                                               "answer_start": j['answers'][0]['answer_start'], 
+                                                               "answer_end": j['answers'][0]['answer_start'] + len(j['answers'][0]['text'])}}, 
+                                                               ignore_index=True)
+            else:
+                new_df_train = new_df_train.append({'context': df_train["context"][i], 
+                                                    'question': j['question'], 
+                                                    'answer': {"text": str(), 
+                                                               "answer_start": 0, 
+                                                               "answer_end": 0}}, 
+                                                               ignore_index=True)
+
+    cols = ['context', 'question', 'answer']
+    new_df_val = pd.DataFrame(columns=cols)
+
+    for i in tqdm(range(len(df_validation['context']))):
+        for j in df_validation["qas"][i]:
+            if len(j['answers']) != 0:
+                new_df_val = new_df_val.append({'context': df_validation["context"][i], 
+                                                'question': j['question'], 
+                                                'answer': {"text": j['answers'][0]['text'], 
+                                                           "answer_start": j['answers'][0]['answer_start'], 
+                                                           "answer_end": j['answers'][0]['answer_start'] + len(j['answers'][0]['text'])}}, 
+                                                           ignore_index=True)
+            else:
+                new_df_val = new_df_val.append({'context': df_validation["context"][i], 
+                                                'question': j['question'], 
+                                                'answer': {"text": str(), 
+                                                           "answer_start": 0, 
+                                                           "answer_end": 0}}, 
+                                                           ignore_index=True)        
+
+    cols = ['context', 'question', 'answer']
+    new_df_test = pd.DataFrame(columns=cols)
+
+    for i in tqdm(range(len(df_test['context']))):
+        for j in df_test["qas"][i]:
+            if len(j['answers']) != 0:
+                new_df_test = new_df_test.append({'context': df_test["context"][i], 
+                                                'question': j['question'], 
+                                                'answer': {"text": j['answers'][0]['text'], 
+                                                           "answer_start": j['answers'][0]['answer_start'], 
+                                                           "answer_end": j['answers'][0]['answer_start'] + len(j['answers'][0]['text'])}}, 
+                                                           ignore_index=True)
+            else:
+                new_df_test = new_df_test.append({'context': df_test["context"][i], 
+                                                'question': j['question'], 
+                                                'answer': {"text": str(), 
+                                                           "answer_start": 0, 
+                                                           "answer_end": 0}}, 
+                                                           ignore_index=True)
+    
+    train_dataset = Dataset.from_dict(new_df_train)
+    validation_dataset = Dataset.from_dict(new_df_val)
+    test_dataset = Dataset.from_dict(new_df_test)
+    
+    data_qas_id = DatasetDict({"train": train_dataset, "validation": validation_dataset, "test": test_dataset})
+
+elif (DATA_NAME == "TYDI-QA-ID"):
+    conhelps = NusantaraConfigHelper()
+    data_qas_id = conhelps.filtered(lambda x: 'tydiqa_id' in x.dataset_name)[0].load_dataset()
+
+    df_train = pd.DataFrame(data_qas_id['train'])
+    df_validation = pd.DataFrame(data_qas_id['validation'])
+    df_test = pd.DataFrame(data_qas_id['test'])
+
+    cols = ['context', 'question', 'answer']
+    new_df_train = pd.DataFrame(columns=cols)
+
+    for i in range(len(df_train['context'])):
+        answer_start = df_train['context'][i].index(df_train['label'][i])
+        answer_end = answer_start + len(df_train['label'][i])
+        new_df_train = new_df_train.append({'context': df_train["context"][i], 
+                                            'question': df_train["question"][i], 
+                                            'answer': {"text": df_train["label"][i], 
+                                                       "answer_start": answer_start, 
+                                                       "answer_end": answer_end}}, 
+                                                       ignore_index=True)
+
+    cols = ['context', 'question', 'answer']
+    new_df_val = pd.DataFrame(columns=cols)    
+        
+    for i in range(len(df_validation['context'])):
+        answer_start = df_validation['context'][i].index(df_validation['label'][i])
+        answer_end = answer_start + len(df_validation['label'][i])
+        new_df_val = new_df_val.append({'context': df_validation["context"][i], 
+                                        'question': df_validation["question"][i], 
+                                        'answer': {"text": df_validation["label"][i], 
+                                                   "answer_start": answer_start, 
+                                                   "answer_end": answer_end}}, 
+                                                   ignore_index=True)    
+        
+    cols = ['context', 'question', 'answer']
+    new_df_test = pd.DataFrame(columns=cols)
+
+    for i in range(len(df_test['context'])):
+        answer_start = df_test['context'][i].index(df_test['label'][i])
+        answer_end = answer_start + len(df_test['label'][i])
+        new_df_test = new_df_test.append({'context': df_test["context"][i], 
+                                        'question': df_test["question"][i], 
+                                        'answer': {"text": df_test["label"][i], 
+                                                   "answer_start": answer_start, 
+                                                   "answer_end": answer_end}}, 
+                                                   ignore_index=True)
+    
+    train_dataset = Dataset.from_dict(new_df_train)
+    validation_dataset = Dataset.from_dict(new_df_val)
+    test_dataset = Dataset.from_dict(new_df_test)
+
+    data_qas_id = DatasetDict({"train": train_dataset, "validation": validation_dataset, "test": test_dataset})
+\end{lstlisting}
+
+Pada tahap ini, akan dijalankan pengambilan \emph{dataset} SQuAD-ID, TyDI-QA-ID, dan IDK-MRC dari GitHub \href{https://github.com/IndoNLP/nusa-crowd/tree/master/nusacrowd/nusa_datasets/}{\texttt{nusacrowd}} dan penyamaan format \texttt{DatasetDict}. Tujuan dilakukan hal tersebut agar dapat lebih mempermudah eksperimen kedepannya.
 
 %-----------------------------------------------------------------------------%
-\subsection{Mengimpor \emph{tokenizer}}
+\subsection{Proses \emph{preprocess} dan tokenisasi \emph{dataset} sistem tanya jawab}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Proses \emph{preprocess} dan tokenisasi \emph{dataset} sistem tanya jawab]
+def rindex(lst, value, operator=operator):
+  return len(lst) - operator.indexOf(reversed(lst), value) - 1
+
+def preprocess_function_qa(examples, tokenizer, MAX_LENGTH=MAX_LENGTH, STRIDE=STRIDE, 
+                           rindex=rindex, operator=operator):
+    
+    examples["question"] = [q.lstrip() for q in examples["question"]]
+    examples["context"] = [c.lstrip() for c in examples["context"]]
+
+    if (args.model_name) == "xlmr":
+        
+        tokenized_examples = tokenizer(
+            examples['question'],
+            examples['context'],
+            truncation=True,
+            max_length = MAX_LENGTH,
+            stride=STRIDE,
+            return_overflowing_tokens=True,
+            return_offsets_mapping=True,
+            padding="max_length",
+            return_tensors='np'
+        )
+    
+    else:
+
+        tokenized_examples = tokenizer(
+            examples['question'],
+            examples['context'],
+            truncation=True,
+            max_length = MAX_LENGTH,
+            stride=STRIDE,
+            return_overflowing_tokens=True,
+            return_token_type_ids=True,
+            return_offsets_mapping=True,
+            padding="max_length",
+            return_tensors='np'
+        )
+
+    tokenized_examples['start_positions'] = []
+    tokenized_examples['end_positions'] = []
+
+    for seq_idx in range(len(tokenized_examples['input_ids'])):
+        seq_ids = tokenized_examples.sequence_ids(seq_idx)
+        offset_mappings = tokenized_examples['offset_mapping'][seq_idx]
+
+        cur_example_idx = tokenized_examples['overflow_to_sample_mapping'][seq_idx]
+        answer = examples['answer'][cur_example_idx]
+        answer = eval(str(answer))
+        answer_start = answer['answer_start']
+        answer_end = answer['answer_end']
+
+        context_pos_start = seq_ids.index(1)
+        context_pos_end = rindex(seq_ids, 1, operator)
+
+        s = e = 0
+        if (offset_mappings[context_pos_start][0] <= answer_start and 
+            offset_mappings[context_pos_end][1] >= answer_end):
+            i = context_pos_start
+            while offset_mappings[i][0] < answer_start:
+                i += 1
+            if offset_mappings[i][0] == answer_start:
+                s = i
+            else:
+                s = i - 1
+
+            j = context_pos_end
+            while offset_mappings[j][1] > answer_end:
+                j -= 1      
+            if offset_mappings[j][1] == answer_end:
+                e = j
+            else:
+                e = j + 1
+
+        tokenized_examples['start_positions'].append(s)
+        tokenized_examples['end_positions'].append(e)
+    
+    return tokenized_examples
+
+# ## Melakukan tokenisasi data IndoNLI
+tokenized_data_qas_id = data_qas_id.map(
+    preprocess_function_qa,
+    batched=True,
+    load_from_cache_file=True,
+    num_proc=1,
+    remove_columns=data_qas_id['train'].column_names,
+    fn_kwargs={'tokenizer': tokenizer, 'MAX_LENGTH': MAX_LENGTH, 
+            'STRIDE': STRIDE, 'rindex': rindex, 'operator': operator}
+)
+
+tokenized_data_qas_id = tokenized_data_qas_id.remove_columns(["offset_mapping", "overflow_to_sample_mapping"])
+
+if (args.model_name) == "xlmr":
+    tokenized_data_qas_id.set_format("torch", columns=["input_ids"], output_all_columns=True, device=device)
+
+else:
+    tokenized_data_qas_id.set_format("torch", columns=["input_ids", "token_type_ids"], output_all_columns=True, device=device)
+
+tokenized_data_qas_id_train = Dataset.from_dict(tokenized_data_qas_id["train"][:SAMPLE])
+tokenized_data_qas_id_validation = Dataset.from_dict(tokenized_data_qas_id["validation"][:SAMPLE])
+tokenized_data_qas_id_test = Dataset.from_dict(tokenized_data_qas_id["test"][:SAMPLE])
+\end{lstlisting}
+
+Pada tahap ini, akan dijalankan  \emph{preprocess} dan tokenisasi \emph{dataset} sistem tanya jawab. Tokenisasi dijalankan dengan melakukan tokenisasi bagian \texttt{question} dan \texttt{context} saja, dengan menggunakan \emph{hyperparameter} yang sebelumnya sudah ditentukan.
 
 %-----------------------------------------------------------------------------%
-\subsection{Proses \emph{preprocess} dan tokenisasi}
+\subsection{Mengimpor model \emph{question answering}}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Mengimpor model \emph{question answering}]
+model_qa = AutoModelForQuestionAnswering.from_pretrained(MODEL_NAME, num_labels=2)
+\end{lstlisting}
+
+Pada tahapan ini, penulis menyuplai banyak label sebanyak 2, karena pada \emph{question answering task} membutuhkan dua "label", yaitu: \emph{start positions} dan \emph{end positions}.
 
 %-----------------------------------------------------------------------------%
-\subsection{Mengimpor model}
+\subsection{Perancangan metrik komputasi untuk penilaian \emph{question answering task}}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Perancangan metrik komputasi untuk penilaian \emph{question answering task}]
+def normalize_text(s):
+    def remove_articles(text):
+        regex = re.compile(r"\b(a|an|the)\b", re.UNICODE)
+        return re.sub(regex, " ", text)
+    def white_space_fix(text):
+        return " ".join(text.split())
+    def remove_punc(text):
+        exclude = set(string.punctuation)
+        return "".join(ch for ch in text if ch not in exclude)
+    def lower(text):
+        return text.lower()
+    return white_space_fix(remove_articles(remove_punc(lower(s))))
+
+def compute_f1(pred, gold):
+    pred_tokens = normalize_text(pred).split() # True positive + False positive = Untuk precision
+    gold_tokens = normalize_text(gold).split() # True positive + False negatives = Untuk recall
+    common = collections.Counter(pred_tokens) & collections.Counter(gold_tokens)
+    num_same = sum(common.values()) # True positive
+    
+    if len(gold_tokens) == 0 or len(pred_tokens) == 0: 
+        return int(gold_tokens == pred_tokens)
+    
+    if num_same == 0:
+        return 0
+    
+    precision = 1.0 * num_same / len(pred_tokens)
+    recall = 1.0 * num_same / len(gold_tokens)
+    f1 = (2.0 * precision * recall) / (precision + recall)
+    
+    return f1
+
+def compute_metrics(predict_result, 
+                tokenized_data_qas_id_validation=tokenized_data_qas_id_validation, 
+                tokenized_data_qas_id_test=tokenized_data_qas_id_test):
+
+    predictions_idx = np.argmax(predict_result.predictions, axis=2)
+    denominator = len(predictions_idx[0])
+    label_array = np.asarray(predict_result.label_ids)
+    total_correct = 0
+    f1_array = []
+    
+    if len(predict_result.predictions[0]) == len(tokenized_data_qas_id_validation):
+        tokenized_data = tokenized_data_qas_id_validation
+    
+    elif len(predict_result.predictions[0]) == len(tokenized_data_qas_id_test):
+        tokenized_data = tokenized_data_qas_id_test
+
+    for i in range(len(predict_result.predictions[0])):
+        start_pred_idx = predictions_idx[0][i]
+        end_pred_idx = predictions_idx[1][i] + 1
+        start_gold_idx = label_array[0][i]
+        end_gold_idx = label_array[1][i] + 1
+
+        pred_text = tokenizer.decode(tokenized_data[i]['input_ids']
+                                    [start_pred_idx: end_pred_idx])
+        gold_text = tokenizer.decode(tokenized_data[i]['input_ids']
+                                    [start_gold_idx: end_gold_idx])
+
+        if pred_text == gold_text:
+            total_correct += 1
+
+        f1 = compute_f1(pred=pred_text, gold=gold_text)
+
+        f1_array.append(f1)
+
+    exact_match = ((total_correct / denominator) * 100.0)
+    final_f1 = np.mean(f1_array) * 100.0
+
+    return {'exact_match': exact_match, 'f1': final_f1}
+\end{lstlisting}
+
+Pada perancangan metrik komputasi \emph{question answering task}, penulis melakukan kalkulasi skor \emph{exact match} dan skor F1 secara manual, tanpa menggunakan \emph{library} apapun, termasuk \emph{library} \texttt{evaluate}.
 
 %-----------------------------------------------------------------------------%
-\subsection{Perancangan metrik komputasi untuk penilaian}
+\subsection{Perancangan penamaan eksperimen \emph{question answering task}}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Perancangan penamaan eksperimen \emph{question answering task}]
+TIME_NOW = str(datetime.now()).replace(":", "-").replace(" ", "_").replace(".", "_")
+    
+if (re.findall(r'.*/(.*)$', MODEL_NAME) == []): 
+    NAME = f'DatasetQAS-{DATA_NAME}-with-{str(MODEL_NAME)}'
+else:
+    new_name = re.findall(r'.*/(.*)$', MODEL_NAME)[0]
+    NAME = f'DatasetQAS-{DATA_NAME}-with-{str(new_name)}'
 
-%-----------------------------------------------------------------------------%
-\subsection{Perancangan penamaan eksperimen}
-%-----------------------------------------------------------------------------%
+if MODEL_SC_NAME == None:
+    NAME = f'{NAME}-without-ITTL'
+else:
+    NAME = f'{NAME}-with-ITTL'
+
+if FREEZE == True:
+    NAME = f'{NAME}-with-freeze'
+else:
+    NAME = f'{NAME}-without-freeze'
+
+NAME = f'{NAME}-LR-{LEARNING_RATE}'
+
+QA = f'./results/{NAME}-{TIME_NOW}'
+CHECKPOINT_DIR = f'{QA}/checkpoint/'
+MODEL_DIR = f'{QA}/model/'
+OUTPUT_DIR = f'{QA}/output/'
+METRIC_RESULT_DIR = f'{QA}/metric-result/'
+REPO_NAME = f'fine-tuned-{NAME}'[:96]
+\end{lstlisting}
+
+Pada tahap ini, penulis merancang penamaan eksperimen agar dapat melakukan evaluasi \& analisis terkait eksperimen dengan lebih mudah, rapih, dan teratur.
 
 %-----------------------------------------------------------------------------%
 \subsection{Perancangan argumen latih (\emph{training arguments})}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Perancangan metrik komputasi untuk penilaian \emph{question answering task}]
+training_args_qa = TrainingArguments(
+        
+    # Checkpoint
+    output_dir=CHECKPOINT_DIR,
+    overwrite_output_dir=True,
+    save_strategy='steps',
+    save_total_limit=EPOCH,
+    
+    # Log
+    report_to='tensorboard',
+    logging_strategy='steps',
+    logging_first_step=True,
+    logging_steps=LOGGING_STEPS,
+    
+    # Train
+    num_train_epochs=EPOCH,
+    weight_decay=WEIGHT_DECAY,
+    per_device_train_batch_size=BATCH_SIZE,
+    per_device_eval_batch_size=BATCH_SIZE,
+    gradient_accumulation_steps=GRADIENT_ACCUMULATION,
+    learning_rate=LEARNING_RATE,
+    warmup_ratio=WARMUP_RATIO,
+    bf16=False,
+    dataloader_num_workers=cpu_count(),
+    
+    # Miscellaneous
+    evaluation_strategy='steps',
+    save_steps=int((tokenized_data_qas_id_train.num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * EVAL_STEPS_RATIO),
+    eval_steps=int((tokenized_data_qas_id_train.num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * EVAL_STEPS_RATIO),
+    seed=SEED,
+    hub_token=HUB_TOKEN,
+    push_to_hub=True,
+    hub_model_id=REPO_NAME,
+    load_best_model_at_end=True,
+    metric_for_best_model='f1',
+)
+\end{lstlisting}
+
+Pada tahap ini, penulis merancang \emph{training arguments} agar jalannya eksperimen sesuai parameter yang telah disuplai sebelumnya. \texttt{STEP} disesuaikan dengan rumus: \texttt{BATCH SIZE $\times$ GRADIENT ACCUMULATION $\times$ EVAL STEPS RATIO} ditujukan agar model melakukan evaluasi setiap \texttt{EVAL STEPS RATIO} agar dapat melakukan \emph{early callback} nantinya untuk efisiensi \emph{training}. Pemilihan \emph{best model} dipilih ke metrik skor F1, karena metrik F1 dapat mengatasi permasalahan \emph{label imbalance}.
 
 %-----------------------------------------------------------------------------%
-\subsection{Melakukan \emph{Training} dan prediksi jawaban}
+\subsection{Melakukan \emph{training} dan prediksi jawaban \emph{question answering}}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Melakukan \emph{training} dan prediksi jawaban \emph{question answering}]
+trainer_qa = Trainer(
+    model=model_qa,
+    args=training_args_qa,
+    train_dataset=tokenized_data_qas_id_train,
+    eval_dataset=tokenized_data_qas_id_validation,
+    tokenizer=tokenizer,
+    data_collator=data_collator,
+    compute_metrics=compute_metrics,
+    callbacks=[EarlyStoppingCallback(early_stopping_patience=3)]
+)
+
+trainer_qa.train()
+
+predict_result = trainer_qa.predict(tokenized_data_qas_id_test)
+\end{lstlisting}
+
+Pada tahap ini, dilakukan \emph{training} dengan menggunakan data \emph{train} dan data \emph{validation} sebagai parameter \emph{training}-nya. Penulis juga melakukan \emph{early callback} dengan \emph{patience} sebesar 3, yang artinya model akan berhenti \emph{training} bila tiga hasil evaluasi setelahnya memiliki nilai metrik yang lebih kecil dibanding sebelumnya; hal tersebut dilakukan untuk efisiensi waktu dan \emph{resource} \emph{training}-nya. Dan, terakhir, dilakukan prediksi terhadap data \emph{test}, dengan menggunakan fungsi \texttt{predict}.
 
 %-----------------------------------------------------------------------------%
 \subsection{Representasi prediksi jawaban untuk evaluasi dan analisis}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Representasi prediksi jawaban untuk evaluasi dan analisis]
+def represent_prediction_output(predict_result, assign_answer_types=assign_answer_types):
+        
+    predictions_idx = np.argmax(predict_result.predictions, axis=2)
+    label_array = np.asarray(predict_result.label_ids)
+        
+    question_array = []
+    context_array = []
+
+    pred_answer_array = []
+    gold_answer_array = []
+    
+    answer_types_array = []
+    
+    for i in tqdm(range(len(predict_result.predictions[0]))):
+
+        start_pred_idx = predictions_idx[0][i]
+        end_pred_idx = predictions_idx[1][i] + 1
+
+        start_gold_idx = label_array[0][i]
+        end_gold_idx = label_array[1][i] + 1
+        
+        if len(predict_result.predictions[0]) == len(tokenized_data_qas_id_validation):
+            tokenized_data = tokenized_data_qas_id_validation
+        
+        elif len(predict_result.predictions[0]) == len(tokenized_data_qas_id_test):
+            tokenized_data = tokenized_data_qas_id_test
+
+        pred_answer = tokenizer.decode(tokenized_data[i]['input_ids']
+                                    [start_pred_idx: end_pred_idx], skip_special_tokens=True)
+
+        gold_answer = tokenizer.decode(tokenized_data[i]['input_ids']
+                                    [start_gold_idx: end_gold_idx], skip_special_tokens=True)
+
+        pred_answer_array.append(pred_answer)
+        gold_answer_array.append(gold_answer)
+        
+        answer_types_array.append(assign_answer_types(answer=gold_answer))
+        
+        question = []
+        context = []
+        
+        if (args.model_name) == "xlmr":
+            
+            start_question = tokenized_data[i]['input_ids'].index(0)
+            end_question = tokenized_data[i]['input_ids'].index(2)  + 1
+            start_context = end_question
+
+            question.append(tokenized_data[i]['input_ids'][start_question: end_question])
+            context.append(tokenized_data[i]['input_ids'][start_context: ])
+
+            question_decoded = tokenizer.decode(question[0], skip_special_tokens=True)
+            context_decoded = tokenizer.decode(context[0], skip_special_tokens=True)
+            
+        else:
+            
+            for j in range(len(tokenized_data[i]['token_type_ids'])):
+
+                if tokenized_data[i]['token_type_ids'][j] == 0:
+                    question.append(tokenized_data[i]['input_ids'][j])
+
+                else:
+                    context.append(tokenized_data[i]['input_ids'][j])
+
+            question_decoded = tokenizer.decode(question, skip_special_tokens=True)
+            context_decoded = tokenizer.decode(context, skip_special_tokens=True)
+        
+        question_array.append(question_decoded)
+        context_array.append(context_decoded)
+        
+    qas_df = pd.DataFrame({'Context': context_array, 
+                            'Question': question_array, 
+                            'Prediction Answer': pred_answer_array,
+                            'Gold Answer': gold_answer_array,
+                            'Answer Type': answer_types_array,
+                            'Reasoning Type': '-'
+                        })
+
+    ...
+\end{lstlisting}
+
+Pada tahap ini, penulis mengubah \texttt{PredictionOutput} hasil dari prediksi model menjadi sebuah \texttt{DataFrame} yang dapat dibaca secara jelas oleh manusia. Tahapan ini berguna untuk evaluasi dan analisis kedepannya.
 
 %-----------------------------------------------------------------------------%
 \subsection{Melakukan \emph{push} ke akun Hugging Face}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Melakukan \emph{push} ke akun Hugging Face]
+api = HfApi()
+
+api.upload_folder(
+    folder_path=f"{OUTPUT_DIR}",
+    repo_id=f"{USER}/{REPO_NAME}",
+    repo_type="model",
+    token=HUB_TOKEN,
+    path_in_repo="results/output",
+)
+
+api.upload_folder(
+    folder_path=f"{METRIC_RESULT_DIR}",
+    repo_id=f"{USER}/{REPO_NAME}",
+    repo_type="model",
+    token=HUB_TOKEN,
+    path_in_repo="results/evaluation",
+)
+\end{lstlisting}
+
+Pada tahapan ini, sederhananya, penulis hanya melakukan \emph{push} hasil eksperimen, meliputi: model, evaluasi, dan keluaran dari eksperimen ke akun Hugging Face yang telah disuplai \texttt{TOKEN}-nya pada bagian parameter sebelumnya.
 
 %-----------------------------------------------------------------------------%
 \section{Metode \emph{Intermediate-Task Transfer Learning}}
 %-----------------------------------------------------------------------------%
+Pada sub-bab ini, akan dijelaskan mengenai \emph{training} model pada tugas \emph{question answering task} dalam belajar tiga \emph{dataset} sistem tanya jawab dengan metode \emph{intermediate-task transfer learning} yang penulis lakukan pada pada penelitian ini.
 
 %-----------------------------------------------------------------------------%
-\subsection{Pengambilan parameter}
+\subsection{Pengambilan parameter untuk \emph{training question answering task}}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Pengambilan parameter untuk \emph{training question answering task}]
+parser = argparse.ArgumentParser(description="Program untuk fine-tuning dataset QA")
+parser.add_argument('-m', '--model_name', type=str, metavar='', required=True, help="Nama model Anda; String; choice=[indolem, indonlu, xlmr, your model choice]")
+parser.add_argument('-d', '--data_name', type=str, metavar='', required=True, help="Nama dataset Anda; String; choice=[squadid, idkmrc, tydiqaid]")
+parser.add_argument('-e', '--epoch', type=int, metavar='', required=True, help="Jumlah epoch Anda; Integer; choice=[all integer]")
+parser.add_argument('-sa', '--sample', type=str, metavar='', required=True, help="Jumlah sampling data Anda; Integer; choice=[max, all integer]")
+parser.add_argument('-l', '--learn_rate', type=str, metavar='', required=False, help="Jumlah learning rate Anda; Float; choice=[all float]; default=1e-5", default=1e-5)
+parser.add_argument('-se', '--seed', type=int, metavar='', required=False, help="Jumlah seed Anda; Integer; choice=[all integer]; default=42", default=42)
+parser.add_argument('-bs', '--batch_size', type=int, metavar='', required=False, help="Jumlah batch-size Anda; Integer; choice=[all integer]; default=16", default=16)
+parser.add_argument('-ga', '--gradient_accumulation', type=int, metavar='', required=False, help="Jumlah gradient accumulation Anda; Integer; choice=[all integer]; default=8", default=8)
+parser.add_argument('-t', '--token', type=str, metavar='', required=False, help="Token Hugging Face Anda; String; choice=[all string token]; default=(TOKEN_HF_muhammadravi251001)", default="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")
+parser.add_argument('-wi', '--with_ittl', type=lambda x: bool(strtobool(x)), metavar='', required=False, help="Dengan ITTL atau tidak?; Boolean; choice=[True, False]; default=False", default=False)
+parser.add_argument('-fr', '--freeze', type=lambda x: bool(strtobool(x)), metavar='', required=False, help="Dengan ITTL, apa mau freeze layer BERT?; Boolean; choice=[True, False]; default=False", default=False)
+args = parser.parse_args()
+\end{lstlisting}
+
+Pengambilan parameter untuk \emph{training baseline question answering task} menggunakan bantuan \emph{library} dari \texttt{argparse}. Penulis gunakan \texttt{argparse} agar dapat menjalankan eksperimen via \emph{terminal} bukan dengan satu-satu menjalankan via \emph{notebook}. Parameter yang dapat digunakan dalam \emph{training baseline question answering task} ini meliputi: nama model, nama \emph{dataset}, jumlah \emph{epoch}, jumlah sampel data, jumlah \emph{learn rate}, jumlah \emph{seed}, jumlah \emph{batch size}, jumlah \emph{gradient accumulation}, pilihan apakah mau melakukan \emph{intermediate task transfer learning}, pilihan apakah mau melakukan \emph{freezing layer}, dan token akun Hugging Face agar dapat otomatis \emph{push} ke akun Hugging Face-nya. Untuk pilihan isi dari masing-masing parameternya, sudah penulis sertakan pada setiap baris kode di bagian \texttt{choice}.
+
+%-----------------------------------------------------------------------------%
+\subsection{Pemilihan \emph{hyperparameter} untuk \emph{question answering task}}
+%-----------------------------------------------------------------------------%
+Selain dari \emph{hyperparameter} yang dapat diatur pada pengambilan parameter di atas, terdapat beberapa \emph{hyperparameter} permanen untuk penelitian ini, berikut \emph{hyperparameter} yang tidak bisa diubah-ubah via \texttt{argparse}.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{||c | c||} 
+ \hline
+ \emph{Hyperparameter} & Nilai \\ [0.5ex] 
+ \hline\hline
+ MAX LENGTH & 512 \\ 
+ STRIDE & 128 \\
+ LOGGING STEPS & 50 \\
+ WARMUP RATIO & 0.0 \\
+ WEIGHT DECAY & 0.0 \\ 
+ EVAL STEPS RATIO & 0.5 \\ [1ex] 
+ \hline\hline
+\end{tabular}
+\caption{Tabel \emph{hyperparameter} pada \emph{training question answering} sistem tanya jawab}
+\end{table}
 
 %-----------------------------------------------------------------------------%
 \subsection{Mengimpor \emph{dataset} sistem tanya jawab}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Mengimpor \emph{dataset} sistem tanya jawab]
+if (DATA_NAME == "Squad-ID"):
+    conhelps = NusantaraConfigHelper()
+    data_qas_id = conhelps.filtered(lambda x: 'squad_id' in x.dataset_name)[0].load_dataset()
+
+    df_train = pd.DataFrame(data_qas_id['train'])
+    df_test = pd.DataFrame(data_qas_id['validation'])
+
+    cols = ['context', 'question', 'answer']
+    new_df_test = pd.DataFrame(columns=cols)
+
+    for i in tqdm(range(len(df_test['context']))):
+        new_df_test = new_df_test.append({'context': df_test["context"][i], 
+                                        'question': df_test["question"][i], 
+                                        'answer': {"text": eval(df_test["answer"][i][0])['text'], 
+                                        "answer_start": eval(df_test["answer"][i][0])['answer_start'], 
+                                        "answer_end": eval(df_test["answer"][i][0])['answer_end']}}, 
+                                    ignore_index=True)
+
+    cols = ['context', 'question', 'answer']
+    new_df_train = pd.DataFrame(columns=cols)
+
+    for i in tqdm(range(len(df_train['context']))):
+        new_df_train = new_df_train.append({'context': df_train["context"][i], 
+                                        'question': df_train["question"][i], 
+                                        'answer': {"text": eval(df_train["answer"][i][0])['text'], 
+                                        "answer_start": eval(df_train["answer"][i][0])['answer_start'], 
+                                        "answer_end": eval(df_train["answer"][i][0])['answer_end']}}, 
+                                    ignore_index=True)
+
+    train_final_df = new_df_train[:-11874]
+    validation_final_df = new_df_train[-11874:]
+
+    train_dataset = Dataset.from_dict(train_final_df)
+    validation_dataset = Dataset.from_dict(validation_final_df)
+    test_dataset = Dataset.from_dict(new_df_test)
+
+    data_qas_id = DatasetDict({"train": train_dataset, "validation": validation_dataset, "test": test_dataset})
+
+elif (DATA_NAME == "IDK-MRC"):
+    conhelps = NusantaraConfigHelper()
+    data_qas_id = conhelps.filtered(lambda x: 'idk_mrc' in x.dataset_name)[0].load_dataset()
+
+    df_train = pd.DataFrame(data_qas_id['train'])
+    df_validation = pd.DataFrame(data_qas_id['validation'])
+    df_test = pd.DataFrame(data_qas_id['test'])
+
+    cols = ['context', 'question', 'answer']
+    new_df_train = pd.DataFrame(columns=cols)
+
+    for i in tqdm(range(len(df_train['context']))):
+        for j in df_train["qas"][i]:
+            if len(j['answers']) != 0:
+                new_df_train = new_df_train.append({'context': df_train["context"][i], 
+                                                    'question': j['question'], 
+                                                    'answer': {"text": j['answers'][0]['text'], 
+                                                               "answer_start": j['answers'][0]['answer_start'], 
+                                                               "answer_end": j['answers'][0]['answer_start'] + len(j['answers'][0]['text'])}}, 
+                                                               ignore_index=True)
+            else:
+                new_df_train = new_df_train.append({'context': df_train["context"][i], 
+                                                    'question': j['question'], 
+                                                    'answer': {"text": str(), 
+                                                               "answer_start": 0, 
+                                                               "answer_end": 0}}, 
+                                                               ignore_index=True)
+
+    cols = ['context', 'question', 'answer']
+    new_df_val = pd.DataFrame(columns=cols)
+
+    for i in tqdm(range(len(df_validation['context']))):
+        for j in df_validation["qas"][i]:
+            if len(j['answers']) != 0:
+                new_df_val = new_df_val.append({'context': df_validation["context"][i], 
+                                                'question': j['question'], 
+                                                'answer': {"text": j['answers'][0]['text'], 
+                                                           "answer_start": j['answers'][0]['answer_start'], 
+                                                           "answer_end": j['answers'][0]['answer_start'] + len(j['answers'][0]['text'])}}, 
+                                                           ignore_index=True)
+            else:
+                new_df_val = new_df_val.append({'context': df_validation["context"][i], 
+                                                'question': j['question'], 
+                                                'answer': {"text": str(), 
+                                                           "answer_start": 0, 
+                                                           "answer_end": 0}}, 
+                                                           ignore_index=True)        
+
+    cols = ['context', 'question', 'answer']
+    new_df_test = pd.DataFrame(columns=cols)
+
+    for i in tqdm(range(len(df_test['context']))):
+        for j in df_test["qas"][i]:
+            if len(j['answers']) != 0:
+                new_df_test = new_df_test.append({'context': df_test["context"][i], 
+                                                'question': j['question'], 
+                                                'answer': {"text": j['answers'][0]['text'], 
+                                                           "answer_start": j['answers'][0]['answer_start'], 
+                                                           "answer_end": j['answers'][0]['answer_start'] + len(j['answers'][0]['text'])}}, 
+                                                           ignore_index=True)
+            else:
+                new_df_test = new_df_test.append({'context': df_test["context"][i], 
+                                                'question': j['question'], 
+                                                'answer': {"text": str(), 
+                                                           "answer_start": 0, 
+                                                           "answer_end": 0}}, 
+                                                           ignore_index=True)
+    
+    train_dataset = Dataset.from_dict(new_df_train)
+    validation_dataset = Dataset.from_dict(new_df_val)
+    test_dataset = Dataset.from_dict(new_df_test)
+    
+    data_qas_id = DatasetDict({"train": train_dataset, "validation": validation_dataset, "test": test_dataset})
+
+elif (DATA_NAME == "TYDI-QA-ID"):
+    conhelps = NusantaraConfigHelper()
+    data_qas_id = conhelps.filtered(lambda x: 'tydiqa_id' in x.dataset_name)[0].load_dataset()
+
+    df_train = pd.DataFrame(data_qas_id['train'])
+    df_validation = pd.DataFrame(data_qas_id['validation'])
+    df_test = pd.DataFrame(data_qas_id['test'])
+
+    cols = ['context', 'question', 'answer']
+    new_df_train = pd.DataFrame(columns=cols)
+
+    for i in range(len(df_train['context'])):
+        answer_start = df_train['context'][i].index(df_train['label'][i])
+        answer_end = answer_start + len(df_train['label'][i])
+        new_df_train = new_df_train.append({'context': df_train["context"][i], 
+                                            'question': df_train["question"][i], 
+                                            'answer': {"text": df_train["label"][i], 
+                                                       "answer_start": answer_start, 
+                                                       "answer_end": answer_end}}, 
+                                                       ignore_index=True)
+
+    cols = ['context', 'question', 'answer']
+    new_df_val = pd.DataFrame(columns=cols)    
+        
+    for i in range(len(df_validation['context'])):
+        answer_start = df_validation['context'][i].index(df_validation['label'][i])
+        answer_end = answer_start + len(df_validation['label'][i])
+        new_df_val = new_df_val.append({'context': df_validation["context"][i], 
+                                        'question': df_validation["question"][i], 
+                                        'answer': {"text": df_validation["label"][i], 
+                                                   "answer_start": answer_start, 
+                                                   "answer_end": answer_end}}, 
+                                                   ignore_index=True)    
+        
+    cols = ['context', 'question', 'answer']
+    new_df_test = pd.DataFrame(columns=cols)
+
+    for i in range(len(df_test['context'])):
+        answer_start = df_test['context'][i].index(df_test['label'][i])
+        answer_end = answer_start + len(df_test['label'][i])
+        new_df_test = new_df_test.append({'context': df_test["context"][i], 
+                                        'question': df_test["question"][i], 
+                                        'answer': {"text": df_test["label"][i], 
+                                                   "answer_start": answer_start, 
+                                                   "answer_end": answer_end}}, 
+                                                   ignore_index=True)
+    
+    train_dataset = Dataset.from_dict(new_df_train)
+    validation_dataset = Dataset.from_dict(new_df_val)
+    test_dataset = Dataset.from_dict(new_df_test)
+
+    data_qas_id = DatasetDict({"train": train_dataset, "validation": validation_dataset, "test": test_dataset})
+\end{lstlisting}
+
+Pada tahap ini, akan dijalankan pengambilan \emph{dataset} SQuAD-ID, TyDI-QA-ID, dan IDK-MRC dari GitHub \href{https://github.com/IndoNLP/nusa-crowd/tree/master/nusacrowd/nusa_datasets/}{\texttt{nusacrowd}} dan penyamaan format \texttt{DatasetDict}. Tujuan dilakukan hal tersebut agar dapat lebih mempermudah eksperimen kedepannya.
 
 %-----------------------------------------------------------------------------%
-\subsection{Mengimpor \emph{tokenizer}}
+\subsection{Proses \emph{preprocess} dan tokenisasi \emph{dataset} sistem tanya jawab}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Proses \emph{preprocess} dan tokenisasi \emph{dataset} sistem tanya jawab]
+def rindex(lst, value, operator=operator):
+  return len(lst) - operator.indexOf(reversed(lst), value) - 1
+
+def preprocess_function_qa(examples, tokenizer, MAX_LENGTH=MAX_LENGTH, STRIDE=STRIDE, 
+                           rindex=rindex, operator=operator):
+    
+    examples["question"] = [q.lstrip() for q in examples["question"]]
+    examples["context"] = [c.lstrip() for c in examples["context"]]
+
+    if (args.model_name) == "xlmr":
+        
+        tokenized_examples = tokenizer(
+            examples['question'],
+            examples['context'],
+            truncation=True,
+            max_length = MAX_LENGTH,
+            stride=STRIDE,
+            return_overflowing_tokens=True,
+            return_offsets_mapping=True,
+            padding="max_length",
+            return_tensors='np'
+        )
+    
+    else:
+
+        tokenized_examples = tokenizer(
+            examples['question'],
+            examples['context'],
+            truncation=True,
+            max_length = MAX_LENGTH,
+            stride=STRIDE,
+            return_overflowing_tokens=True,
+            return_token_type_ids=True,
+            return_offsets_mapping=True,
+            padding="max_length",
+            return_tensors='np'
+        )
+
+    tokenized_examples['start_positions'] = []
+    tokenized_examples['end_positions'] = []
+
+    for seq_idx in range(len(tokenized_examples['input_ids'])):
+        seq_ids = tokenized_examples.sequence_ids(seq_idx)
+        offset_mappings = tokenized_examples['offset_mapping'][seq_idx]
+
+        cur_example_idx = tokenized_examples['overflow_to_sample_mapping'][seq_idx]
+        answer = examples['answer'][cur_example_idx]
+        answer = eval(str(answer))
+        answer_start = answer['answer_start']
+        answer_end = answer['answer_end']
+
+        context_pos_start = seq_ids.index(1)
+        context_pos_end = rindex(seq_ids, 1, operator)
+
+        s = e = 0
+        if (offset_mappings[context_pos_start][0] <= answer_start and 
+            offset_mappings[context_pos_end][1] >= answer_end):
+            i = context_pos_start
+            while offset_mappings[i][0] < answer_start:
+                i += 1
+            if offset_mappings[i][0] == answer_start:
+                s = i
+            else:
+                s = i - 1
+
+            j = context_pos_end
+            while offset_mappings[j][1] > answer_end:
+                j -= 1      
+            if offset_mappings[j][1] == answer_end:
+                e = j
+            else:
+                e = j + 1
+
+        tokenized_examples['start_positions'].append(s)
+        tokenized_examples['end_positions'].append(e)
+    
+    return tokenized_examples
+
+# ## Melakukan tokenisasi data IndoNLI
+tokenized_data_qas_id = data_qas_id.map(
+    preprocess_function_qa,
+    batched=True,
+    load_from_cache_file=True,
+    num_proc=1,
+    remove_columns=data_qas_id['train'].column_names,
+    fn_kwargs={'tokenizer': tokenizer, 'MAX_LENGTH': MAX_LENGTH, 
+            'STRIDE': STRIDE, 'rindex': rindex, 'operator': operator}
+)
+
+tokenized_data_qas_id = tokenized_data_qas_id.remove_columns(["offset_mapping", "overflow_to_sample_mapping"])
+
+if (args.model_name) == "xlmr":
+    tokenized_data_qas_id.set_format("torch", columns=["input_ids"], output_all_columns=True, device=device)
+
+else:
+    tokenized_data_qas_id.set_format("torch", columns=["input_ids", "token_type_ids"], output_all_columns=True, device=device)
+
+tokenized_data_qas_id_train = Dataset.from_dict(tokenized_data_qas_id["train"][:SAMPLE])
+tokenized_data_qas_id_validation = Dataset.from_dict(tokenized_data_qas_id["validation"][:SAMPLE])
+tokenized_data_qas_id_test = Dataset.from_dict(tokenized_data_qas_id["test"][:SAMPLE])
+\end{lstlisting}
+
+Pada tahap ini, akan dijalankan  \emph{preprocess} dan tokenisasi \emph{dataset} sistem tanya jawab. Tokenisasi dijalankan dengan melakukan tokenisasi bagian \texttt{question} dan \texttt{context} saja, dengan menggunakan \emph{hyperparameter} yang sebelumnya sudah ditentukan.
 
 %-----------------------------------------------------------------------------%
-\subsection{Proses \emph{preprocess} dan tokenisasi}
+\subsection{Mengimpor model \emph{question answering}}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Mengimpor model \emph{question answering}]
+model_qa = AutoModelForQuestionAnswering.from_pretrained(MODEL_NAME, num_labels=2)
+\end{lstlisting}
 
-%-----------------------------------------------------------------------------%
-\subsection{Mengimpor model}
-%-----------------------------------------------------------------------------%
+Pada tahapan ini, penulis menyuplai banyak label sebanyak 2, karena pada \emph{question answering task} membutuhkan dua "label", yaitu: \emph{start positions} dan \emph{end positions}.
 
 %-----------------------------------------------------------------------------%
 \subsection{Proses pemberian bobot dari model \emph{sequence classification task}}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Proses pemberian bobot dari model \emph{sequence classification task}]
+if MODEL_SC_NAME != None:
+    
+    id2label = {0: 'entailment', 1: 'neutral', 
+                2: 'contradiction'}
+    label2id = {'entailment': 0, 'neutral': 
+                1, 'contradiction': 2}
+    accuracy = evaluate.load('accuracy')
+
+    model_sc = BertForSequenceClassification.from_pretrained(
+        MODEL_SC_NAME, num_labels=3, 
+        id2label=id2label, label2id=label2id)
+    
+    filtered_dict = {k: v for k, v in model_sc.state_dict().items() if k in model_qa.state_dict()}
+    model_qa.state_dict().update(filtered_dict)
+    model_qa.load_state_dict(model_qa.state_dict())
+\end{lstlisting}
+
+Pada tahap ini, akan dilakukan \emph{transfer learning} dengan cara mengambil model \emph{sequence classification task} sebelumnya dan melakukan \emph{update} \texttt{state dict} model \emph{question answering task} dengan \texttt{state dict} model \emph{sequence classification task}. State dict merupakan bobot (dalam bentuk \emph{tensor}) pada setiap \emph{layer}-nya. Kemudian, untuk model \emph{sequence classification task} yang dipilih adalah model yang menghasilkan skor F1 terbaik pada \emph{sequence classification task}-nya, yaitu pada model XLM-RoBERTa dengan \emph{dataset} \emph{augmented} IndoNLI.
 
 %-----------------------------------------------------------------------------%
-\subsection{Proses \emph{freezing layer} klasifier (opsional)}
+\subsection{Proses \emph{freezing layer} (opsional)}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Proses \emph{freezing layer} (opsional)]
+if FREEZE == True:
+    for name, param in model_qa.named_parameters():
+        if 'qa_outputs' not in name:
+            param._trainable = False
+\end{lstlisting}
+
+Pada tahap ini, akan dijalankan proses \emph{freezing layer} sesuai nilai yang disuplai pada pengambilan parameter sebelumnya. Sederhananya, kita dapat melakukan \emph{freezing layer} dengan "mematikan" properti \texttt{trainable} dengan mengubahnya menjadi \texttt{False}. Setiap \emph{layer} memiliki namanya yang masing-masing unik, dan untuk \emph{layer} \emph{classifier} memiliki nama: \texttt{qa\char`_outputs}, jadi dengan menjalankan kode di atas, kita hanya akan "mematikan" properti \texttt{trainable} pada semua \emph{layer} kecuali \emph{layer} \emph{classifier}-nya, yaitu: \emph{layer} \texttt{qa\char`_outputs}.
 
 %-----------------------------------------------------------------------------%
-\subsection{Perancangan metrik komputasi untuk penilaian}
+\subsection{Perancangan metrik komputasi untuk penilaian \emph{question answering task}}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Perancangan metrik komputasi untuk penilaian \emph{question answering task}]
+def normalize_text(s):
+    def remove_articles(text):
+        regex = re.compile(r"\b(a|an|the)\b", re.UNICODE)
+        return re.sub(regex, " ", text)
+    def white_space_fix(text):
+        return " ".join(text.split())
+    def remove_punc(text):
+        exclude = set(string.punctuation)
+        return "".join(ch for ch in text if ch not in exclude)
+    def lower(text):
+        return text.lower()
+    return white_space_fix(remove_articles(remove_punc(lower(s))))
+
+def compute_f1(pred, gold):
+    pred_tokens = normalize_text(pred).split() # True positive + False positive = Untuk precision
+    gold_tokens = normalize_text(gold).split() # True positive + False negatives = Untuk recall
+    common = collections.Counter(pred_tokens) & collections.Counter(gold_tokens)
+    num_same = sum(common.values()) # True positive
+    
+    if len(gold_tokens) == 0 or len(pred_tokens) == 0: 
+        return int(gold_tokens == pred_tokens)
+    
+    if num_same == 0:
+        return 0
+    
+    precision = 1.0 * num_same / len(pred_tokens)
+    recall = 1.0 * num_same / len(gold_tokens)
+    f1 = (2.0 * precision * recall) / (precision + recall)
+    
+    return f1
+
+def compute_metrics(predict_result, 
+                tokenized_data_qas_id_validation=tokenized_data_qas_id_validation, 
+                tokenized_data_qas_id_test=tokenized_data_qas_id_test):
+
+    predictions_idx = np.argmax(predict_result.predictions, axis=2)
+    denominator = len(predictions_idx[0])
+    label_array = np.asarray(predict_result.label_ids)
+    total_correct = 0
+    f1_array = []
+    
+    if len(predict_result.predictions[0]) == len(tokenized_data_qas_id_validation):
+        tokenized_data = tokenized_data_qas_id_validation
+    
+    elif len(predict_result.predictions[0]) == len(tokenized_data_qas_id_test):
+        tokenized_data = tokenized_data_qas_id_test
+
+    for i in range(len(predict_result.predictions[0])):
+        start_pred_idx = predictions_idx[0][i]
+        end_pred_idx = predictions_idx[1][i] + 1
+        start_gold_idx = label_array[0][i]
+        end_gold_idx = label_array[1][i] + 1
+
+        pred_text = tokenizer.decode(tokenized_data[i]['input_ids']
+                                    [start_pred_idx: end_pred_idx])
+        gold_text = tokenizer.decode(tokenized_data[i]['input_ids']
+                                    [start_gold_idx: end_gold_idx])
+
+        if pred_text == gold_text:
+            total_correct += 1
+
+        f1 = compute_f1(pred=pred_text, gold=gold_text)
+
+        f1_array.append(f1)
+
+    exact_match = ((total_correct / denominator) * 100.0)
+    final_f1 = np.mean(f1_array) * 100.0
+
+    return {'exact_match': exact_match, 'f1': final_f1}
+\end{lstlisting}
+
+Pada perancangan metrik komputasi \emph{question answering task}, penulis melakukan kalkulasi skor \emph{exact match} dan skor F1 secara manual, tanpa menggunakan \emph{library} apapun, termasuk \emph{library} \texttt{evaluate}.
 
 %-----------------------------------------------------------------------------%
-\subsection{Perancangan penamaan eksperimen}
+\subsection{Perancangan penamaan eksperimen \emph{question answering task}}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Perancangan penamaan eksperimen \emph{question answering task}]
+TIME_NOW = str(datetime.now()).replace(":", "-").replace(" ", "_").replace(".", "_")
+    
+if (re.findall(r'.*/(.*)$', MODEL_NAME) == []): 
+    NAME = f'DatasetQAS-{DATA_NAME}-with-{str(MODEL_NAME)}'
+else:
+    new_name = re.findall(r'.*/(.*)$', MODEL_NAME)[0]
+    NAME = f'DatasetQAS-{DATA_NAME}-with-{str(new_name)}'
+
+if MODEL_SC_NAME == None:
+    NAME = f'{NAME}-without-ITTL'
+else:
+    NAME = f'{NAME}-with-ITTL'
+
+if FREEZE == True:
+    NAME = f'{NAME}-with-freeze'
+else:
+    NAME = f'{NAME}-without-freeze'
+
+NAME = f'{NAME}-LR-{LEARNING_RATE}'
+
+QA = f'./results/{NAME}-{TIME_NOW}'
+CHECKPOINT_DIR = f'{QA}/checkpoint/'
+MODEL_DIR = f'{QA}/model/'
+OUTPUT_DIR = f'{QA}/output/'
+METRIC_RESULT_DIR = f'{QA}/metric-result/'
+REPO_NAME = f'fine-tuned-{NAME}'[:96]
+\end{lstlisting}
+
+Pada tahap ini, penulis merancang penamaan eksperimen agar dapat melakukan evaluasi \& analisis terkait eksperimen dengan lebih mudah, rapih, dan teratur.
 
 %-----------------------------------------------------------------------------%
 \subsection{Perancangan argumen latih (\emph{training arguments})}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Perancangan metrik komputasi untuk penilaian \emph{question answering task}]
+training_args_qa = TrainingArguments(
+        
+    # Checkpoint
+    output_dir=CHECKPOINT_DIR,
+    overwrite_output_dir=True,
+    save_strategy='steps',
+    save_total_limit=EPOCH,
+    
+    # Log
+    report_to='tensorboard',
+    logging_strategy='steps',
+    logging_first_step=True,
+    logging_steps=LOGGING_STEPS,
+    
+    # Train
+    num_train_epochs=EPOCH,
+    weight_decay=WEIGHT_DECAY,
+    per_device_train_batch_size=BATCH_SIZE,
+    per_device_eval_batch_size=BATCH_SIZE,
+    gradient_accumulation_steps=GRADIENT_ACCUMULATION,
+    learning_rate=LEARNING_RATE,
+    warmup_ratio=WARMUP_RATIO,
+    bf16=False,
+    dataloader_num_workers=cpu_count(),
+    
+    # Miscellaneous
+    evaluation_strategy='steps',
+    save_steps=int((tokenized_data_qas_id_train.num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * EVAL_STEPS_RATIO),
+    eval_steps=int((tokenized_data_qas_id_train.num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * EVAL_STEPS_RATIO),
+    seed=SEED,
+    hub_token=HUB_TOKEN,
+    push_to_hub=True,
+    hub_model_id=REPO_NAME,
+    load_best_model_at_end=True,
+    metric_for_best_model='f1',
+)
+\end{lstlisting}
+
+Pada tahap ini, penulis merancang \emph{training arguments} agar jalannya eksperimen sesuai parameter yang telah disuplai sebelumnya. \texttt{STEP} disesuaikan dengan rumus: \texttt{BATCH SIZE $\times$ GRADIENT ACCUMULATION $\times$ EVAL STEPS RATIO} ditujukan agar model melakukan evaluasi setiap \texttt{EVAL STEPS RATIO} agar dapat melakukan \emph{early callback} nantinya untuk efisiensi \emph{training}. Pemilihan \emph{best model} dipilih ke metrik skor F1, karena metrik F1 dapat mengatasi permasalahan \emph{label imbalance}.
 
 %-----------------------------------------------------------------------------%
-\subsection{Melakukan \emph{Training} dan prediksi jawaban}
+\subsection{Melakukan \emph{training} dan prediksi jawaban \emph{question answering}}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Melakukan \emph{training} dan prediksi jawaban \emph{question answering}]
+trainer_qa = Trainer(
+    model=model_qa,
+    args=training_args_qa,
+    train_dataset=tokenized_data_qas_id_train,
+    eval_dataset=tokenized_data_qas_id_validation,
+    tokenizer=tokenizer,
+    data_collator=data_collator,
+    compute_metrics=compute_metrics,
+    callbacks=[EarlyStoppingCallback(early_stopping_patience=3)]
+)
+
+trainer_qa.train()
+
+predict_result = trainer_qa.predict(tokenized_data_qas_id_test)
+\end{lstlisting}
+
+Pada tahap ini, dilakukan \emph{training} dengan menggunakan data \emph{train} dan data \emph{validation} sebagai parameter \emph{training}-nya. Penulis juga melakukan \emph{early callback} dengan \emph{patience} sebesar 3, yang artinya model akan berhenti \emph{training} bila tiga hasil evaluasi setelahnya memiliki nilai metrik yang lebih kecil dibanding sebelumnya; hal tersebut dilakukan untuk efisiensi waktu dan \emph{resource} \emph{training}-nya. Dan, terakhir, dilakukan prediksi terhadap data \emph{test}, dengan menggunakan fungsi \texttt{predict}.
 
 %-----------------------------------------------------------------------------%
 \subsection{Representasi prediksi jawaban untuk evaluasi dan analisis}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Representasi prediksi jawaban untuk evaluasi dan analisis]
+def represent_prediction_output(predict_result, assign_answer_types=assign_answer_types):
+        
+    predictions_idx = np.argmax(predict_result.predictions, axis=2)
+    label_array = np.asarray(predict_result.label_ids)
+        
+    question_array = []
+    context_array = []
+
+    pred_answer_array = []
+    gold_answer_array = []
+    
+    answer_types_array = []
+    
+    for i in tqdm(range(len(predict_result.predictions[0]))):
+
+        start_pred_idx = predictions_idx[0][i]
+        end_pred_idx = predictions_idx[1][i] + 1
+
+        start_gold_idx = label_array[0][i]
+        end_gold_idx = label_array[1][i] + 1
+        
+        if len(predict_result.predictions[0]) == len(tokenized_data_qas_id_validation):
+            tokenized_data = tokenized_data_qas_id_validation
+        
+        elif len(predict_result.predictions[0]) == len(tokenized_data_qas_id_test):
+            tokenized_data = tokenized_data_qas_id_test
+
+        pred_answer = tokenizer.decode(tokenized_data[i]['input_ids']
+                                    [start_pred_idx: end_pred_idx], skip_special_tokens=True)
+
+        gold_answer = tokenizer.decode(tokenized_data[i]['input_ids']
+                                    [start_gold_idx: end_gold_idx], skip_special_tokens=True)
+
+        pred_answer_array.append(pred_answer)
+        gold_answer_array.append(gold_answer)
+        
+        answer_types_array.append(assign_answer_types(answer=gold_answer))
+        
+        question = []
+        context = []
+        
+        if (args.model_name) == "xlmr":
+            
+            start_question = tokenized_data[i]['input_ids'].index(0)
+            end_question = tokenized_data[i]['input_ids'].index(2)  + 1
+            start_context = end_question
+
+            question.append(tokenized_data[i]['input_ids'][start_question: end_question])
+            context.append(tokenized_data[i]['input_ids'][start_context: ])
+
+            question_decoded = tokenizer.decode(question[0], skip_special_tokens=True)
+            context_decoded = tokenizer.decode(context[0], skip_special_tokens=True)
+            
+        else:
+            
+            for j in range(len(tokenized_data[i]['token_type_ids'])):
+
+                if tokenized_data[i]['token_type_ids'][j] == 0:
+                    question.append(tokenized_data[i]['input_ids'][j])
+
+                else:
+                    context.append(tokenized_data[i]['input_ids'][j])
+
+            question_decoded = tokenizer.decode(question, skip_special_tokens=True)
+            context_decoded = tokenizer.decode(context, skip_special_tokens=True)
+        
+        question_array.append(question_decoded)
+        context_array.append(context_decoded)
+        
+    qas_df = pd.DataFrame({'Context': context_array, 
+                            'Question': question_array, 
+                            'Prediction Answer': pred_answer_array,
+                            'Gold Answer': gold_answer_array,
+                            'Answer Type': answer_types_array,
+                            'Reasoning Type': '-'
+                        })
+
+    ...
+\end{lstlisting}
+
+Pada tahap ini, penulis mengubah \texttt{PredictionOutput} hasil dari prediksi model menjadi sebuah \texttt{DataFrame} yang dapat dibaca secara jelas oleh manusia. Tahapan ini berguna untuk evaluasi dan analisis kedepannya.
 
 %-----------------------------------------------------------------------------%
 \subsection{Melakukan \emph{push} ke akun Hugging Face}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Melakukan \emph{push} ke akun Hugging Face]
+api = HfApi()
+
+api.upload_folder(
+    folder_path=f"{OUTPUT_DIR}",
+    repo_id=f"{USER}/{REPO_NAME}",
+    repo_type="model",
+    token=HUB_TOKEN,
+    path_in_repo="results/output",
+)
+
+api.upload_folder(
+    folder_path=f"{METRIC_RESULT_DIR}",
+    repo_id=f"{USER}/{REPO_NAME}",
+    repo_type="model",
+    token=HUB_TOKEN,
+    path_in_repo="results/evaluation",
+)
+\end{lstlisting}
+
+Pada tahapan ini, sederhananya, penulis hanya melakukan \emph{push} hasil eksperimen, meliputi: model, evaluasi, dan keluaran dari eksperimen ke akun Hugging Face yang telah disuplai \texttt{TOKEN}-nya pada bagian parameter sebelumnya.
 
 %-----------------------------------------------------------------------------%
 \section{Metode \emph{Task Recasting} dengan IndoNLI sebagai verifikator}

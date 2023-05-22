@@ -562,7 +562,7 @@ if __name__ == "__main__":
         metric_for_best_model='f1',
     )
 
-    # ## Mulai training untuk fine-tune IndoNLI diatas IndoBERT
+    # ## Mulai training question answering task
     trainer_qa = Trainer(
         model=model_qa,
         args=training_args_qa,
