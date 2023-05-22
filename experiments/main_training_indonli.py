@@ -190,10 +190,8 @@ if __name__ == "__main__":
     tokenized_data_indonli_validation = Dataset.from_dict(tokenized_data_indonli["validation"][:SAMPLE])
 
     # ## Dictionary untuk mapping label
-    id2label = {0: 'entailment', 1: 'neutral', 
-                2: 'contradiction'}
-    label2id = {'entailment': 0, 'neutral': 
-                1, 'contradiction': 2}
+    id2label = {0: 'entailment', 1: 'neutral', 2: 'contradiction'}
+    label2id = {'entailment': 0, 'neutral': 1, 'contradiction': 2}
     
     # ## Menggunakan library evaluate untuk evaluasi metrik
     accuracy = evaluate.load('accuracy')

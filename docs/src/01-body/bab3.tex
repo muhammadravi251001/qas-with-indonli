@@ -104,6 +104,30 @@ Properti-properti di atas yang akan menjadi bahan evaluasi dan analisis peneliti
 Pada sub-bab ini, akan dijelaskan mengenai pelatihan model dan eksperimen yang penulis lakukan pada pada penelitian ini. 
 
 %-----------------------------------------------------------------------------%
+\subsection{\emph{Training Sequence Classification Task}}
+%-----------------------------------------------------------------------------%
+
+\begin{figure}[h]
+\includegraphics[width=\linewidth]{assets/pics/alur-sc.png}
+\centering
+\caption{Visualisasi grafik \emph{training sequence classification task}.}
+\end{figure}
+
+Sebelumnya, penulis melakukan \emph{training} terlebih dahulu untuk \emph{sequence classification task} untuk belajar terkait \emph{natural language inference}. \emph{Training} dilakukan dengan menggunakan masing-masing tiga model, dan tiga \emph{dataset}. Pada sub-bab ini akan ditekankan terkait \emph{dataset} yang penulis gunakan. \emph{Dataset} yang penulis gunakan dalam \emph{training sequence classification task} ini dibagi tiga, yaitu: \emph{basic} IndoNLI, \emph{translated} IndoNLI, \emph{augmented} IndoNLI. Dimana, \emph{basic} IndoNLI merupakan data NLI berbahasa Indonesia yang dianotasikan oleh manusia, kemudian \emph{translated} IndoNLI merupakan \emph{dataset} MNLI yang diterjemahkan ke bahasa Indonesia, lalu \emph{augmented} IndoNLI merupakan gabungan dari \emph{basic} IndoNLI dan \emph{translated} IndoNLI. Untuk alur penelitian tahapan ini sangat sederhana, yaitu: mencoba satu-satu setiap model \& \emph{dataset} IndoNLI-nya, dan cari hasil yang terbaik dari hasil \emph{training}-nya. Dimana, hasil yang terbaik itu akan disuplai ke metode \emph{intermediate-task transfer learning} dan \emph{task recasting}.
+
+%-----------------------------------------------------------------------------%
+\subsection{\emph{Training Baseline Question Answering System}}
+%-----------------------------------------------------------------------------%
+
+\begin{figure}[h]
+\includegraphics[width=\linewidth]{assets/pics/alur-baseline.png}
+\centering
+\caption{Visualisasi grafik \emph{baseline question answering task}.}
+\end{figure}
+
+Pada tahapan ini, eksperimen dilakukan dengan sangat sederhana. Dimana, model yang telah dipilih sebelumnya dilatih dengan \emph{question answering task}, dengan tiga \emph{dataset} yang berbeda. Tahapan ini digunakan sebagai acuan awal, apakah metode-metode pemanfaatan IndoNLI berhasil meningkatkan atau menurunkan performa sistem tanya jawab yang orisinil, tanpa penambahan metode apapun.
+
+%-----------------------------------------------------------------------------%
 \subsection{\emph{Intermediate-Task Transfer Learning}}
 %-----------------------------------------------------------------------------%
 
@@ -116,10 +140,8 @@ Pada sub-bab ini, akan dijelaskan mengenai pelatihan model dan eksperimen yang p
 Alur penelitian tahapan \emph{intermediate-task transfer learning} yang penulis lakukan adalah sebagai berikut:
 
 \begin{itemize}
-    
-    \item Model-model yang telah dipilih sebelumnya, akan dilatih terlebih dahulu pada \emph{task} \emph{sequence classification} sebagai \emph{intermediate task}-nya.
 
-    \item Setelah model selesai dilatih pada \emph{task} \emph{sequence classification}, kemudian bobot (\emph{weight}) dari hasil latih tersebut disimpan terlebih dahulu.
+    \item Model yang telah dilatih pada \emph{task} \emph{sequence classification}, kemudian bobot (\emph{weight}) dari hasil latih tersebut disimpan terlebih dahulu.
 
     \item Kemudian, model-model baru akan diinisiasikan dengan \emph{task} \emph{question answering} sebagai \emph{target task}-nya.
 
@@ -141,7 +163,7 @@ Alur penelitian tahapan \emph{task} Recasting dengan IndoNLI sebagai verifikator
 
 \begin{itemize}
     
-    \item Model-model yang telah dipilih sebelumnya, akan dilatih terlebih dahulu pada \emph{task} \emph{sequence classification} sebagai verifikator parameter NLI pada \emph{task} \emph{question answering}-nya.
+    \item Menyiapkan model-model yang telah telah dilatih pada \emph{task} \emph{sequence classification} sebagai verifikator parameter NLI pada \emph{task} \emph{question answering}-nya.
 
     \item Kemudian, model-model baru diinisiasikan dengan \emph{task} \emph{question answering} sebagai prediktor dari \emph{dataset} \emph{question answering system}-nya.
     

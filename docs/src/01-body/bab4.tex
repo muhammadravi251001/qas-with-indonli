@@ -5,55 +5,328 @@
 Bab keempat ini menjelaskan tentang implementasi teknis yang penulis lakukan dalam penelitian ini. Sub-bab 4.1 menjelaskan mengenai TODO. Sub-bab 4.2 menjelaskan mengenai  TODO. Sub-bab 4.3 menjelaskan mengenai TODO. Sub-bab 4.4 lalu menjelaskan mengenai TODO.
 
 %-----------------------------------------------------------------------------%
-\section{Pelatihan \emph{Sequence Classification Task}}
+\section{\emph{Training} \emph{Sequence Classification Task}}
 %-----------------------------------------------------------------------------%
+Pada sub-bab ini, akan dijelaskan mengenai \emph{training} model pada tugas \emph{sequence classification} dalam belajar \emph{natural language inference} yang penulis lakukan pada pada penelitian ini. 
 
 %-----------------------------------------------------------------------------%
-\subsection{Pengambilan parameter}
+\subsection{Pengambilan parameter untuk \emph{training sequence classification task}}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Pengambilan parameter untuk \emph{training sequence classification task}]
+import argparse
+import sys
+
+parser = argparse.ArgumentParser(description="Program untuk training IndoNLI")
+parser.add_argument('-m', '--model_name', type=str, metavar='', required=True, help="Nama model Anda; String; choice=[indolem, indonlu, xlmr, your model choice]")
+parser.add_argument('-d', '--data_name', type=str, metavar='', required=True, help="Nama dataset Anda; String; choice=[basic, translated, augmented]")
+parser.add_argument('-e', '--epoch', type=int, metavar='', required=True, help="Jumlah epoch Anda; Integer; choice=[all integer]")
+parser.add_argument('-sa', '--sample', type=str, metavar='', required=True, help="Jumlah sampling data Anda; Integer; choice=[max, all integer]")
+parser.add_argument('-l', '--learn_rate', type=str, metavar='', required=False, help="Jumlah learning rate Anda; Float; choice=[all float]; default=1e-5", default=1e-5)
+parser.add_argument('-se', '--seed', type=int, metavar='', required=False, help="Jumlah seed Anda; Integer; choice=[all integer]; default=42", default=42)
+parser.add_argument('-bs', '--batch_size', type=int, metavar='', required=False, help="Jumlah batch-size Anda; Integer; choice=[all integer]; default=16", default=16)
+parser.add_argument('-ga', '--gradient_accumulation', type=int, metavar='', required=False, help="Jumlah gradient accumulation Anda; Integer; choice=[all integer]; default=8", default=8)
+parser.add_argument('-t', '--token', type=str, metavar='', required=False, help="Token Hugging Face Anda; String; choice=[all string token]; default=(TOKEN_HF_muhammadravi251001)", default="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")
+args = parser.parse_args()
+\end{lstlisting}
+
+Pengambilan parameter untuk \emph{training sequence classification task} menggunakan bantuan \emph{library} dari \texttt{argparse}. Penulis gunakan \texttt{argparse} agar dapat menjalankan eksperimen via \emph{terminal} bukan dengan satu-satu menjalankan via \emph{notebook}. Parameter yang dapat digunakan dalam \emph{training sequence classification task} ini meliputi: nama model, nama \emph{dataset}, jumlah \emph{epoch}, jumlah sampel data, jumlah \emph{learn rate}, jumlah \emph{seed}, jumlah \emph{batch size}, jumlah \emph{gradient accumulation}, dan token akun Hugging Face agar dapat otomatis \emph{push} ke akun Hugging Face-nya. Untuk pilihan isi dari masing-masing parameternya, sudah penulis sertakan pada setiap baris kode di bagian \texttt{choice}.
+
+%-----------------------------------------------------------------------------%
+\subsection{Pemilihan \emph{hyperparameter}}
+%-----------------------------------------------------------------------------%
+Selain dari \emph{hyperparameter} yang dapat diatur pada pengambilan parameter di atas, terdapat beberapa \emph{hyperparameter} permanen untuk penelitian ini, berikut \emph{hyperparameter} yang tidak bisa diubah-ubah via \texttt{argparse}.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{||c | c||} 
+ \hline
+ \emph{Hyperparameter} & Nilai \\ [0.5ex] 
+ \hline\hline
+ MAX LENGTH & 512 \\ 
+ STRIDE & 128 \\
+ LOGGING STEPS & 50 \\
+ WARMUP RATIO & 0.0 \\
+ WEIGHT DECAY & 0.0 \\ 
+ EVAL STEPS RATIO & 0.5 \\ [1ex] 
+ \hline\hline
+\end{tabular}
+\caption{Tabel \emph{hyperparameter} pada \emph{training sequence classification} IndoNLI}
+\end{table}
 
 %-----------------------------------------------------------------------------%
 \subsection{Mengimpor \emph{dataset} IndoNLI}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Mengimpor \emph{dataset} IndoNLI]
+if (DATA_NAME == "Basic"):
+    data_indonli = load_dataset("indonli")
+
+elif (DATA_NAME == "Translated"):
+    data_train = pd.read_json(path_or_buf='train.jsonl', lines=True)
+    data_train = data_train[['sentence1', 'sentence2', 'gold_label']]
+    data_train = data_train.rename(columns={'sentence1': 'premise', 'sentence2': 'hypothesis', 'gold_label': 'label'})
+    data_train['label'] = data_train['label'].replace(['entailment'], 0)
+    data_train['label'] = data_train['label'].replace(['contradiction'], 1)
+    data_train['label'] = data_train['label'].replace(['neutral'], 2)
+
+    data_validation = pd.read_json(path_or_buf='dev.jsonl', lines=True)
+    data_validation = data_validation[['sentence1', 'sentence2', 'gold_label']]
+    data_validation = data_validation.rename(columns={'sentence1': 'premise', 'sentence2': 'hypothesis', 'gold_label': 'label'})
+    data_validation['label'] = data_validation['label'].replace(['entailment'], 0)
+    data_validation['label'] = data_validation['label'].replace(['contradiction'], 1)
+    data_validation['label'] = data_validation['label'].replace(['neutral'], 2)
+
+    data_train = data_train[data_train.label != '-']
+    data_validation = data_validation[data_validation.label != '-']
+    train_dataset = Dataset.from_dict(data_train)
+    validation_dataset = Dataset.from_dict(data_validation)
+
+    data_indonli_translated = DatasetDict({"train": train_dataset, "validation": validation_dataset})
+    data_indonli = data_indonli_translated
+
+elif (DATA_NAME == "Augmented"):
+    data_train = pd.read_json(path_or_buf='train_augmented.jsonl', lines=True)
+    data_validation = pd.read_json(path_or_buf='dev_augmented.jsonl', lines=True)
+
+    data_train = data_train[data_train.label != '-']
+    data_validation = data_validation[data_validation.label != '-']
+
+    train_dataset = Dataset.from_dict(data_train)
+    validation_dataset = Dataset.from_dict(data_validation)
+
+    data_indonli_augmented = DatasetDict({"train": train_dataset, "validation": validation_dataset})
+    data_indonli = data_indonli_augmented
+\end{lstlisting}
+
+Pada tahap ini, akan dijalankan pengambilan \emph{dataset} IndoNLI dari Hugging Face maupun GitHub dan penyamaan format \texttt{DatasetDict}. Tujuan dilakukan hal tersebut agar dapat lebih mempermudah eksperimen kedepannya.
 
 %-----------------------------------------------------------------------------%
-\subsection{Mengimpor \emph{tokenizer}}
+\subsection{Proses \emph{preprocess} dan tokenisasi \emph{dataset} IndoNLI}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Proses \emph{preprocess} dan tokenisasi \emph{dataset} IndoNLI]
+def preprocess_function_indonli(examples, tokenizer, MAX_LENGTH):
+    return tokenizer(
+        examples['premise'], examples['hypothesis'],
+        truncation=True, return_token_type_ids=True,
+        max_length=MAX_LENGTH
+    )
+
+tokenized_data_indonli = data_indonli.map(
+    preprocess_function_indonli,
+    batched=True,
+    load_from_cache_file=True,
+    num_proc=1,
+    remove_columns=['premise', 'hypothesis'],
+    fn_kwargs={'tokenizer': tokenizer, 'MAX_LENGTH': MAX_LENGTH}
+)
+
+tokenized_data_indonli.set_format("torch", columns=["input_ids", "token_type_ids"], output_all_columns=True, device=device)
+tokenized_data_indonli_train = Dataset.from_dict(tokenized_data_indonli["train"][:SAMPLE])
+tokenized_data_indonli_validation = Dataset.from_dict(tokenized_data_indonli["validation"][:SAMPLE])
+\end{lstlisting}
+
+Pada tahap ini, akan dijalankan  \emph{preprocess} dan tokenisasi \emph{dataset} IndoNLI. Tokenisasi dijalankan dengan melakukan tokenisasi bagian \texttt{premise} dan \texttt{hypothesis} saja, dengan menggunakan \emph{hyperparameter} yang sebelumnya sudah ditentukan.
 
 %-----------------------------------------------------------------------------%
-\subsection{Proses \emph{preprocess} dan tokenisasi}
+\subsection{Mengimpor model \emph{question answering}}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Mengimpor model \emph{question answering}]
+id2label = {0: 'entailment', 1: 'neutral', 2: 'contradiction'}
+label2id = {'entailment': 0, 'neutral': 1, 'contradiction': 2}
 
-%-----------------------------------------------------------------------------%
-\subsection{Mengimpor model}
-%-----------------------------------------------------------------------------%
+model_sc = AutoModelForSequenceClassification.from_pretrained(
+        MODEL_NAME, num_labels=3, 
+        id2label=id2label, label2id=label2id)
+\end{lstlisting}
+
+Pada tahapan ini, penulis menyuplai banyak label sebanyak 3, karena hasil label dari permasalahan NLI di IndoNLI memiliki tiga label akhir, yaitu: \emph{entailment}, \emph{neutral}, \emph{contradiction}. Kemudian, tidak lupa juga menyuplai \texttt{id2label} dan \texttt{label2id}.
 
 %-----------------------------------------------------------------------------%
 \subsection{Perancangan metrik komputasi untuk penilaian}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Perancangan metrik komputasi untuk penilaian \emph{sequence classification task}]
+accuracy = evaluate.load('accuracy')
+f1 = evaluate.load('f1')
+
+def compute_metrics(eval_pred):
+    predictions = eval_pred.predictions
+    predictions = np.argmax(predictions, axis=1)
+    labels = eval_pred.label_ids
+    
+    acc_result = accuracy.compute(predictions=predictions, references=labels)
+    f1_result = f1.compute(predictions=predictions, references=labels, average="weighted")
+
+    return {'accuracy': acc_result['accuracy'], 'f1': f1_result['f1']}
+\end{lstlisting}
+
+Pada perancangan metrik komputasi \emph{sequence classification task}, penulis menggunakan \emph{library} dari \texttt{evaluate} untuk menggunakan metrik akurasi dan skor F1, dimana skor F1 penulis atur ke \texttt{average="weighted"} karena tipe \emph{average weighted} dapat menghitung metrik setiap label dengan memperhatikan \emph{label imbalance}.
 
 %-----------------------------------------------------------------------------%
-\subsection{Perancangan penamaan eksperimen}
+\subsection{Perancangan penamaan eksperimen \emph{sequence classification task}}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Perancangan penamaan eksperimen \emph{sequence classification task}]
+TIME_NOW = str(datetime.now()).replace(":", "-").replace(" ", "_").replace(".", "_")
+    
+if (re.findall(r'.*/(.*)$', MODEL_NAME) == []): 
+    NAME = f'IndoNLI-{DATA_NAME}-with-{str(MODEL_NAME)}'
+else:
+    new_name = re.findall(r'.*/(.*)$', MODEL_NAME)[0]
+    NAME = f'IndoNLI-{DATA_NAME}-with-{str(new_name)}'
+
+NAME = f'{NAME}-LR-{LEARNING_RATE}'
+
+SC = f'./results/{NAME}-{TIME_NOW}'
+CHECKPOINT_DIR = f'{SC}/checkpoint/'
+MODEL_DIR = f'{SC}/model/'
+OUTPUT_DIR = f'{SC}/output/'
+METRIC_RESULT_DIR = f'{SC}/metric-result/'
+REPO_NAME = f'fine-tuned-{NAME}'[:96]
+\end{lstlisting}
+
+Pada tahap ini, penulis merancang penamaan eksperimen agar dapat melakukan evaluasi \& analisis terkait eksperimen dengan lebih mudah, rapih, dan teratur.
 
 %-----------------------------------------------------------------------------%
-\subsection{Perancangan argumen latih (\emph{training arguments})}
+\subsection{Perancangan argumen latih (\emph{training arguments}) \emph{sequence classification}}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Perancangan argumen latih (\emph{training arguments}) \emph{sequence classification}]
+training_args_sc = TrainingArguments(
+        
+    # Checkpoint
+    output_dir=CHECKPOINT_DIR,
+    overwrite_output_dir=True,
+    save_strategy='steps',
+    save_total_limit=EPOCH,
+    
+    # Log
+    report_to='tensorboard',
+    logging_strategy='steps',
+    logging_first_step=True,
+    logging_steps=LOGGING_STEPS,
+    
+    # Train
+    num_train_epochs=EPOCH,
+    weight_decay=WEIGHT_DECAY,
+    per_device_train_batch_size=BATCH_SIZE,
+    per_device_eval_batch_size=BATCH_SIZE,
+    gradient_accumulation_steps=GRADIENT_ACCUMULATION,
+    learning_rate=LEARNING_RATE,
+    warmup_ratio=WARMUP_RATIO,
+    bf16=False,
+    dataloader_num_workers=cpu_count(),
+    
+    # Miscellaneous
+    evaluation_strategy='steps',
+    save_steps=int((data_indonli['train'].num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * EVAL_STEPS_RATIO),
+    eval_steps=int((data_indonli['train'].num_rows / (BATCH_SIZE * GRADIENT_ACCUMULATION)) * EVAL_STEPS_RATIO),
+    seed=SEED,
+    hub_token=HUB_TOKEN,
+    push_to_hub=True,
+    hub_model_id=REPO_NAME,
+    load_best_model_at_end=True,
+    metric_for_best_model='f1',
+)
+\end{lstlisting}
+
+Pada tahap ini, penulis merancang \emph{training arguments} agar jalannya eksperimen sesuai parameter yang telah disuplai sebelumnya. \texttt{STEP} disesuaikan dengan rumus: \texttt{BATCH SIZE $\times$ GRADIENT ACCUMULATION $\times$ EVAL STEPS RATIO} ditujukan agar model melakukan evaluasi setiap \texttt{EVAL STEPS RATIO} agar dapat melakukan \emph{early callback} nantinya untuk efisiensi \emph{training}. Pemilihan \emph{best model} dipilih ke metrik skor F1, karena metrik F1 dapat mengatasi permasalahn \emph{label imbalance}.
 
 %-----------------------------------------------------------------------------%
-\subsection{Melakukan pelatihan dan prediksi jawaban}
+\subsection{Melakukan \emph{training} dan prediksi jawaban \emph{sequence classification}}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Melakukan \emph{training} dan prediksi jawaban \emph{sequence classification}]
+trainer_sc = Trainer(
+    model=model_sc,
+    args=training_args_sc,
+    train_dataset=tokenized_data_indonli_train,
+    eval_dataset=tokenized_data_indonli_validation,
+    tokenizer=tokenizer,
+    data_collator=data_collator,
+    compute_metrics=compute_metrics,
+    callbacks = [EarlyStoppingCallback(early_stopping_patience=3)]
+)
+
+trainer_sc.train()
+\end{lstlisting}
+
+Pada tahap ini, dilakukan \emph{training} dengan menggunakan data \emph{train} dan data \emph{validation} sebagai parameter \emph{training}-nya. Penulis juga melakukan \emph{early callback} dengan \emph{patience} sebesar 3, yang artinya model akan berhenti \emph{training} bila tiga hasil evaluasi setelahnya memiliki nilai metrik yang lebih kecil dibanding sebelumnya; hal tersebut dilakukan untuk efisiensi waktu dan \emph{resource} \emph{training}-nya.
 
 %-----------------------------------------------------------------------------%
-\subsection{Representasi prediksi jawaban}
+\subsection{Representasi prediksi jawaban \emph{sequence classification}}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Representasi prediksi jawaban \emph{sequence classification}]
+def represent_prediction_output(predict_result):
+        predictions_idx = np.argmax(predict_result.predictions, axis=1)
+        label_array = np.asarray(predict_result.label_ids)
+        
+    premise_array = []
+    hypothesis_array = []
+    
+    pred_label_array = []
+    gold_label_array = []
+    
+    for i in tqdm(range(len(predict_result.predictions))):
+        
+        premise = []
+        hypothesis = []
+        
+        for j in range(len(tokenized_data_indonli_validation[i]['token_type_ids'])):
+
+            if tokenized_data_indonli_validation[i]['token_type_ids'][j] == 0:
+                premise.append(tokenized_data_indonli_validation[i]['input_ids'][j])
+
+            else:
+                hypothesis.append(tokenized_data_indonli_validation[i]['input_ids'][j])
+        
+        premise_decoded = tokenizer.decode(premise, skip_special_tokens=True)
+        hypothesis_decoded = tokenizer.decode(hypothesis, skip_special_tokens=True)
+
+        premise_array.append(premise_decoded)
+        hypothesis_array.append(hypothesis_decoded)
+        
+        pred_label_array.append(predictions_idx[i])
+        gold_label_array.append(label_array[i])
+        
+    id2label = {0: 'entailment', 1: 'neutral', 2: 'contradiction'}
+    
+    nli_df = pd.DataFrame({'Premise': premise_array, 
+                            'Hypothesis': hypothesis_array,
+                        'Prediction Label': pred_label_array,
+                        'Gold Label': gold_label_array
+                            })
+    
+    nli_df["Prediction Label"] = nli_df["Prediction Label"].map(id2label)
+    nli_df["Gold Label"] = nli_df["Gold Label"].map(id2label)
+    
+    return nli_df
+\end{lstlisting}
+
+Pada tahap ini, penulis mengubah \texttt{PredictionOutput} hasil dari prediksi model menjadi sebuah \texttt{DataFrame} yang dapat dibaca secara jelas oleh manusia. Tahapan ini berguna untuk evaluasi dan analisis kedepannya.
 
 %-----------------------------------------------------------------------------%
-\subsection{Melakukan \emph{push} ke akun Hugging Face}
+\subsection{Melakukan \emph{push} \emph{sequence classification} ke akun Hugging Face}
 %-----------------------------------------------------------------------------%
+\begin{lstlisting}[language=Python, caption=Melakukan \emph{push} \emph{sequence classification} ke akun Hugging Face]
+api = HfApi()
+
+api.upload_folder(
+    folder_path=f"{OUTPUT_DIR}",
+    repo_id=f"{USER}/{REPO_NAME}",
+    repo_type="model",
+    token=HUB_TOKEN,
+    path_in_repo="results/output",
+)
+
+api.upload_folder(
+    folder_path=f"{METRIC_RESULT_DIR}",
+    repo_id=f"{USER}/{REPO_NAME}",
+    repo_type="model",
+    token=HUB_TOKEN,
+    path_in_repo="results/evaluation",
+)
+\end{lstlisting}
+
+Pada tahapan ini, sederhananya, penulis hanya melakukan \emph{push} hasil eksperimen, meliputi: model, evaluasi, dan keluaran dari eksperimen ke akun Hugging Face yang telah disuplai \texttt{TOKEN}-nya pada bagian parameter sebelumnya.
 
 %-----------------------------------------------------------------------------%
-\section{Pelatihan \emph{Baseline} model \emph{Question Answering Task}}
+\section{\emph{Training} \emph{Baseline} model \emph{Question Answering Task}}
 %-----------------------------------------------------------------------------%
 
 %-----------------------------------------------------------------------------%
@@ -89,7 +362,7 @@ Bab keempat ini menjelaskan tentang implementasi teknis yang penulis lakukan dal
 %-----------------------------------------------------------------------------%
 
 %-----------------------------------------------------------------------------%
-\subsection{Melakukan pelatihan dan prediksi jawaban}
+\subsection{Melakukan \emph{Training} dan prediksi jawaban}
 %-----------------------------------------------------------------------------%
 
 %-----------------------------------------------------------------------------%
@@ -145,7 +418,7 @@ Bab keempat ini menjelaskan tentang implementasi teknis yang penulis lakukan dal
 %-----------------------------------------------------------------------------%
 
 %-----------------------------------------------------------------------------%
-\subsection{Melakukan pelatihan dan prediksi jawaban}
+\subsection{Melakukan \emph{Training} dan prediksi jawaban}
 %-----------------------------------------------------------------------------%
 
 %-----------------------------------------------------------------------------%
