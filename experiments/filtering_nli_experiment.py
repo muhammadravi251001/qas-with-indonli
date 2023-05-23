@@ -1095,8 +1095,6 @@ if __name__ == "__main__":
             pred_answer_before_filtering_array.append([pred_answer])
             pred_hypothesis_before_filtering_array.append([pred_hypothesis])
             label_before_filtering_array.append([predicted_label])
-            
-            # OTAK ATIK BAGIAN SINI TODO
 
             # Cek label dari answer prediksi dan context, bila labelnya entailment (atau neutral), maka answernya jadi hasil akhir
             if predicted_label['label'] == 'neutral' and predicted_label['score'] >= threshold:
