@@ -827,7 +827,7 @@ if __name__ == "__main__":
             question = []
             context = []
 
-            if MODEL_NAME == 'xlm-roberta-base' or MODEL_NAME == 'xlm-roberta-large':
+            if (args.model_name) == "xlmr":
 
                 start_question = tokenized_data[i]['input_ids'].index(0)
                 end_question = tokenized_data[i]['input_ids'].index(2)  + 1
@@ -1060,7 +1060,7 @@ if __name__ == "__main__":
             question = []
             context = []
 
-            if MODEL_NAME == 'xlm-roberta-base' or MODEL_NAME == 'xlm-roberta-large':
+            if (args.model_name) == "xlmr":
 
                 start_question = tokenized_data[i]['input_ids'].index(0)
                 end_question = tokenized_data[i]['input_ids'].index(2)  + 1

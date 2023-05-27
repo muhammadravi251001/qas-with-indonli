@@ -1,13 +1,13 @@
 %-----------------------------------------------------------------------------%
 \chapter{\babTiga}
 %-----------------------------------------------------------------------------%
-Bab ketiga ini menjelaskan tentang rancangan dan metodologi yang penulis lakukan dalam penelitian ini. Sub-bab 3.1 menjelaskan mengenai tahapan penelitian yang akan penulis lakukan. Sub-bab 3.2 menjelaskan bagaimana persiapan data, model, dan metode yang akan dilakukan pada penelitian ini. Sub-bab 3.3 menjelaskan pelatihan model dan alur eksperimen yang dilakukan. Sub-bab 3.4 lalu menjelaskan metrik umum yang digunakan setiap metode dan metrik khusus yang digunakan untuk setiap metode.
+Bab ketiga ini menjelaskan tentang rancangan dan metodologi yang penulis lakukan dalam penelitian ini. Sub-bab 3.2 menjelaskan mengenai gambaran umum terkait bagaimana teknik untuk memanfaatkan NLI untuk meningkatkan performa suatu sistem tanya jawab. Sub-bab 3.2 menjelaskan mengenai tahapan penelitian yang akan penulis lakukan. Sub-bab 3.3 menjelaskan bagaimana persiapan data, model, dan metode yang akan dilakukan pada penelitian ini. Sub-bab 3.4 menjelaskan pelatihan model dan alur eksperimen yang dilakukan. Sub-bab 3.5 lalu menjelaskan metrik umum yang digunakan setiap metode dan metrik khusus yang digunakan untuk setiap metode.
 
 %-----------------------------------------------------------------------------%
-\section{Pembuka}
+\section{Pemanfaatan NLI Untuk Sistem Tanya Jawab}
 %-----------------------------------------------------------------------------%
 
-Sebagai pembuka dari bagian metodologi ini, penelitian ini ditujukan untuk mengetahui apakah performa sistem tanya jawab berbahasa Indonesia akan lebih baik dengan memanfaatkan NLI dan jenis-jenis pertanyaan apa saja yang lebih baik dengan memanfaatkan NLI. Bab metodologi ini akan berfokus kepada gambaran umum dari penelitian ini.
+Sebagai pembuka dari bagian metodologi ini, penelitian ini ditujukan untuk mengetahui apakah performa sistem tanya jawab berbahasa Indonesia akan lebih baik dengan memanfaatkan NLI dan jenis-jenis pertanyaan apa saja yang lebih baik dengan memanfaatkan NLI. Metode yang penulis gunakan pada penelitian ini secara umum dapat dibagi dua, yaitu: \emph{intermediate task transfer learning} dan \emph{task recasting}. Untuk metode \emph{intermediate task transfer learning} penulis mengikuti teknik yang digunakan oleh \citeauthor{pruksachatkun-etal-2020-intermediate}, yaitu dengan memecah tugasnya menjadi dua, yaitu: \emph{intermediate task} dan \emph{target task}. Kemudian, untuk metode \emph{task recasting} penulis mengikuti teknik yang digunakan oleh \citeauthor{chen-etal-2021-nli-models}, yaitu dengan melakukan penyaringan (\emph{filtering}) prediksi jawaban dengan parameter hasil label NLI-nya. Bab metodologi ini akan berfokus kepada gambaran umum dari penelitian ini.
 
 %-----------------------------------------------------------------------------%
 \section{Tahapan Penelitian}
@@ -44,12 +44,12 @@ Pada sub-bab ini, akan dijelaskan beberapa metode yang penulis pilih, yaitu: \em
 %-----------------------------------------------------------------------------%
 \subsubsection{\emph{Intermediate-Task Transfer Learning}}
 %-----------------------------------------------------------------------------%
-Pada tahapan eksperimen ini, penulis menggunakan metode yang persis digunakan oleh \citep{pruksachatkun-etal-2020-intermediate}, yaitu dengan memecah tugasnya menjadi dua, yaitu: \emph{intermediate task} dan \emph{target task}. Pada penelitian ini, \emph{intermediate task} yang dipilih adalah \emph{sequence classification task} dengan menggunakan \emph{dataset} IndoNLI, dan \emph{target task} yang dipilih adalah \emph{question answering task} dengan menggunakan \emph{dataset} SQuAD-ID, TyDi-QA-ID, dan IDK-MRC. Untuk alur eksperimen tahap ini, akan dijelaskan pada sub-bab selanjutnya.
+Pada penelitian ini, \emph{intermediate task} yang dipilih adalah \emph{sequence classification task} dengan menggunakan \emph{dataset} IndoNLI, dan \emph{target task} yang dipilih adalah \emph{question answering task} dengan menggunakan \emph{dataset} SQuAD-ID, TyDi-QA-ID, dan IDK-MRC. Untuk alur eksperimen tahap ini, akan dijelaskan pada sub-bab selanjutnya.
 
 %-----------------------------------------------------------------------------%
 \subsubsection{\emph{Task Recasting} dengan IndoNLI sebagai verifikator}
 %-----------------------------------------------------------------------------%
-Pada tahapan eksperimen ini, penulis menggunakan metode yang persis digunakan oleh \citep{chen-etal-2021-nli-models}, yaitu dengan melakukan penyaringan (\emph{filtering}) prediksi jawaban dengan parameter hasil label NLI-nya. Pada penelitian ini, prediksi jawaban oleh model \emph{question answering} tidak diganggu sama sekali, setelah prediksi jawaban didapatkan, baru dilakukan penyaringan (\emph{filtering}) prediksi jawabannya. Untuk alur eksperimen tahap ini, akan dijelaskan pada sub-bab selanjutnya. 
+Pada penelitian ini, prediksi jawaban oleh model \emph{question answering} tidak diganggu sama sekali, setelah prediksi jawaban didapatkan, baru dilakukan penyaringan (\emph{filtering}) prediksi jawabannya. Untuk alur eksperimen tahap ini, akan dijelaskan pada sub-bab selanjutnya. 
 
 %-----------------------------------------------------------------------------%
 \subsubsection{\emph{Task Recasting} dengan IndoNLI sebagai penghasil jawaban}

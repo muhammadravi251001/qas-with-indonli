@@ -1,3 +1,14 @@
+# Backup
+python filtering_nli_experiment.py -m indolem -d squadid
+python filtering_nli_experiment.py -m indolem -d idkmrc
+python filtering_nli_experiment.py -m indolem -d tydiqaid
+python filtering_nli_experiment.py -m indonlu -d squadid
+python filtering_nli_experiment.py -m indonlu -d idkmrc
+python filtering_nli_experiment.py -m indonlu -d tydiqaid
+python filtering_nli_experiment.py -m xlmr -d squadid
+python filtering_nli_experiment.py -m xlmr -d idkmrc
+python filtering_nli_experiment.py -m xlmr -d tydiqaid
+
 # Training IndoNLI
 python main_training_indonli.py -m indolem -d basic -e 10 -sa max -bs 4 -ga 32
 python main_training_indonli.py -m indolem -d translated -e 10 -sa max -bs 4 -ga 32
@@ -42,13 +53,104 @@ python main_fine_tuning_qas_dataset.py -m xlmr -d squadid -e 10 -sa max -wi True
 python main_fine_tuning_qas_dataset.py -m xlmr -d idkmrc -e 10 -sa max -wi True -fr True -bs 4 -ga 32
 python main_fine_tuning_qas_dataset.py -m xlmr -d tydiqaid -e 10 -sa max -wi True -fr True -bs 4 -ga 32
 
-# Alur 2
-python filtering_nli_experiment.py -m indolem -d squadid -e 10 -sa max -bs 4 -ga 32
-python filtering_nli_experiment.py -m indolem -d idkmrc -e 10 -sa max -bs 4 -ga 32
-python filtering_nli_experiment.py -m indolem -d tydiqaid -e 10 -sa max -bs 4 -ga 32
-python filtering_nli_experiment.py -m indonlu -d squadid -e 10 -sa max -bs 4 -ga 32
-python filtering_nli_experiment.py -m indonlu -d idkmrc -e 10 -sa max -bs 4 -ga 32
-python filtering_nli_experiment.py -m indonlu -d tydiqaid -e 10 -sa max -bs 4 -ga 32
-python filtering_nli_experiment.py -m xlmr -d squadid -e 10 -sa max -bs 4 -ga 32
-python filtering_nli_experiment.py -m xlmr -d idkmrc -e 10 -sa max -bs 4 -ga 32
-python filtering_nli_experiment.py -m xlmr -d tydiqaid -e 10 -sa max -bs 4 -ga 32
+# Alur 2: TYPE_QAS
+python filtering_nli_experiment.py -m indolem -d squadid -tq entailment_only
+python filtering_nli_experiment.py -m indolem -d idkmrc -tq entailment_only
+python filtering_nli_experiment.py -m indolem -d tydiqaid -tq entailment_only
+python filtering_nli_experiment.py -m indonlu -d squadid -tq entailment_only
+python filtering_nli_experiment.py -m indonlu -d idkmrc -tq entailment_only
+python filtering_nli_experiment.py -m indonlu -d tydiqaid -tq entailment_only
+python filtering_nli_experiment.py -m xlmr -d squadid -tq entailment_only
+python filtering_nli_experiment.py -m xlmr -d idkmrc -tq entailment_only
+python filtering_nli_experiment.py -m xlmr -d tydiqaid -tq entailment_only
+
+python filtering_nli_experiment.py -m indolem -d squadid -tq entailment_or_neutral
+python filtering_nli_experiment.py -m indolem -d idkmrc -tq entailment_or_neutral
+python filtering_nli_experiment.py -m indolem -d tydiqaid -tq entailment_or_neutral
+python filtering_nli_experiment.py -m indonlu -d squadid -tq entailment_or_neutral
+python filtering_nli_experiment.py -m indonlu -d idkmrc -tq entailment_or_neutral
+python filtering_nli_experiment.py -m indonlu -d tydiqaid -tq entailment_or_neutral
+python filtering_nli_experiment.py -m xlmr -d squadid -tq entailment_or_neutral
+python filtering_nli_experiment.py -m xlmr -d idkmrc -tq entailment_or_neutral
+python filtering_nli_experiment.py -m xlmr -d tydiqaid -tq entailment_or_neutral
+
+# Alur 2: TYPE_SMOOTHING
+python filtering_nli_experiment.py -m indolem -d squadid -ts replace_first
+python filtering_nli_experiment.py -m indolem -d idkmrc -ts replace_first
+python filtering_nli_experiment.py -m indolem -d tydiqaid -ts replace_first
+python filtering_nli_experiment.py -m indonlu -d squadid -ts replace_first
+python filtering_nli_experiment.py -m indonlu -d idkmrc -ts replace_first
+python filtering_nli_experiment.py -m indonlu -d tydiqaid -ts replace_first
+python filtering_nli_experiment.py -m xlmr -d squadid -ts replace_first
+python filtering_nli_experiment.py -m xlmr -d idkmrc -ts replace_first
+python filtering_nli_experiment.py -m xlmr -d tydiqaid -ts replace_first
+
+python filtering_nli_experiment.py -m indolem -d squadid -ts replace_question_mark
+python filtering_nli_experiment.py -m indolem -d idkmrc -ts replace_question_mark
+python filtering_nli_experiment.py -m indolem -d tydiqaid -ts replace_question_mark
+python filtering_nli_experiment.py -m indonlu -d squadid -ts replace_question_mark
+python filtering_nli_experiment.py -m indonlu -d idkmrc -ts replace_question_mark
+python filtering_nli_experiment.py -m indonlu -d tydiqaid -ts replace_question_mark
+python filtering_nli_experiment.py -m xlmr -d squadid -ts replace_question_mark
+python filtering_nli_experiment.py -m xlmr -d idkmrc -ts replace_question_mark
+python filtering_nli_experiment.py -m xlmr -d tydiqaid -ts replace_question_mark
+
+python filtering_nli_experiment.py -m indolem -d squadid -ts add_adalah
+python filtering_nli_experiment.py -m indolem -d idkmrc -ts add_adalah
+python filtering_nli_experiment.py -m indolem -d tydiqaid -ts add_adalah
+python filtering_nli_experiment.py -m indonlu -d squadid -ts add_adalah
+python filtering_nli_experiment.py -m indonlu -d idkmrc -ts add_adalah
+python filtering_nli_experiment.py -m indonlu -d tydiqaid -ts add_adalah
+python filtering_nli_experiment.py -m xlmr -d squadid -ts add_adalah
+python filtering_nli_experiment.py -m xlmr -d idkmrc -ts add_adalah
+python filtering_nli_experiment.py -m xlmr -d tydiqaid -ts add_adalah
+
+python filtering_nli_experiment.py -m indolem -d squadid -ts just_concat_answer_and_question
+python filtering_nli_experiment.py -m indolem -d idkmrc -ts just_concat_answer_and_question
+python filtering_nli_experiment.py -m indolem -d tydiqaid -ts just_concat_answer_and_question
+python filtering_nli_experiment.py -m indonlu -d squadid -ts just_concat_answer_and_question
+python filtering_nli_experiment.py -m indonlu -d idkmrc -ts just_concat_answer_and_question
+python filtering_nli_experiment.py -m indonlu -d tydiqaid -ts just_concat_answer_and_question
+python filtering_nli_experiment.py -m xlmr -d squadid -ts just_concat_answer_and_question
+python filtering_nli_experiment.py -m xlmr -d idkmrc -ts just_concat_answer_and_question
+python filtering_nli_experiment.py -m xlmr -d tydiqaid -ts just_concat_answer_and_question
+
+python filtering_nli_experiment.py -m indolem -d squadid -ts rule_based
+python filtering_nli_experiment.py -m indolem -d idkmrc -ts rule_based
+python filtering_nli_experiment.py -m indolem -d tydiqaid -ts rule_based
+python filtering_nli_experiment.py -m indonlu -d squadid -ts rule_based
+python filtering_nli_experiment.py -m indonlu -d idkmrc -ts rule_based
+python filtering_nli_experiment.py -m indonlu -d tydiqaid -ts rule_based
+python filtering_nli_experiment.py -m xlmr -d squadid -ts rule_based
+python filtering_nli_experiment.py -m xlmr -d idkmrc -ts rule_based
+python filtering_nli_experiment.py -m xlmr -d tydiqaid -ts rule_based
+
+python filtering_nli_experiment.py -m indolem -d squadid -ts machine_generation_with_rule_based
+python filtering_nli_experiment.py -m indolem -d idkmrc -ts machine_generation_with_rule_based
+python filtering_nli_experiment.py -m indolem -d tydiqaid -ts machine_generation_with_rule_based
+python filtering_nli_experiment.py -m indonlu -d squadid -ts machine_generation_with_rule_based
+python filtering_nli_experiment.py -m indonlu -d idkmrc -ts machine_generation_with_rule_based
+python filtering_nli_experiment.py -m indonlu -d tydiqaid -ts machine_generation_with_rule_based
+python filtering_nli_experiment.py -m xlmr -d squadid -ts machine_generation_with_rule_based
+python filtering_nli_experiment.py -m xlmr -d idkmrc -ts machine_generation_with_rule_based
+python filtering_nli_experiment.py -m xlmr -d tydiqaid -ts machine_generation_with_rule_based
+
+python filtering_nli_experiment.py -m indolem -d squadid -ts pure_machine_generation
+python filtering_nli_experiment.py -m indolem -d idkmrc -ts pure_machine_generation
+python filtering_nli_experiment.py -m indolem -d tydiqaid -ts pure_machine_generation
+python filtering_nli_experiment.py -m indonlu -d squadid -ts pure_machine_generation
+python filtering_nli_experiment.py -m indonlu -d idkmrc -ts pure_machine_generation
+python filtering_nli_experiment.py -m indonlu -d tydiqaid -ts pure_machine_generation
+python filtering_nli_experiment.py -m xlmr -d squadid -ts pure_machine_generation
+python filtering_nli_experiment.py -m xlmr -d idkmrc -ts pure_machine_generation
+python filtering_nli_experiment.py -m xlmr -d tydiqaid -ts pure_machine_generation
+
+python filtering_nli_experiment.py -m indolem -d squadid -ts machine_generation_with_translation
+python filtering_nli_experiment.py -m indolem -d idkmrc -ts machine_generation_with_translation
+python filtering_nli_experiment.py -m indolem -d tydiqaid -ts machine_generation_with_translation
+python filtering_nli_experiment.py -m indonlu -d squadid -ts machine_generation_with_translation
+python filtering_nli_experiment.py -m indonlu -d idkmrc -ts machine_generation_with_translation
+python filtering_nli_experiment.py -m indonlu -d tydiqaid -ts machine_generation_with_translation
+python filtering_nli_experiment.py -m xlmr -d squadid -ts machine_generation_with_translation
+python filtering_nli_experiment.py -m xlmr -d idkmrc -ts machine_generation_with_translation
+python filtering_nli_experiment.py -m xlmr -d tydiqaid -ts machine_generation_with_translation
