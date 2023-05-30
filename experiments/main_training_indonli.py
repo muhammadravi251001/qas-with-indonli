@@ -107,19 +107,17 @@ if __name__ == "__main__":
     from huggingface_hub import HfApi
 
     from datasets import (
-    load_dataset,
-    Dataset,
-    DatasetDict,
+        load_dataset,
+        Dataset,
+        DatasetDict,
     )
     from transformers import (
-    DataCollatorWithPadding,
-    TrainingArguments,
-    Trainer,
-    BertForSequenceClassification,
-    AutoModelForSequenceClassification,
-    AutoTokenizer,
-    EarlyStoppingCallback, 
-    AutoModel
+        DataCollatorWithPadding,
+        TrainingArguments,
+        Trainer,
+        AutoModelForSequenceClassification,
+        AutoTokenizer,
+        EarlyStoppingCallback
     )
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -169,11 +167,20 @@ if __name__ == "__main__":
 
     # ## Fungsi utilitas untuk pre-process data IndoNLI
     def preprocess_function_indonli(examples, tokenizer, MAX_LENGTH):
-        return tokenizer(
-            examples['premise'], examples['hypothesis'],
-            truncation=True, return_token_type_ids=True,
-            max_length=MAX_LENGTH
-        )
+
+        if (args.model_name) == "xlmr":
+            return tokenizer(
+                examples['premise'], examples['hypothesis'],
+                truncation=True,
+                max_length=MAX_LENGTH
+            )
+
+        else:
+            return tokenizer(
+                examples['premise'], examples['hypothesis'],
+                truncation=True, return_token_type_ids=True,
+                max_length=MAX_LENGTH
+            )
 
     # ## Melakukan tokenisasi data IndoNLI
     tokenized_data_indonli = data_indonli.map(
@@ -185,7 +192,12 @@ if __name__ == "__main__":
         fn_kwargs={'tokenizer': tokenizer, 'MAX_LENGTH': MAX_LENGTH}
     )
 
-    tokenized_data_indonli.set_format("torch", columns=["input_ids", "token_type_ids"], output_all_columns=True, device=device)
+    if (args.model_name) == "xlmr":
+        tokenized_data_indonli.set_format("torch", columns=["input_ids"], output_all_columns=True, device=device)
+    
+    else:
+        tokenized_data_indonli.set_format("torch", columns=["input_ids", "token_type_ids"], output_all_columns=True, device=device)
+    
     tokenized_data_indonli_train = Dataset.from_dict(tokenized_data_indonli["train"][:SAMPLE])
     tokenized_data_indonli_validation = Dataset.from_dict(tokenized_data_indonli["validation"][:SAMPLE])
 
@@ -307,15 +319,27 @@ if __name__ == "__main__":
             hypothesis = []
             
             for j in range(len(tokenized_data_indonli_validation[i]['token_type_ids'])):
+                
+                if (args.model_name) == "xlmr":
+                    start_premise = tokenized_data_indonli_validation[i]['input_ids'].index(0)
+                    end_premise = tokenized_data_indonli_validation[i]['input_ids'].index(2)  + 1
+                    start_hypothesis = end_premise
 
-                if tokenized_data_indonli_validation[i]['token_type_ids'][j] == 0:
-                    premise.append(tokenized_data_indonli_validation[i]['input_ids'][j])
+                    premise.append(tokenized_data_indonli_validation[i]['input_ids'][start_premise: end_premise])
+                    hypothesis.append(tokenized_data_indonli_validation[i]['input_ids'][start_hypothesis: ])
 
+                    premise_decoded = tokenizer.decode(premise, skip_special_tokens=True)
+                    hypothesis_decoded = tokenizer.decode(hypothesis, skip_special_tokens=True)
+                
                 else:
-                    hypothesis.append(tokenized_data_indonli_validation[i]['input_ids'][j])
+                    if tokenized_data_indonli_validation[i]['token_type_ids'][j] == 0:
+                        premise.append(tokenized_data_indonli_validation[i]['input_ids'][j])
+
+                    else:
+                        hypothesis.append(tokenized_data_indonli_validation[i]['input_ids'][j])
             
-            premise_decoded = tokenizer.decode(premise, skip_special_tokens=True)
-            hypothesis_decoded = tokenizer.decode(hypothesis, skip_special_tokens=True)
+                    premise_decoded = tokenizer.decode(premise, skip_special_tokens=True)
+                    hypothesis_decoded = tokenizer.decode(hypothesis, skip_special_tokens=True)
 
             premise_array.append(premise_decoded)
             hypothesis_array.append(hypothesis_decoded)

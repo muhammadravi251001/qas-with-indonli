@@ -114,8 +114,7 @@ if __name__ == "__main__":
         DataCollatorWithPadding,
         TrainingArguments,
         Trainer,
-        BertForSequenceClassification,
-        BertForQuestionAnswering,
+        AutoModelForSequenceClassification,
         AutoTokenizer,
         EarlyStoppingCallback, 
         AutoModelForQuestionAnswering,
@@ -408,7 +407,7 @@ if __name__ == "__main__":
                     1, 'contradiction': 2}
         accuracy = evaluate.load('accuracy')
 
-        model_sc = BertForSequenceClassification.from_pretrained(
+        model_sc = AutoModelForSequenceClassification.from_pretrained(
             MODEL_SC_NAME, num_labels=3, 
             id2label=id2label, label2id=label2id)
         

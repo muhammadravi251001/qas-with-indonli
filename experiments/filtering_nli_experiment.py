@@ -512,6 +512,7 @@ if __name__ == "__main__":
         
         # Train
         warmup_ratio=WARMUP_RATIO,
+        weight_decay=WEIGHT_DECAY,
         bf16=False,
         dataloader_num_workers=cpu_count(),
         

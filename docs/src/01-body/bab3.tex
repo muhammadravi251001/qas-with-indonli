@@ -16,7 +16,7 @@ Pada sub-bab ini, akan dijelaskan mengenai tahapan penelitian yang penulis gunak
 
 \begin{itemize}
     
-    \item \textbf{Persiapan data, model, dan metode}: Pada tahap ini penulis melakukan pencarian untuk memilih data, model, dan metode eksperimen apa saja yang akan digunakan dalam penelitian ini. Tahap ini meliputi pemilihan data dan model yang akan digunakan untuk tiap metode dan penjelasan metode yang dipakai untuk penelitian. Kemudian, untuk metode penelitian, penulis memutuskan untuk menggunakan tiga metode eksperimen, yaitu: \emph{intermediate-task transfer learning}, \emph{task recasting} dengan IndoNLI sebagai verifikator, dan \emph{task recasting} dengan IndoNLI sebagai penghasil jawaban. Hasil dari tahap ini adalah data yang akan digunakan pada tahap selanjutnya.
+    \item \textbf{Persiapan data, model, dan metode}: Pada tahap ini penulis melakukan pencarian untuk memilih data, model, dan metode eksperimen apa saja yang akan digunakan dalam penelitian ini. Tahap ini meliputi pemilihan data dan model yang akan digunakan untuk tiap metode dan penjelasan metode yang dipakai untuk penelitian. Kemudian, untuk metode penelitian, penulis memutuskan untuk menggunakan tiga metode eksperimen, yaitu: \emph{intermediate-task transfer learning} dan \emph{task recasting} dengan IndoNLI sebagai verifikator. Hasil dari tahap ini adalah data yang akan digunakan pada tahap selanjutnya.
 
     \item \textbf{Eksplorasi \emph{dataset} (EDA)}: Pada tahap ini penulis melakukan eksplorasi dari \emph{dataset} sistem tanya jawab yang telah dipilih sebelumnya. Eksplorasi \emph{dataset} (EDA) dilakukan dengan bertujuan untuk mengerti karakteristik dari suatu \emph{dataset} sistem tanya jawab yang sedang diproses.
     
@@ -39,7 +39,7 @@ Data yang penulis gunakan dapat terbagi menjadi dua bagian, data NLI dan data si
 %-----------------------------------------------------------------------------%
 \subsection{Metode Eksperimen}
 %-----------------------------------------------------------------------------%
-Pada sub-bab ini, akan dijelaskan beberapa metode yang penulis pilih, yaitu: \emph{intermediate-task transfer learning}, \emph{task recasting} dengan IndoNLI sebagai verifikator jawaban, dan \emph{task recasting} dengan IndoNLI sebagai penghasil jawaban. 
+Pada sub-bab ini, akan dijelaskan beberapa metode yang penulis pilih, yaitu: \emph{intermediate-task transfer learning} dan \emph{task recasting} dengan IndoNLI sebagai verifikator jawaban. 
 
 %-----------------------------------------------------------------------------%
 \subsubsection{\emph{Intermediate-Task Transfer Learning}}
@@ -50,11 +50,6 @@ Pada penelitian ini, \emph{intermediate task} yang dipilih adalah \emph{sequence
 \subsubsection{\emph{Task Recasting} dengan IndoNLI sebagai verifikator}
 %-----------------------------------------------------------------------------%
 Pada penelitian ini, prediksi jawaban oleh model \emph{question answering} tidak diganggu sama sekali, setelah prediksi jawaban didapatkan, baru dilakukan penyaringan (\emph{filtering}) prediksi jawabannya. Untuk alur eksperimen tahap ini, akan dijelaskan pada sub-bab selanjutnya. 
-
-%-----------------------------------------------------------------------------%
-\subsubsection{\emph{Task Recasting} dengan IndoNLI sebagai penghasil jawaban}
-%-----------------------------------------------------------------------------%
-\todo
 
 %-----------------------------------------------------------------------------%
 \section{Eksplorasi \emph{dataset} (EDA)}
@@ -202,11 +197,6 @@ Alur penelitian tahapan \emph{task} Recasting dengan IndoNLI sebagai verifikator
 \end{itemize}
 
 %-----------------------------------------------------------------------------%
-\subsection{\emph{Task Recasting} dengan IndoNLI sebagai penghasil jawaban}
-%-----------------------------------------------------------------------------%
-\todo
-
-%-----------------------------------------------------------------------------%
 \section{Evaluasi dan Analisis Hasil}
 %-----------------------------------------------------------------------------%
 Pada sub-bab ini, akan dilakukan tahapan evaluasi dan analisis hasil ketiga metode itu dengan \emph{baseline} tanpa melakukan eksperimen sama sekali, kemudian, metrik yang dipilih sebagai bahan evaluasi dan analisis secara umum ada dua, yaitu: \emph{exact match} (atau bisa direpresentasikan sebagai akurasi) dan skor F1 berdasarkan \emph{token} prediksi jawaban. Pemilihan kedua metrik evaluasi tersebut didasari oleh keinginan penulis untuk mencontoh \citep{rajpurkar-etal-2016-squad} dalam penggunaan metrik evaluasi sistem tanya jawab. Namun, secara khusus, metrik evaluasi yang digunakan oleh setiap metode akan berbeda, contohnya akan dijelaskan pada sub-bab selanjutnya.
@@ -220,8 +210,3 @@ Metrik yang penulis gunakan pada tahap ini adalah: \emph{exact match} dan skor F
 \subsection{\emph{Task Recasting} dengan IndoNLI sebagai verifikator}
 %-----------------------------------------------------------------------------%
 Metrik yang penulis gunakan pada tahap ini adalah: \emph{exact match} berdasarkan \emph{token prediksi} jawaban, skor F1 berdasarkan \emph{token} prediksi jawaban, akurasi berdasarkan parameter label NLI, dan skor F1 berdasarkan parameter label NLI. Analisis dan evaluasi akan didasari oleh keempat metrik tersebut. Hal tersebut bertujuan untuk mengetahui penurunan atau peningkatan hasil prediksi jawaban yang tersaring (\emph{filtered}). Dengan keempat metrik tersebut, seharusnya sudah dapat terbaca bagaimana kualitas sistem penyaringan (\emph{filtering}) sistem tanya jawab kita, apakah jawaban benar tidak masuk prediksi final karena terhalang oleh label NLI, ataupun sebaliknya, apakah jawaban salah justru masuk prediksi final karena label NLI-nya sudah sesuai.
-
-%-----------------------------------------------------------------------------%
-\subsection{\emph{Task Recasting} dengan IndoNLI sebagai penghasil jawaban}
-%-----------------------------------------------------------------------------%
-\todo
