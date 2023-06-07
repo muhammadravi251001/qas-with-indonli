@@ -2,62 +2,65 @@
 \chapter{\babEmpat}
 \label{bab:4}
 %-----------------------------------------------------------------------------%
-Bab keempat ini menjelaskan tentang implementasi teknis yang penulis lakukan dalam penelitian ini. Sub-bab 4.1 menjelaskan mengenai \emph{training} \emph{sequence classification task}. Sub-bab 4.2 menjelaskan mengenai  \emph{training} \emph{baseline} model \emph{question answering task}. Sub-bab 4.3 menjelaskan mengenai metode \emph{intermediate-task transfer learning}. Sub-bab 4.4 lalu menjelaskan mengenai metode \emph{task recasting} dengan IndoNLI sebagai verifikator.
+Bab keempat ini menjelaskan tentang implementasi teknis yang penulis lakukan dalam penelitian ini. Sub-bab \ref{4.1} menjelaskan mengenai \emph{training} \emph{sequence classification task}. Sub-bab \ref{4.2} menjelaskan mengenai  \emph{training} \emph{baseline} model \emph{question answering task}. Sub-bab \ref{4.3} menjelaskan mengenai metode \emph{intermediate-task transfer learning}. Sub-bab \ref{4.4} lalu menjelaskan mengenai metode \emph{task recasting} dengan IndoNLI sebagai verifikator.
 
 %-----------------------------------------------------------------------------%
 \section{\emph{Training} \emph{Sequence Classification Task}}
+\label{4.1}
 %-----------------------------------------------------------------------------%
 Pada sub-bab ini, akan dijelaskan mengenai \emph{training} model pada tugas \emph{sequence classification} dalam belajar \emph{natural language inference} yang penulis lakukan pada pada penelitian ini. 
 
 %-----------------------------------------------------------------------------%
 \subsection{Pengambilan Parameter Untuk \emph{Training Sequence Classification Task}}
+\label{4.1.1}
 %-----------------------------------------------------------------------------%
 Pengambilan parameter untuk \emph{training sequence classification task} menggunakan bantuan \emph{library} dari \texttt{argparse}. Penulis gunakan \texttt{argparse} agar dapat menjalankan eksperimen via \emph{terminal} bukan dengan satu-satu menjalankan via \emph{notebook}. Parameter yang dapat digunakan dalam \emph{training sequence classification task} ini meliputi: nama model, nama \emph{dataset}, jumlah \emph{epoch}, jumlah sampel data, jumlah \emph{learn rate}, jumlah \emph{seed}, jumlah \emph{batch size}, jumlah \emph{gradient accumulation}, dan token akun Hugging Face agar dapat otomatis \emph{push} ke akun Hugging Face-nya. Untuk pilihan nilai dari masing-masing parameternya, penulis sertakan di tabel bawah ini.
 
-\begin{table}[h!]
+\begin{table}[H]
 \centering
-\begin{tabular}{|P{2.0in}|P{4.0in}|}
- \hline
- Parameter & Pilihan Nilai \\ [0.5ex] 
- \hline
- Nama model & \texttt{indobert-base-uncased}, \texttt{indobert-large-p2}, \texttt{xlm-roberta-large} \\ 
- Nama data & IndoNLI-\emph{basic}, IndoNLI-\emph{translated}, IndoNLI-\emph{augmented} \\
+\begin{tabularx}{\linewidth}{XlXX}
+ \toprule
+ Parameter & Pilihan Nilai \\
+ \midrule
+ Nama model & [\texttt{indobert-base-uncased}, \texttt{indobert-large-p2}, \texttt{xlm-roberta-large}] \\  
+ Nama data & [IndoNLI-\emph{basic}, IndoNLI-\emph{translated}, IndoNLI-\emph{augmented}] \\
  Jumlah \emph{epoch} & Isi dengan \emph{integer} berapapun \\
  Jumlah sampel & Isi dengan \emph{integer} berapapun, atau dengan \emph{string} \texttt{max} \\
  Jumlah \emph{learn rate} & Isi dengan \emph{float} berapapun \\ 
  Jumlah \emph{seed} & Isi dengan \emph{integer} berapapun \\ 
  Jumlah \emph{batch size} & Isi dengan \emph{integer} berapapun \\ 
  Jumlah \emph{gradient accumulation} & Isi dengan \emph{integer} berapapun \\ 
- \emph{Token} & Isi dengan \emph{string} \emph{token} yang tertera pada Hugging Face \\[1ex] 
- \hline
-\end{tabular}
+ \emph{Token} & Isi dengan \emph{string} \emph{token} yang tertera pada Hugging Face \\ 
+ \bottomrule
+\end{tabularx}
 \caption{Tabel parameter dan pilihan nilai pada \emph{training sequence classification} IndoNLI}
 \end{table}
 
 %-----------------------------------------------------------------------------%
 \subsection{Pemilihan \emph{Hyperparameter} Untuk \emph{Sequence Classification Task}}
+\label{4.1.2}
 %-----------------------------------------------------------------------------%
 Selain dari \emph{hyperparameter} yang dapat diatur pada pengambilan parameter sebelumnya, terdapat beberapa \emph{hyperparameter} permanen untuk penelitian ini, berikut \emph{hyperparameter} yang tidak bisa diubah-ubah via \texttt{argparse}.
 
 \begin{table}[h]
 \centering
-\begin{tabular}{||c | c||} 
- \hline\hline
+\begin{tabular}{lr} 
+ \toprule
  \emph{Hyperparameter} & Nilai \\ [0.5ex] 
- \hline\hline
+ \midrule
  MAX LENGTH & 512 \\ 
- STRIDE & 128 \\
  LOGGING STEPS & 50 \\
  WARMUP RATIO & 0.0 \\
  WEIGHT DECAY & 0.0 \\ 
  EVAL STEPS RATIO & 0.5 \\ [1ex] 
- \hline\hline
+ \bottomrule
 \end{tabular}
 \caption{Tabel \emph{hyperparameter} pada \emph{training sequence classification} IndoNLI}
 \end{table}
 
 %-----------------------------------------------------------------------------%
 \subsection{Mengimpor \emph{Dataset} IndoNLI}
+\label{4.1.3}
 %-----------------------------------------------------------------------------%
 Pada tahap ini, akan dijalankan pengambilan \emph{dataset} IndoNLI dari Hugging Face maupun GitHub dan penyamaan format \texttt{DatasetDict}. Tujuan dilakukan hal tersebut agar dapat lebih mempermudah eksperimen kedepannya. Untuk \emph{dataset} IndoNLI-\emph{basic}, penulis hanya mengambil via Hugging Face saja dengan fungsi \texttt{load\char`_dataset("indonli")}. 
 
@@ -67,6 +70,7 @@ Terakhir, untuk \emph{dataset} IndoNLI-\emph{translated}, penulis mengambil via 
 
 %-----------------------------------------------------------------------------%
 \subsection{Proses \emph{Preprocess} dan Tokenisasi \emph{Dataset} IndoNLI}
+\label{4.1.4}
 %-----------------------------------------------------------------------------%
 Pada tahap ini, akan dijalankan  \emph{preprocess} dan tokenisasi \emph{dataset} IndoNLI. Tokenisasi dijalankan dengan melakukan tokenisasi pada bagian \texttt{premise} dan \texttt{hypothesis} saja, dengan menggunakan \emph{hyperparameter} yang sebelumnya sudah ditentukan. \emph{Preprocess} dijalankan dengan beberapa parameter tambahan, seperti: \texttt{truncation=True} dan \texttt{return\char`_token\char`_type\char`_ids=True}. Parameter \texttt{truncation} berfungsi untuk memotong (\emph{truncate}) karakter sesuai parameter \texttt{MAX LENGTH} yang dijelaskan sebelumnya dan parameter \texttt{return\char`_token\char`_type\char`_ids} digunakan untuk mengembalikan \texttt{TOKEN\char`_IDS} yang berguna untuk membedakan antara \texttt{premise} dan \texttt{hypothesis}-nya, agak berbeda sedikit dengan model \texttt{xlm-roberta-large}, karena model tersebut tidak mengenal konsep \texttt{return\char`_token\char`_type\char`_ids}, maka cara untuk membedakan antara \texttt{premise} dan \texttt{hypothesis}-nya dengan menggunakan fungsi \texttt{index} bawaan Python dengan mencari ID = 2 (\texttt{</s>}) pada \texttt{input\char`_ids} sebagai pemisahnnya. 
 
@@ -76,6 +80,7 @@ Terakhir, penulis mengubah format kolom \texttt{input\char`_ids} dan \texttt{tok
 
 %-----------------------------------------------------------------------------%
 \subsection{Mengimpor Model \emph{Sequence Classification}}
+\label{4.1.5}
 %-----------------------------------------------------------------------------%
 Pada tahapan ini, penulis menyuplai \texttt{pretrained\char`_model\char`_name\char`_or\char`_path} sesuai dengan parameter yang telah dipilih via \texttt{argparse} sebelumnya dan penulis menyuplai banyak label sebanyak 3, karena hasil label dari persoalan NLI di IndoNLI memiliki tiga label akhir, yaitu: \emph{entailment}, \emph{neutral}, \emph{contradiction}. Hal tersebut digunakan agar hasil dari klasifier akhir model yang telah dipilih menghasilkan tiga \emph{unit} saja sesuai dengan kebutuhan \emph{task} yang sedang dilakukan, yaitu: \emph{sequence classification task}. Pendefinisian model \emph{sequence classification} ini menggunakan modul \texttt{AutoModelForSequenceClassification}.
 
@@ -83,11 +88,13 @@ Kemudian, tidak lupa juga menyuplai \texttt{id2label} dan \texttt{label2id}. Dim
 
 %-----------------------------------------------------------------------------%
 \subsection{Perancangan Metrik Komputasi Untuk Penilaian \emph{Sequence Classification Task}}
+\label{4.1.6}
 %-----------------------------------------------------------------------------%
 Pada perancangan metrik komputasi \emph{sequence classification task}, penulis menggunakan \emph{library} dari \texttt{evaluate} untuk menggunakan metrik akurasi dan skor F1, dimana skor F1 penulis atur ke \texttt{average="weighted"} karena tipe \emph{average weighted} dapat menghitung metrik setiap label dengan memperhatikan \emph{label imbalance}. Perhitungan metrik akurasi dan skor F1 dilakukan secara bersamaan dengan fungsi \texttt{load} bawaan dari \emph{library} \texttt{evaluate} dengan parameter \texttt{'accuracy'} dan \texttt{'f1'}. Hasil prediksi dari model didapatkan dari hasil fungsi \texttt{np.argmax} terhadap properti \texttt{predictions} dengan parameter \texttt{axis=1}; dan \emph{golden truth} didapatkan dari properti \texttt{label\char`_ids}.
 
 %-----------------------------------------------------------------------------%
 \subsection{Perancangan Penamaan Eksperimen \emph{Sequence Classification Task}}
+\label{4.1.7}
 %-----------------------------------------------------------------------------%
 Pada tahap ini, penulis merancang penamaan eksperimen agar dapat melakukan evaluasi \& analisis terkait eksperimen dengan lebih mudah, rapih, dan teratur. Pada penamaan eksperimen \emph{sequence classification task} ini, penulis memastikan untuk memberikan nama yang memenuhi berisi: nama model, nama \emph{dataset} yang digunakan, jumlah \emph{learn rate}. Penamaan tersebut berguna untuk melakukan penyimpanan eksperimen ke lokal dan saat \emph{push} ke repositori Hugging Face. 
 
@@ -97,6 +104,7 @@ Untuk nama repositori pada Hugging Face memiliki beberapa syarat penamaan, antar
 
 %-----------------------------------------------------------------------------%
 \subsection{Perancangan Argumen Latih (\emph{Training Arguments}) \emph{Sequence Classification}}
+\label{4.1.8}
 %-----------------------------------------------------------------------------%
 Pada tahap ini, penulis merancang \emph{training arguments} dengan modul \texttt{TrainingArguments} agar jalannya eksperimen sesuai parameter yang telah dipilih sebelumnya, seperti: jumlah \emph{epoch}, jumlah \emph{learn rate}, jumlah \emph{seed}, jumlah \emph{batch size}, jumlah \emph{gradient accumulation}, \emph{token}; dan juga \emph{hyperparameter} permanen, seperti:  \texttt{LOGGING STEPS}, \texttt{WEIGHT DECAY}, \texttt{WARMUP RATIO}. 
 
@@ -108,6 +116,7 @@ Kemudian, pada sisi memori saat melakukan \emph{training}, penulis menyuplai par
 
 %-----------------------------------------------------------------------------%
 \subsection{Melakukan \emph{Training} dan Prediksi Jawaban \emph{Sequence Classification}}
+\label{4.1.9}
 %-----------------------------------------------------------------------------%
 Pada tahap ini, dilakukan \emph{training} dengan menggunakan data \emph{train} dan data \emph{validation} sebagai parameter \emph{training}-nya. Penulis juga melakukan \emph{early callback} dengan nilai \emph{patience} sebesar 3, yang artinya model akan berhenti \emph{training} bila tiga hasil evaluasi setelahnya memiliki nilai metrik yang lebih kecil dibanding sebelumnya; hal tersebut dilakukan untuk efisiensi waktu dan \emph{resource} \emph{training}-nya. 
 
@@ -115,6 +124,7 @@ Sehingga, pada tahap ini, penulis menyuplai beberapa parameter pada modul \textt
 
 %-----------------------------------------------------------------------------%
 \subsection{Representasi Prediksi Jawaban \emph{Sequence Classification}}
+\label{4.1.10}
 %-----------------------------------------------------------------------------%
 Pada tahap ini, penulis mengubah \texttt{PredictionOutput} hasil dari prediksi model menjadi sebuah \texttt{DataFrame} yang dapat dibaca secara jelas oleh manusia. Tahapan ini berguna untuk evaluasi dan analisis kedepannya. Pada tahap ini, penulis mengekstrak \texttt{premise}, \texttt{hypothesis}, \texttt{prediction label}, \texttt{golden label} dari \texttt{PredictionOutput} hasil dari prediksi model dan diubah dalam bentuk \texttt{DataFrame}. 
 
@@ -122,27 +132,30 @@ Proses pemisahan antara \texttt{premise} dan \texttt{hypothesis} menggunakan pro
 
 %-----------------------------------------------------------------------------%
 \subsection{Melakukan \emph{push} \emph{sequence classification} ke akun Hugging Face}
+\label{4.1.11}
 %-----------------------------------------------------------------------------%
-Pada tahapan ini, sederhananya, penulis hanya melakukan \emph{push} hasil eksperimen, meliputi: model, evaluasi, dan keluaran dari eksperimen ke akun Hugging Face yang telah disuplai \texttt{TOKEN}-nya pada bagian parameter sebelumnya. Proses \emph{push} menggunakan API khusus Hugging Face, yaitu: \texttt{HfApi} dimana pengunggahan dilakukan dengan fungsi \texttt{upload\char`_folder}, kemudian hanya untuk folder \emph{output} dan folder \emph{metric result} saja yang diunggah ke repositori Hugging Face karena hanya folder-folder tersebut saja yang dirasa berguna untuk evaluasi dan analisis kedepannya. Untuk folder \emph{model} sudah otomatis diunggah saat \emph{training} karena penggunaan parameter \texttt{push\char`_to\char`_hub=True} pada pendefinisian \emph{TrainingArguments} sebelumnya.
+Pada tahapan ini, sederhananya, penulis hanya melakukan \emph{push} hasil eksperimen, meliputi: model, evaluasi, dan keluaran dari eksperimen ke akun Hugging Face yang telah disuplai \texttt{TOKEN}-nya pada bagian parameter sebelumnya. Proses \emph{push} menggunakan API khusus Hugging Face, yaitu: \texttt{HfApi} dimana pengunggahan dilakukan dengan fungsi \texttt{upload\char`_folder}, kemudian hanya untuk folder \emph{output} dan folder \emph{metric result} saja yang diunggah ke repositori Hugging Face karena hanya folder-folder tersebut saja yang dirasa berguna untuk evaluasi dan analisis kedepannya. Untuk folder \emph{model} sudah otomatis diunggah saat \emph{training} karena penggunaan parameter \texttt{push\char`_to\char`_hub=True} pada pendefinisian \texttt{TrainingArguments} sebelumnya.
 
 %-----------------------------------------------------------------------------%
 \section{\emph{Training} \emph{Baseline} Model \emph{Question Answering Task}}
+\label{4.2}
 %-----------------------------------------------------------------------------%
 Pada sub-bab ini, akan dijelaskan mengenai \emph{training} model pada tugas \emph{question answering task} dalam belajar tiga \emph{dataset} sistem tanya jawab yang penulis lakukan pada pada penelitian ini.
 
 %-----------------------------------------------------------------------------%
 \subsection{Pengambilan Parameter Untuk \emph{Training Baseline Question Answering Task}}
+\label{4.2.1}
 %-----------------------------------------------------------------------------%
-Pengambilan parameter untuk \emph{training question answering task} menggunakan bantuan \emph{library} dari \texttt{argparse}. Penulis gunakan \texttt{argparse} agar dapat menjalankan eksperimen via \emph{terminal} bukan dengan satu-satu menjalankan via \emph{notebook}. Parameter yang dapat digunakan dalam \emph{training question answering task} ini meliputi: nama model, nama \emph{dataset}, jumlah \emph{epoch}, jumlah sampel data, jumlah \emph{learn rate}, jumlah \emph{seed}, jumlah \emph{batch size}, jumlah \emph{gradient accumulation}, pilihan apakah mau melakukan \emph{intermediate-task transfer learning}, pilihan apakah mau melakukan \emph{freezing layer}, dan token akun Hugging Face agar dapat otomatis \emph{push} ke akun Hugging Face-nya. Untuk pilihan nilai dari masing-masing parameternya, penulis sertakan di tabel bawah ini.
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.1.1}, namun ada beberapa perbedaan pada tahap ini, antara lain: parameter yang dapat digunakan dalam \emph{training question answering task} ini meliputi: nama model, nama \emph{dataset}, jumlah \emph{epoch}, jumlah sampel data, jumlah \emph{learn rate}, jumlah \emph{seed}, jumlah \emph{batch size}, jumlah \emph{gradient accumulation}, pilihan apakah mau melakukan \emph{intermediate-task transfer learning}, pilihan apakah mau melakukan \emph{freezing layer}, dan token akun Hugging Face agar dapat otomatis \emph{push} ke akun Hugging Face-nya. Untuk pilihan nilai dari masing-masing parameternya, penulis sertakan di tabel bawah ini.
 
 \begin{table}[h!]
 \centering
-\begin{tabular}{|P{2.0in}|P{4.0in}|}
- \hline
- Parameter & Pilihan Nilai \\ [0.5ex] 
- \hline
- Nama model & \texttt{indobert-base-uncased}, \texttt{indobert-large-p2}, \texttt{xlmr-large} \\ 
- Nama data & SQuAD-ID, TyDI-QA-ID, IDK-MRC \\
+\begin{tabularx}{\linewidth}{XlXX}
+ \toprule
+ Parameter & Pilihan Nilai \\
+ \midrule
+ Nama model & [\texttt{indobert-base-uncased}, \texttt{indobert-large-p2}, \texttt{xlm-roberta-large}] \\  
+ Nama data & [SQuAD-ID, TyDI-QA-ID, IDK-MRC] \\
  Jumlah \emph{epoch} & Isi dengan \emph{integer} berapapun \\
  Jumlah sampel & Isi dengan \emph{integer} berapapun, atau dengan \emph{string} \texttt{max} \\
  Jumlah \emph{learn rate} & Isi dengan \emph{float} berapapun \\ 
@@ -151,9 +164,9 @@ Pengambilan parameter untuk \emph{training question answering task} menggunakan 
  Jumlah \emph{gradient accumulation} & Isi dengan \emph{integer} berapapun \\ 
  \emph{Token} & Isi dengan \emph{string} \emph{token} yang tertera pada Hugging Face \\
  \emph{With ITTL} & \texttt{True} atau \texttt{False} \\
- \emph{With Freezing Layer} & \texttt{True} atau \texttt{False} \\ [1ex] 
- \hline
-\end{tabular}
+ \emph{With Freezing Layer} & \texttt{True} atau \texttt{False} \\
+ \bottomrule
+\end{tabularx}
 \caption{Tabel parameter dan pilihan nilai pada \emph{training question answering} \emph{baseline} model \emph{question answer task}. Catatan: ITTL pada tabel tersebut merupakan singkatan dari \emph{Intermediate-Task Transfer Learning}.}
 \end{table}
 
@@ -161,28 +174,30 @@ Namun, pada bagian \emph{training question answering baseline} ini, parameter \e
 
 %-----------------------------------------------------------------------------%
 \subsection{Pemilihan \emph{Hyperparameter} Untuk \emph{Baseline Question Answering Task}}
+\label{4.2.2}
 %-----------------------------------------------------------------------------%
 Selain dari \emph{hyperparameter} yang dapat diatur pada pengambilan parameter di atas, terdapat beberapa \emph{hyperparameter} permanen untuk penelitian ini, berikut \emph{hyperparameter} yang tidak bisa diubah-ubah via \texttt{argparse}.
 
 \begin{table}[h]
 \centering
-\begin{tabular}{||c | c||} 
- \hline\hline
+\begin{tabular}{lr} 
+ \toprule
  \emph{Hyperparameter} & Nilai \\ [0.5ex] 
- \hline\hline
+ \midrule
  MAX LENGTH & 512 \\ 
  STRIDE & 128 \\
  LOGGING STEPS & 50 \\
  WARMUP RATIO & 0.0 \\
  WEIGHT DECAY & 0.0 \\ 
  EVAL STEPS RATIO & 0.5 \\ [1ex] 
- \hline\hline
+ \bottomrule
 \end{tabular}
 \caption{Tabel \emph{hyperparameter} pada \emph{training question answering} \emph{baseline} sistem tanya jawab}
 \end{table}
 
 %-----------------------------------------------------------------------------%
 \subsection{Mengimpor \emph{Dataset} Sistem Tanya Jawab}
+\label{4.2.3}
 %-----------------------------------------------------------------------------%
 Pada tahap ini, akan dijalankan pengambilan semua \emph{dataset} sistem tanya jawab yang akan dieksperimenkan dari \href{https://github.com/IndoNLP/nusa-crowd/tree/master/nusacrowd/nusa_datasets/}{\texttt{nusacrowd}} dan penyamaan format \texttt{DatasetDict}. Tujuan dilakukan hal tersebut agar dapat lebih mempermudah eksperimen kedepannya. Untuk \emph{dataset} SQuAD-ID, penulis hanya mengambil via \href{https://github.com/IndoNLP/nusa-crowd/tree/master/nusacrowd/nusa_datasets/}{\texttt{nusacrowd}} dengan bantuan modul \texttt{NusantaraConfigHelper()} dengan fungsi \texttt{load\char`_dataset} dengan nama \emph{dataset}-nya adalah: \texttt{squad\char`_id}. 
 
@@ -194,6 +209,7 @@ Terakhir, untuk \emph{dataset} IDK-MRC, penulis hanya mengambil via \href{https:
 
 %-----------------------------------------------------------------------------%
 \subsection{Proses \emph{Preprocess} dan Tokenisasi \emph{Dataset} Sistem Tanya Jawab}
+\label{4.2.4}
 %-----------------------------------------------------------------------------%
 Pada tahap ini, akan dijalankan  \emph{preprocess} dan tokenisasi \emph{dataset} sistem tanya jawab. Tokenisasi dijalankan dengan melakukan tokenisasi pada bagian \texttt{question} dan \texttt{context} saja, dengan menggunakan \emph{hyperparameter} yang sebelumnya sudah ditentukan. \emph{Preprocess} dijalankan dengan beberapa parameter tambahan, seperti: \texttt{truncation=True}, \texttt{return\char`_token\char`_type\char`_ids=True}, \texttt{return\char`_overflowing\char`_tokens=True}, \texttt{return\char`_offsets\char`_mapping=True}, \texttt{padding="max\char`_length"}, \texttt{return\char`_tensors='np'}.Parameter \texttt{truncation} berfungsi untuk memotong (\emph{truncate}) karakter sesuai parameter \texttt{MAX LENGTH} yang dijelaskan sebelumnya, lalu parameter \texttt{return\char`_token\char`_type\char`_ids} digunakan untuk mengembalikan \texttt{TOKEN\char`_IDS} yang berguna untuk membedakan antara \texttt{premise} dan \texttt{hypothesis}-nya. agak berbeda sedikit dengan model \texttt{xlm-roberta-large}, karena model tersebut tidak mengenal konsep \texttt{return\char`_token\char`_type\char`_ids}, maka cara untuk membedakan antara \texttt{premise} dan \texttt{hypothesis}-nya dengan menggunakan fungsi \texttt{index} bawaan Python dengan mencari ID = 2 (\texttt{</s>}) pada \texttt{input\char`_ids} sebagai pemisahnnya. 
 
@@ -205,11 +221,13 @@ Terakhir, penulis mengubah format kolom \texttt{input\char`_ids} dan \texttt{tok
 
 %-----------------------------------------------------------------------------%
 \subsection{Mengimpor Model \emph{Question Answering}}
+\label{4.2.5}
 %-----------------------------------------------------------------------------%
 Pada tahapan ini, penulis menyuplai \texttt{pretrained\char`_model\char`_name\char`_or\char`_path} sesuai dengan parameter yang telah dipilih via \texttt{argparse} sebelumnya dan penulis menyuplai banyak label sebanyak 2, karena pada \emph{question answering task} membutuhkan dua label, yaitu: \texttt{answer\char`_start\char`_position} dan \texttt{answer\char`_end\char`_position}. Hal tersebut digunakan agar hasil dari klasifier akhir model yang telah dipilih menghasilkan dua \emph{unit} saja sesuai dengan kebutuhan \emph{task} yang sedang dilakukan, yaitu: \emph{question answering task}. Pendefinisian model \emph{question answering} ini menggunakan modul \texttt{AutoModelForQuestionAnswering}. Terakhir, penulis juga memindahkan model yang sudah dibuat tersebut ke \texttt{device} GPU yang penulis pilih dengan fungsi \texttt{.to(device)}.
 
 %-----------------------------------------------------------------------------%
 \subsection{Perancangan Metrik Komputasi Untuk Penilaian \emph{Baseline Question Answering Task}}
+\label{4.2.6}
 %-----------------------------------------------------------------------------%
 Pada perancangan metrik komputasi \emph{question answering task}, penulis melakukan kalkulasi skor \emph{exact match} dan skor F1 secara manual, tanpa menggunakan \emph{library} apapun, termasuk \emph{library} \texttt{evaluate}. Perhitungan metrik skor \emph{exact match} dan skor F1 dilakukan secara bersamaan. Perhitungan skor \emph{exact match} hanya dengan melakukan perbandingan antara jawaban prediksi dengan jawaban \emph{golden truth} dalam bentuk \emph{string}, jika sama persis maka skor \emph{exact match} akan ditambah dengan 1. 
 
@@ -217,129 +235,80 @@ Kemudian, perhitungan skor F1 lebih rumit dibandingkan perhitungan skor \emph{ex
 
 %-----------------------------------------------------------------------------%
 \subsection{Perancangan Penamaan Eksperimen \emph{Baseline Question Answering Task}}
+\label{4.2.7}
 %-----------------------------------------------------------------------------%
-Pada tahap ini, penulis merancang penamaan eksperimen agar dapat melakukan evaluasi \& analisis terkait eksperimen dengan lebih mudah, rapih, dan teratur. Pada penamaan eksperimen \emph{question answering task} ini, penulis memastikan untuk memberikan nama yang memenuhi berisi: nama model, nama \emph{dataset} yang digunakan, jumlah \emph{learn rate}. Penamaan tersebut berguna untuk melakukan penyimpanan eksperimen ke lokal dan saat \emph{push} ke repositori Hugging Face. 
-
-Untuk pengarsipan eksperimen ke lokal, penulis memasukan ke dalam satu folder besar yang didalamnya berisi empat folder-folder kecil; nama folder besar tersebut merupakan gabungan dari \emph{prefix} \texttt{DatasetQAS}, nama \emph{dataset} yang digunakan, nama model, jumlah \emph{learn rate}, dan juga waktu saat mulai menjalankan \emph{training}. Kemudian, folder-folder kecilnya terdiri dari folder \emph{checkpoint}, \emph{model}, \emph{output}, \emph{metric result}. Dimana, folder \emph{checkpoint} digunakan untuk menyimpan \emph{checkpoint} saat \emph{training} \emph{question answering task}; kemudian, folder \emph{model} digunakan untuk menyimpan \emph{model} akhir setelah \emph{training} \emph{question answering task}; lalu, folder \emph{output} digunakan untuk menyimpan \emph{output} akhir hasil dari prediksi model yang sudah dilatih tersebut terhadap data \emph{validation}; terakhir, folder \emph{metric result} berisi terkait perhitungan metrik dari model yang sudah dilatih tersebut terhadap data \emph{test}. 
-
-Untuk nama repositori pada Hugging Face memiliki beberapa syarat penamaan, antara lain: memiliki \emph{prefix} "\emph{fine-tuned} \texttt{DatasetQAS}", nama \emph{dataset} yang digunakan, nama model, dan jumlah \emph{learn rate}, tanpa waktu saat mulai menjalankan \emph{training}, dan juga dibatasi hingga 96 karakter saja mengikuti aturan penamaan repositori dari Hugging Face. Karena bagian ini merupakan \emph{training question answering baseline}, maka ada nama tambahan yang disimpan di lokal maupun pada repositori Hugging Face, yaitu: \emph{without-ITTL} dan \emph{without-freeze}.
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.1.7}, namun pada sub-bab penamaan eksperimen \emph{question answering task} ini, ada beberapa perbedaan minor, antara lain: penamaan folder besar merupakan gabungan dari \emph{prefix} \texttt{DatasetQAS}, nama \emph{dataset} yang digunakan, nama model, jumlah \emph{learn rate}, folder \emph{checkpoint} digunakan untuk menyimpan \emph{checkpoint} saat \emph{training} \emph{question answering task}, folder \emph{model} digunakan untuk menyimpan \emph{model} akhir setelah \emph{training} \emph{question answering task}; lalu, folder \emph{output} digunakan untuk menyimpan \emph{output} akhir hasil dari prediksi model yang sudah dilatih tersebut terhadap data \emph{validation}, folder \emph{metric result} berisi terkait perhitungan metrik dari model yang sudah dilatih tersebut terhadap data \emph{test}, terakhir, untuk nama repositori pada Hugging Face memiliki beberapa syarat penamaan, antara lain: memiliki \emph{prefix} "\emph{fine-tuned} \texttt{DatasetQAS}", nama \emph{dataset} yang digunakan, nama model, dan jumlah \emph{learn rate}, tanpa waktu saat mulai menjalankan \emph{training}. Kemudian, karena bagian ini merupakan \emph{training question answering baseline}, maka ada nama tambahan yang disimpan di lokal maupun pada repositori Hugging Face, yaitu: \emph{without-ITTL} dan \emph{without-freeze}.
 
 %-----------------------------------------------------------------------------%
 \subsection{Perancangan Argumen Latih (\emph{Training Arguments})}
+\label{4.2.8}
 %-----------------------------------------------------------------------------%
-Pada tahap ini, penulis merancang \emph{training arguments} dengan modul \texttt{TrainingArguments} agar jalannya eksperimen sesuai parameter yang telah dipilih sebelumnya, seperti: jumlah \emph{epoch}, jumlah \emph{learn rate}, jumlah \emph{seed}, jumlah \emph{batch size}, jumlah \emph{gradient accumulation}, \emph{token}; dan juga \emph{hyperparameter} permanen, seperti:  \texttt{LOGGING STEPS}, \texttt{WEIGHT DECAY}, \texttt{WARMUP RATIO}. 
-
-\texttt{STEP} disesuaikan dengan rumus: \texttt{BATCH SIZE $\times$ GRADIENT ACCUMULATION $\times$ EVAL STEPS RATIO} ditujukan agar model melakukan evaluasi setiap \texttt{EVAL STEPS RATIO} agar dapat melakukan \emph{early callback} nantinya untuk efisiensi \emph{training}. Pemilihan \emph{best model} dipilih ke metrik skor F1, karena metrik F1 dapat mengatasi permasalahan \emph{label imbalance}.
-
-Pada bagian ini juga dilakukan penyimpanan terkait data (\emph{data-ops}) yang juga disuplai kepada parameter \texttt{TrainingArguments}, seperti: direktori \emph{checkpoint}, \emph{logging platform} yang otomatis diatur ke \texttt{tensorboard}, strategi \emph{logging}, strategi penyimpanan, dan strategi evaluasi yang otomatis diatur ke \texttt{steps}, Kecenderungan penulis untuk menggunakan \texttt{steps} pada bagian ini dikarenakan nantinya penulis akan menggunakan parameter \texttt{load\char`_best\char`_model\char`_at\char`_end} sebagai \texttt{True}, dan dimana strategi penyimpanan dan strategi evaluasi harus diatur ke \texttt{steps} sesuai dengan aturan dari modul \texttt{TrainingArguments}.
-
-Kemudian, pada sisi memori saat melakukan \emph{training}, penulis menyuplai parameter \texttt{dataloader\char`_num\char`_workers=cpu\char`_count()} agar dapat menggunakan subproses (paralelisme) yang digunakan untuk memuat data sesuai dengan banyaknya CPU pada sistem; dan juga penulis menyuplai parameter \texttt{push\char`_to\char`_hub=True} untuk otomatis \emph{push} ke repositori Hugging Face saat menjalankan \emph{training}, sesuai dengan nama repositori yang telah dijelaskan di sub-bab sebelumnya, dan suplai parameter \texttt{load\char`_best\char`_model\char`_at\char`_end=True} agar model yang nanti diambil merupakan hasil model yang terbaik dari sepanjang proses \emph{training}.
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.1.8}, tanpa ada perubahan apapun.
 
 %-----------------------------------------------------------------------------%
 \subsection{Melakukan \emph{Training} dan Prediksi Jawaban \emph{Baseline Question Answering}}
+\label{4.2.9}
 %-----------------------------------------------------------------------------%
-Pada tahap ini, dilakukan \emph{training} dengan menggunakan data \emph{train} dan data \emph{validation} sebagai parameter \emph{training}-nya. Penulis juga melakukan \emph{early callback} dengan nilai \emph{patience} sebesar 3, yang artinya model akan berhenti \emph{training} bila tiga hasil evaluasi setelahnya memiliki nilai metrik yang lebih kecil dibanding sebelumnya; hal tersebut dilakukan untuk efisiensi waktu dan \emph{resource} \emph{training}-nya. 
-
-Sehingga, pada tahap ini, penulis menyuplai beberapa parameter pada modul \texttt{Trainer}, antara lain: model yang digunakan, \emph{training arguments} yang sebelumnya sudah didefinisikan, \emph{train\_dataset} yang diatur ke data \emph{train}-nya, \emph{validation\_dataset} yang diatur ke data \emph{validation}-nya, \emph{tokenizer} yang digunakan, \emph{data\_collator} yang digunakan, metrik komputasi yang sebelumnya sudah dirancang, dan \emph{callbacks} dimana diatur ke \emph{early callback} dengan \emph{patience} sebesar 3. Kemudian, terakhir, dilakukan prediksi terhadap data \emph{test}, dengan menggunakan fungsi \texttt{predict}.
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.1.9}, namun ada satu perbedaan fundamental, yaitu, pada tahap ini dilakukan prediksi terhadap data \emph{test}, bukan terhadap data \emph{validation}.
 
 %-----------------------------------------------------------------------------%
 \subsection{Representasi Prediksi Jawaban Untuk Evaluasi dan Analisis}
+\label{4.2.10}
 %-----------------------------------------------------------------------------%
 Pada tahap ini, penulis mengubah \texttt{PredictionOutput} hasil dari prediksi model menjadi sebuah \texttt{DataFrame} yang dapat dibaca secara jelas oleh manusia. Tahapan ini berguna untuk evaluasi dan analisis kedepannya. Pada tahap ini, penulis mengekstrak \texttt{context}, \texttt{question}, \texttt{prediction answer}, \texttt{golden answer} dari \texttt{PredictionOutput} hasil dari prediksi model dan diubah dalam bentuk \texttt{DataFrame}. 
 
 Proses pemisahan antara \texttt{question} dan \texttt{context} menggunakan properti \texttt{token\char`_type\char`_ids}, dimana bila \texttt{token\char`_type\char`_ids} bernilai 0, maka \texttt{input\char`_ids} yang bersangkutan merupakan sebuah bagian dari \texttt{question}, sebaliknya bila \texttt{token\char`_type\char`_ids} bernilai 1, maka \texttt{input\char`_ids} yang bersangkutan merupakan sebuah bagian dari \texttt{question}; hal tersebut sesuai dengan urutan \emph{preprocess} dan tokenisasi dimana urutannya \texttt{question} lalu \texttt{question}. Namun agak berbeda sedikit dengan model \texttt{xlm-roberta-large}, karena model tersebut tidak mengenal konsep \texttt{return\char`_token\char`_type\char`_ids}, maka cara untuk membedakan antara \texttt{question} dan \texttt{context}-nya dengan menggunakan fungsi \texttt{index} bawaan Python dengan mencari ID = 2 (\texttt{</s>}) pada \texttt{input\char`_ids} sebagai pemisahnnya. 
 
+Pada tahap ini juga akan dilakukan analisis terhadap beberapa karakteristik pasangan pertanyaan-jawaban-konteks, antara lain: \emph{question type}, panjang konteks, panjang pertanyaan, panjang jawaban \emph{golden truth}, \emph{answer type}, dan \emph{reasoning type}. Evaluasi dan analisis akan dilakukan secara manual, kecuali pada \emph{answer type}, penulis menggunakan model \emph{entity-named recognition} berbahasa Indonesia dengan model \href{https://huggingface.co/cahya/xlm-roberta-base-indonesian-NER}{\texttt{cahya/xlm-roberta-base-indonesian-NER}}, penulis menggunakan model tersebut karena memiliki ketersediannya pada repositori Hugging Face dan memiliki performa yang baik. Sederhananya, akan dilakukan perhitungan persentase jawaban prediksi yang benar (dihitung sebagai \emph{exact match}) dibandingkan jawaban prediksi yang salah, dengan memperhatikan karakteristik pasangan pertanyaan-jawaban-konteks yang telah dijabarkan sebelumnya. Kemudian, hasil analisis ini disimpan dalam format \texttt{txt} dan akan otomatis di-\emph{push} ke repositori Hugging Face pada sub-bab selanjutnya, hal tersebut dilakukan agar mempermudah melihat hasil eksperimen di internet, tanpa perlu mengecek ke penyimpanan (\emph{storage}) lokal.
+
 %-----------------------------------------------------------------------------%
 \subsection{Melakukan \emph{Push} ke Akun Hugging Face}
+\label{4.2.11}
 %-----------------------------------------------------------------------------%
-Pada tahapan ini, sederhananya, penulis hanya melakukan \emph{push} hasil eksperimen, meliputi: model, evaluasi, dan keluaran dari eksperimen ke akun Hugging Face yang telah disuplai \texttt{TOKEN}-nya pada bagian parameter sebelumnya. Proses \emph{push} menggunakan API khusus Hugging Face, yaitu: \texttt{HfApi} dimana pengunggahan dilakukan dengan fungsi \texttt{upload\char`_folder}, kemudian hanya untuk folder \emph{output} dan folder \emph{metric result} saja yang diunggah ke repositori Hugging Face karena hanya folder-folder tersebut saja yang dirasa berguna untuk evaluasi dan analisis kedepannya. Untuk folder \emph{model} sudah otomatis diunggah saat \emph{training} karena penggunaan parameter \texttt{push\char`_to\char`_hub=True} pada pendefinisian \emph{TrainingArguments} sebelumnya.
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.1.11}, tanpa ada perubahan apapun.
 
 %-----------------------------------------------------------------------------%
 \section{Metode \emph{Intermediate-Task Transfer Learning}}
+\label{4.3}
 %-----------------------------------------------------------------------------%
 Pada sub-bab ini, akan dijelaskan mengenai \emph{training} model pada tugas \emph{question answering task} dalam belajar tiga \emph{dataset} sistem tanya jawab dengan metode \emph{intermediate-task transfer learning} yang penulis lakukan pada pada penelitian ini. Secara keseluruhan, sub-bab ini cenderung mirip dengan sub-bab \emph{training} \emph{baseline} model \emph{question answering task}, namun ada beberapa perbedaan mendasar diantara kedua sub-bab ini.
 
 %-----------------------------------------------------------------------------%
 \subsection{Pengambilan Parameter Untuk \emph{Training Intermediate-Task Transfer Learning Question Answering Task}}
+\label{4.3.1}
 %-----------------------------------------------------------------------------%
-Pengambilan parameter untuk \emph{training question answering task} menggunakan bantuan \emph{library} dari \texttt{argparse}. Penulis gunakan \texttt{argparse} agar dapat menjalankan eksperimen via \emph{terminal} bukan dengan satu-satu menjalankan via \emph{notebook}. Parameter yang dapat digunakan dalam \emph{training question answering task} ini meliputi: nama model, nama \emph{dataset}, jumlah \emph{epoch}, jumlah sampel data, jumlah \emph{learn rate}, jumlah \emph{seed}, jumlah \emph{batch size}, jumlah \emph{gradient accumulation}, pilihan apakah mau melakukan \emph{intermediate-task transfer learning}, pilihan apakah mau melakukan \emph{freezing layer}, dan token akun Hugging Face agar dapat otomatis \emph{push} ke akun Hugging Face-nya. Untuk pilihan nilai dari masing-masing parameternya, penulis sertakan di tabel bawah ini.
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{|P{2.0in}|P{4.0in}|}
- \hline
- Parameter & Pilihan Nilai \\ [0.5ex] 
- \hline
- Nama model & \texttt{indobert-base-uncased}, \texttt{indobert-large-p2}, \texttt{xlm-roberta-large} \\ 
- Nama data & SQuAD-ID, TyDI-QA-ID, IDK-MRC \\
- Jumlah \emph{epoch} & Isi dengan \emph{integer} berapapun \\
- Jumlah sampel & Isi dengan \emph{integer} berapapun, atau dengan \emph{string} \texttt{max} \\
- Jumlah \emph{learn rate} & Isi dengan \emph{float} berapapun \\ 
- Jumlah \emph{seed} & Isi dengan \emph{integer} berapapun \\ 
- Jumlah \emph{batch size} & Isi dengan \emph{integer} berapapun \\ 
- Jumlah \emph{gradient accumulation} & Isi dengan \emph{integer} berapapun \\ 
- \emph{Token} & Isi dengan \emph{string} \emph{token} yang tertera pada Hugging Face \\
- \emph{With ITTL} & \texttt{True} atau \texttt{False} \\
- \emph{With Freezing Layer} & \texttt{True} atau \texttt{False} \\ [1ex] 
- \hline
-\end{tabular}
-\caption{Tabel parameter dan pilihan nilai pada \emph{training question answering} \emph{intermediate-task transfer learning} model \emph{question answer task}. Catatan: ITTL pada tabel tersebut merupakan singkatan dari \emph{Intermediate-Task Transfer Learning}.}
-\end{table}
-
-Pada bagian \emph{training question answering intermediate-task transfer learning} ini, parameter \emph{With ITTL} akan diatur sebagai \texttt{True} dan parameter \emph{With Freezing Layer} boleh diatur sebagai \texttt{True} ataupun \texttt{False}. Parameter \emph{With Freezing Layer} boleh diubah secara opsional, untuk memberikan alternatif metode \emph{training}.
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.2.11}, namun dengan satu perbedaan, yaitu, pada tahap ini parameter \emph{With ITTL} akan diatur sebagai \texttt{True} dan parameter \emph{With Freezing Layer} boleh diatur sebagai \texttt{True} ataupun \texttt{False}. Parameter \emph{With Freezing Layer} boleh diubah secara opsional, untuk memberikan alternatif metode \emph{training}.
 
 %-----------------------------------------------------------------------------%
 \subsection{Pemilihan \emph{Hyperparameter} Untuk \emph{Intermediate-Task Transfer Learning Question Answering Task}}
+\label{4.3.2}
 %-----------------------------------------------------------------------------%
-Selain dari \emph{hyperparameter} yang dapat diatur pada pengambilan parameter di atas, terdapat beberapa \emph{hyperparameter} permanen untuk penelitian ini, berikut \emph{hyperparameter} yang tidak bisa diubah-ubah via \texttt{argparse}.
-
-\begin{table}[h]
-\centering
-\begin{tabular}{||c | c||} 
- \hline\hline
- \emph{Hyperparameter} & Nilai \\ [0.5ex] 
- \hline\hline
- MAX LENGTH & 512 \\ 
- STRIDE & 128 \\
- LOGGING STEPS & 50 \\
- WARMUP RATIO & 0.0 \\
- WEIGHT DECAY & 0.0 \\ 
- EVAL STEPS RATIO & 0.5 \\ [1ex] 
- \hline\hline
-\end{tabular}
-\caption{Tabel \emph{hyperparameter} pada \emph{training question answering} \emph{intermediate-task transfer learning} sistem tanya jawab}
-\end{table}
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.2.2}, tanpa ada perubahan apapun.
 
 %-----------------------------------------------------------------------------%
 \subsection{Mengimpor \emph{Dataset} Sistem Tanya Jawab}
+\label{4.3.3}
 %-----------------------------------------------------------------------------%
-Pada tahap ini, akan dijalankan pengambilan semua \emph{dataset} sistem tanya jawab yang akan dieksperimenkan dari \href{https://github.com/IndoNLP/nusa-crowd/tree/master/nusacrowd/nusa_datasets/}{\texttt{nusacrowd}} dan penyamaan format \texttt{DatasetDict}. Tujuan dilakukan hal tersebut agar dapat lebih mempermudah eksperimen kedepannya. Untuk \emph{dataset} SQuAD-ID, penulis hanya mengambil via \href{https://github.com/IndoNLP/nusa-crowd/tree/master/nusacrowd/nusa_datasets/}{\texttt{nusacrowd}} dengan bantuan modul \texttt{NusantaraConfigHelper()} dengan fungsi \texttt{load\char`_dataset} dengan nama \emph{dataset}-nya adalah: \texttt{squad\char`_id}. 
-
-\emph{Preprocess} yang penulis lakukan untuk \emph{dataset} SQuAD-ID meliputi: melakukan format ulang kolom \emph{context}, \emph{question}, \emph{answer}, \emph{answer\_start}, dan \emph{answer\_end}, dimana  \emph{answer\_start} dan \emph{answer\_end} merupakan bagian dari \emph{dictionary answer}; kemudian, penulis melakukan pemecahan \emph{dataset} menjadi tiga bagian, yaitu: data \emph{train}, data \emph{validation}, dan data \emph{test}. Pembagian tersebut dilakukan secara manual, karena pada \emph{library} \href{https://github.com/IndoNLP/nusa-crowd/tree/master/nusacrowd/nusa_datasets/}{\texttt{nusacrowd}} tidak menyediakan data \emph{test}. Untuk mencapai perbandingan yang seimbang dengan data \emph{validation} (perbandingan 8:1:1), maka untuk data \emph{train} penulis pecah menjadi dua, menjadi data \emph{train} dan data \emph{validation}, dan data \emph{validation} yang sebelumnya didapatkan dari \emph{library} \href{https://github.com/IndoNLP/nusa-crowd/tree/master/nusacrowd/nusa_datasets/}{\texttt{nusacrowd}} diubah menjadi data \emph{test}-nya. Pemecahan (\emph{splitting}) tersebut mempertahankan perbandingan 8:1:1 antara data \emph{train}, data \emph{validation}, dan data \emph{test} dan juga tetap mempertahankan persebaran jenis pertanyaan diantara ketiga bagian data tersebut; kemudian, mengubah ketiga bagian data tersebut menjadi format \texttt{Dataset}, sehingga ketiganya bisa digabung dalam format \texttt{DatasetDict}.
-
-Lalu, untuk \emph{dataset} TyDI-QA-ID, penulis hanya mengambil via \href{https://github.com/IndoNLP/nusa-crowd/tree/master/nusacrowd/nusa_datasets/}{\texttt{nusacrowd}} dengan bantuan modul \texttt{NusantaraConfigHelper()} dengan fungsi \texttt{load\char`_dataset} dengan nama \emph{dataset}-nya adalah: \texttt{tydiqa\char`_id}. \emph{Preprocess} yang penulis lakukan untuk \emph{dataset} TyDI-QA-ID meliputi: membuat kolom \emph{answer\_end} dengan menambahkan nilai dari \emph{answer\_start} dengan panjang \emph{answer}, hal ini bertujuan untuk mempermudah tokenisasi nantinya; lalu, melakukan format ulang kolom \emph{context}, \emph{question}, \emph{answer}, \emph{answer\_start}, dan \emph{answer\_end}, dimana  \emph{answer\_start} dan \emph{answer\_end} merupakan bagian dari \emph{dictionary answer}; kemudian, penulis melakukan pemecahan \emph{dataset} menjadi tiga bagian, yaitu: data \emph{train}, data \emph{validation}, dan data \emph{test}. Pembagian tersebut dilakukan secara otomatis, karena pada \emph{library} \href{https://github.com/IndoNLP/nusa-crowd/tree/master/nusacrowd/nusa_datasets/}{\texttt{nusacrowd}} telah menyediakan ketiga bagian data tersebut; kemudian, mengubah ketiga bagian data tersebut menjadi format \texttt{Dataset}, sehingga ketiganya bisa digabung dalam format \texttt{DatasetDict}.
-
-Terakhir, untuk \emph{dataset} IDK-MRC, penulis hanya mengambil via \href{https://github.com/IndoNLP/nusa-crowd/tree/master/nusacrowd/nusa_datasets/}{\texttt{nusacrowd}} dengan bantuan modul \texttt{NusantaraConfigHelper()} dengan fungsi \texttt{load\char`_dataset} dengan nama \emph{dataset}-nya adalah: \texttt{idk\char`_mrc}. \emph{Preprocess} yang penulis lakukan untuk \emph{dataset} IDK-MRC mirip dengan \emph{preprocess} yang dilakukan pada \emph{dataset} TyDI-QA-ID, yaitu meliputi: membuat kolom \emph{answer\_end} dengan menambahkan nilai dari \emph{answer\_start} dengan panjang \emph{answer}, hal ini bertujuan untuk mempermudah tokenisasi nantinya; lalu, melakukan format ulang kolom \emph{context}, \emph{question}, \emph{answer}, \emph{answer\_start}, dan \emph{answer\_end}, dimana  \emph{answer\_start} dan \emph{answer\_end} merupakan bagian dari \emph{dictionary answer}; kemudian, penulis melakukan pemecahan \emph{dataset} menjadi tiga bagian, yaitu: data \emph{train}, data \emph{validation}, dan data \emph{test}. Pembagian tersebut dilakukan secara otomatis, karena pada \emph{library} \href{https://github.com/IndoNLP/nusa-crowd/tree/master/nusacrowd/nusa_datasets/}{\texttt{nusacrowd}} telah menyediakan ketiga bagian data tersebut; kemudian, mengubah ketiga bagian data tersebut menjadi format \texttt{Dataset} sehingga ketiganya bisa digabung dalam format \texttt{DatasetDict}.
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.2.3}, tanpa ada perubahan apapun.
 
 %-----------------------------------------------------------------------------%
 \subsection{Proses \emph{Preprocess} dan Tokenisasi \emph{Dataset} Sistem Tanya Jawab}
+\label{4.3.4}
 %-----------------------------------------------------------------------------%
-Pada tahap ini, akan dijalankan  \emph{preprocess} dan tokenisasi \emph{dataset} sistem tanya jawab. Tokenisasi dijalankan dengan melakukan tokenisasi pada bagian \texttt{question} dan \texttt{context} saja, dengan menggunakan \emph{hyperparameter} yang sebelumnya sudah ditentukan. \emph{Preprocess} dijalankan dengan beberapa parameter tambahan, seperti: \texttt{truncation=True}, \texttt{return\char`_token\char`_type\char`_ids=True}, \texttt{return\char`_overflowing\char`_tokens=True}, \texttt{return\char`_offsets\char`_mapping=True}, \texttt{padding="max\char`_length"}, \texttt{return\char`_tensors='np'}.Parameter \texttt{truncation} berfungsi untuk memotong (\emph{truncate}) karakter sesuai parameter \texttt{MAX LENGTH} yang dijelaskan sebelumnya, lalu parameter \texttt{return\char`_token\char`_type\char`_ids} digunakan untuk mengembalikan \texttt{TOKEN\char`_IDS} yang berguna untuk membedakan antara \texttt{premise} dan \texttt{hypothesis}-nya. agak berbeda sedikit dengan model \texttt{xlm-roberta-large}, karena model tersebut tidak mengenal konsep \texttt{return\char`_token\char`_type\char`_ids}, maka cara untuk membedakan antara \texttt{premise} dan \texttt{hypothesis}-nya dengan menggunakan fungsi \texttt{index} bawaan Python dengan mencari ID = 2 (\texttt{</s>}) pada \texttt{input\char`_ids} sebagai pemisahnnya. 
-
-Kemudian, parameter \texttt{return\char`_overflowing\char`_tokens} berfungsi untuk mendapatkan token-token yang berlebihan dari \texttt{MAX LENGTH} yang telah ditentukan (\emph{overflowing}), lalu, parameter \texttt{return\char`_offsets\char`_mapping} berfungsi untuk mengembalikan index (dalam level \emph{char}) dari suatu ID pada \texttt{input\char`_ids}, kemudian, parameter \texttt{padding} berfungsi untuk melakukan "pengisian" (\emph{pad}) untuk menyesuaikan panjang \texttt{input\char`_ids}-nya, dalam konteks \texttt{padding='max\char`_length'}, maka \texttt{padding} dilakukan sampai ID sama panjang dengan \texttt{MAX LENGTH}-nya; terakhir, parameter \texttt{return\char`_tensors} berfungsi untuk mengembalikan keluaran dalam bentuk \emph{tensor} agar mempermudah perubahan ke format \texttt{torch} nantinya. Sederhananya, pada tahap \emph{preprocess} ini, penulis menyuplai \texttt{answer\char`_start\char`_position} dan \texttt{answer\char`_end\char`_position} dengan menggunakan properti \texttt{offset\char`_mapping}, \texttt{overflow\char`_to\char`_sample\char`_mapping}, dan fungsi \texttt{sequence\char`_ids}.
-
-Kemudian, untuk proses tokenisasi penulis menggunakan fungsi \texttt{map} bawaan dari \emph{library} \texttt{datasets}, dengan tambahan parameter \texttt{batched=True} dan \texttt{remove\char`_columns=['context', 'question', 'answer', 'offset\char`_mapping', 'overflow\char`_to\char`_sample\char`_mapping']}. Parameter \texttt{batched} berfungsi untuk memecah (\emph{batch}) \emph{dataset} agar dapat diproses per-\emph{batch} demi efisiensi penggunaan memori dan \texttt{remove\char`_columns} digunakan untuk menghapus kolom yang tidak digunakan dalam proses \emph{training} hal tersebut ditujukan untuk agar \emph{dataset} lebih terfokus kepada hal-hal yang penting saja, seperti \texttt{answer\char`_start\char`_position}, \texttt{answer\char`_end\char`_position} dan data hasil tokenisasi dari \texttt{context} dan   \texttt{question} yang sudah tersimpan di variabel \texttt{input\char`_ids} saja disamping untuk efisiensi penggunaan memori.
-
-Terakhir, penulis mengubah format kolom \texttt{input\char`_ids} dan \texttt{token\char`_type\char`_ids} keluaran dari tokenisasi dengan fungsi \texttt{set\char`_format} agar hasil tokenisasi berformat \texttt{torch}; format \texttt{torch} digunakan untuk menyuplai variabel ke \texttt{device} GPU yang penulis gunakan, setelah itu, penulis memecah hasil tokenisasi tersebut ke tiga \emph{dataset}, yaitu: \emph{dataset train}, \emph{dataset validation}, dan \emph{dataset test}; yang disimpan dalam bentuk \texttt{DatasetDict}.
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.2.4}, tanpa ada perubahan apapun.
 
 %-----------------------------------------------------------------------------%
 \subsection{Mengimpor Model \emph{Question Answering}}
+\label{4.3.5}
 %-----------------------------------------------------------------------------%
-Pada tahapan ini, penulis menyuplai \texttt{pretrained\char`_model\char`_name\char`_or\char`_path} sesuai dengan parameter yang telah dipilih via \texttt{argparse} sebelumnya dan penulis menyuplai banyak label sebanyak 2, karena pada \emph{question answering task} membutuhkan dua label, yaitu: \texttt{answer\char`_start\char`_position} dan \texttt{answer\char`_end\char`_position}. Hal tersebut digunakan agar hasil dari klasifier akhir model yang telah dipilih menghasilkan dua \emph{unit} saja sesuai dengan kebutuhan \emph{task} yang sedang dilakukan, yaitu: \emph{question answering task}. Pendefinisian model \emph{question answering} ini menggunakan modul \texttt{AutoModelForQuestionAnswering}. Terakhir, penulis juga memindahkan model yang sudah dibuat tersebut ke \texttt{device} GPU yang penulis pilih dengan fungsi \texttt{.to(device)}.
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.2.5}, tanpa ada perubahan apapun.
+
 
 %-----------------------------------------------------------------------------%
 \subsection{Proses Pemberian Bobot Dari Model \emph{Sequence Classification Task}}
+\label{4.3.6}
 %-----------------------------------------------------------------------------%
+Berikut salah satu implementasi konkret dalam bentuk kode Python, mengenai proses pemberian bobot dari model \emph{sequence classification task}.
 
 \begin{lstlisting}[language=Python, caption=Proses pemberian bobot dari model \emph{sequence classification task}]
 model_qa = AutoModelForQuestionAnswering.from_pretrained(MODEL_QA_NAME, num_labels=2)
@@ -362,7 +331,9 @@ Pada tahap ini, akan dilakukan \emph{transfer learning} dengan cara mengambil mo
 
 %-----------------------------------------------------------------------------%
 \subsection{Proses \emph{Freezing Layer} (Opsional)}
+\label{4.3.7}
 %-----------------------------------------------------------------------------%
+Berikut salah satu implementasi konkret dalam bentuk kode Python, mengenai proses \emph{freezing layer}.
 
 \begin{lstlisting}[language=Python, caption=Proses \emph{freezing layer} (opsional)]
 if FREEZE == True:
@@ -375,214 +346,135 @@ Pada tahap ini, akan dijalankan proses \emph{freezing layer} sesuai nilai yang d
 
 %-----------------------------------------------------------------------------%
 \subsection{Perancangan Metrik Komputasi Untuk Penilaian \emph{Intermediate-Task Transfer Learning Question Answering Task}}
+\label{4.3.8}
 %-----------------------------------------------------------------------------%
-Pada perancangan metrik komputasi \emph{question answering task}, penulis melakukan kalkulasi skor \emph{exact match} dan skor F1 secara manual, tanpa menggunakan \emph{library} apapun, termasuk \emph{library} \texttt{evaluate}. Perhitungan metrik skor \emph{exact match} dan skor F1 dilakukan secara bersamaan. Perhitungan skor \emph{exact match} hanya dengan melakukan perbandingan antara jawaban prediksi dengan jawaban \emph{golden truth} dalam bentuk \emph{string}, jika sama persis maka skor \emph{exact match} akan ditambah dengan 1. 
-
-Kemudian, perhitungan skor F1 lebih rumit dibandingkan perhitungan skor \emph{exact match}, berikut alurnya: melakukan normalisasi teks (menghapus kata-kata spesifik, menghapus spasi berlebih, menghapus tanda baca, mengganti huruf kapital dengan huruf kecil) jawaban prediksi dan jawaban \emph{golden truth}, lalu, setiap jawaban prediksi dan jawaban \emph{golden truth} akan dipecah menjadi token, pada token tersebutlah akan dihitung nilai \emph{confusion matrix}-nya (\emph{true positive}, \emph{true negative}, \emph{false positive}, dan \emph{false negative}), sehingga mendapatkan skor F1-nya, pada akhirnya, hasil metrik skor \emph{exact match} dan skor F1 akan dirata-ratakan sebagai metrik komputasi akhirnya. Hasil prediksi dari model didapatkan dari hasil fungsi \texttt{np.argmax} terhadap properti \texttt{predictions} dengan parameter \texttt{axis=2}; dan \emph{golden truth} didapatkan dari properti \texttt{label\char`_ids}. 
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.2.6}, tanpa ada perubahan apapun.
 
 %-----------------------------------------------------------------------------%
 \subsection{Perancangan Penamaan Eksperimen \emph{Intermediate-Task Transfer Learning Question Answering Task}}
+\label{4.3.9}
 %-----------------------------------------------------------------------------%
-Pada tahap ini, penulis merancang penamaan eksperimen agar dapat melakukan evaluasi \& analisis terkait eksperimen dengan lebih mudah, rapih, dan teratur. Pada penamaan eksperimen \emph{question answering task} ini, penulis memastikan untuk memberikan nama yang memenuhi berisi: nama model, nama \emph{dataset} yang digunakan, jumlah \emph{learn rate}. Penamaan tersebut berguna untuk melakukan penyimpanan eksperimen ke lokal dan saat \emph{push} ke repositori Hugging Face. 
-
-Untuk pengarsipan eksperimen ke lokal, penulis memasukan ke dalam satu folder besar yang didalamnya berisi empat folder-folder kecil; nama folder besar tersebut merupakan gabungan dari \emph{prefix} \texttt{DatasetQAS}, nama \emph{dataset} yang digunakan, nama model, jumlah \emph{learn rate}, dan juga waktu saat mulai menjalankan \emph{training}. Kemudian, folder-folder kecilnya terdiri dari folder \emph{checkpoint}, \emph{model}, \emph{output}, \emph{metric result}. Dimana, folder \emph{checkpoint} digunakan untuk menyimpan \emph{checkpoint} saat \emph{training} \emph{question answering task}; kemudian, folder \emph{model} digunakan untuk menyimpan \emph{model} akhir setelah \emph{training} \emph{question answering task}; lalu, folder \emph{output} digunakan untuk menyimpan \emph{output} akhir hasil dari prediksi model yang sudah dilatih tersebut terhadap data \emph{validation}; terakhir, folder \emph{metric result} berisi terkait perhitungan metrik dari model yang sudah dilatih tersebut terhadap data \emph{test}. 
-
-Untuk nama repositori pada Hugging Face memiliki beberapa syarat penamaan, antara lain: memiliki \emph{prefix} "\emph{fine-tuned} \texttt{DatasetQAS}", nama \emph{dataset} yang digunakan, nama model, dan jumlah \emph{learn rate}, tanpa waktu saat mulai menjalankan \emph{training}, dan juga dibatasi hingga 96 karakter saja mengikuti aturan penamaan repositori dari Hugging Face. Karena bagian ini merupakan \emph{training question answering intermediate-task transfer learning}, maka ada nama tambahan yang disimpan di lokal maupun pada repositori Hugging Face, yaitu: \emph{with-ITTL} dan apabila parameter \emph{With Freezing Layer} diatur sebagai \texttt{True}, maka ada tambahan nama: \emph{with-freeze}; sebaliknya, apabila parameter \emph{With Freezing Layer} diatur sebagai \texttt{False}, maka ada tambahan nama: \emph{without-freeze}.
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.2.7}, namun pada sub-bab penamaan eksperimen \emph{question answering task intermediate-task transfer learning} ini, ada satu perbedaan minor, yaitu, karena bagian ini merupakan \emph{training question answering intermediate-task transfer learning}, maka ada nama tambahan yang disimpan di lokal maupun pada repositori Hugging Face, yaitu: \emph{with-ITTL} dan apabila parameter \emph{With Freezing Layer} diatur sebagai \texttt{True}, maka ada tambahan nama: \emph{with-freeze}; sebaliknya, apabila parameter \emph{With Freezing Layer} diatur sebagai \texttt{False}, maka ada tambahan nama: \emph{without-freeze}.
 
 %-----------------------------------------------------------------------------%
 \subsection{Perancangan Argumen Latih (\emph{Training Arguments})}
+\label{4.3.10}
 %-----------------------------------------------------------------------------%
-Pada tahap ini, penulis merancang \emph{training arguments} dengan modul \texttt{TrainingArguments} agar jalannya eksperimen sesuai parameter yang telah dipilih sebelumnya, seperti: jumlah \emph{epoch}, jumlah \emph{learn rate}, jumlah \emph{seed}, jumlah \emph{batch size}, jumlah \emph{gradient accumulation}, \emph{token}; dan juga \emph{hyperparameter} permanen, seperti:  \texttt{LOGGING STEPS}, \texttt{WEIGHT DECAY}, \texttt{WARMUP RATIO}. 
-
-\texttt{STEP} disesuaikan dengan rumus: \texttt{BATCH SIZE $\times$ GRADIENT ACCUMULATION $\times$ EVAL STEPS RATIO} ditujukan agar model melakukan evaluasi setiap \texttt{EVAL STEPS RATIO} agar dapat melakukan \emph{early callback} nantinya untuk efisiensi \emph{training}. Pemilihan \emph{best model} dipilih ke metrik skor F1, karena metrik F1 dapat mengatasi permasalahan \emph{label imbalance}.
-
-Pada bagian ini juga dilakukan penyimpanan terkait data (\emph{data-ops}) yang juga disuplai kepada parameter \texttt{TrainingArguments}, seperti: direktori \emph{checkpoint}, \emph{logging platform} yang otomatis diatur ke \texttt{tensorboard}, strategi \emph{logging}, strategi penyimpanan, dan strategi evaluasi yang otomatis diatur ke \texttt{steps}, Kecenderungan penulis untuk menggunakan \texttt{steps} pada bagian ini dikarenakan nantinya penulis akan menggunakan parameter \texttt{load\char`_best\char`_model\char`_at\char`_end} sebagai \texttt{True}, dan dimana strategi penyimpanan dan strategi evaluasi harus diatur ke \texttt{steps} sesuai dengan aturan dari modul \texttt{TrainingArguments}.
-
-Kemudian, pada sisi memori saat melakukan \emph{training}, penulis menyuplai parameter \texttt{dataloader\char`_num\char`_workers=cpu\char`_count()} agar dapat menggunakan subproses (paralelisme) yang digunakan untuk memuat data sesuai dengan banyaknya CPU pada sistem; dan juga penulis menyuplai parameter \texttt{push\char`_to\char`_hub=True} untuk otomatis \emph{push} ke repositori Hugging Face saat menjalankan \emph{training}, sesuai dengan nama repositori yang telah dijelaskan di sub-bab sebelumnya, dan suplai parameter \texttt{load\char`_best\char`_model\char`_at\char`_end=True} agar model yang nanti diambil merupakan hasil model yang terbaik dari sepanjang proses \emph{training}.
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.1.8}, tanpa ada perubahan apapun.
 
 %-----------------------------------------------------------------------------%
 \subsection{Melakukan \emph{Training} dan Prediksi Jawaban \emph{Intermediate-Task Transfer Learning Question Answering}}
+\label{4.3.11}
 %-----------------------------------------------------------------------------%
-Pada tahap ini, dilakukan \emph{training} dengan menggunakan data \emph{train} dan data \emph{validation} sebagai parameter \emph{training}-nya. Penulis juga melakukan \emph{early callback} dengan nilai \emph{patience} sebesar 3, yang artinya model akan berhenti \emph{training} bila tiga hasil evaluasi setelahnya memiliki nilai metrik yang lebih kecil dibanding sebelumnya; hal tersebut dilakukan untuk efisiensi waktu dan \emph{resource} \emph{training}-nya. 
-
-Sehingga, pada tahap ini, penulis menyuplai beberapa parameter pada modul \texttt{Trainer}, antara lain: model yang digunakan, \emph{training arguments} yang sebelumnya sudah didefinisikan, \emph{train\_dataset} yang diatur ke data \emph{train}-nya, \emph{validation\_dataset} yang diatur ke data \emph{validation}-nya, \emph{tokenizer} yang digunakan, \emph{data\_collator} yang digunakan, metrik komputasi yang sebelumnya sudah dirancang, dan \emph{callbacks} dimana diatur ke \emph{early callback} dengan \emph{patience} sebesar 3. Kemudian, terakhir, dilakukan prediksi terhadap data \emph{test}, dengan menggunakan fungsi \texttt{predict}.
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.2.9}, tanpa ada perubahan apapun.
 
 %-----------------------------------------------------------------------------%
 \subsection{Representasi Prediksi Jawaban Untuk Evaluasi dan Analisis}
+\label{4.3.12}
 %-----------------------------------------------------------------------------%
-Pada tahap ini, penulis mengubah \texttt{PredictionOutput} hasil dari prediksi model menjadi sebuah \texttt{DataFrame} yang dapat dibaca secara jelas oleh manusia. Tahapan ini berguna untuk evaluasi dan analisis kedepannya. Pada tahap ini, penulis mengekstrak \texttt{context}, \texttt{question}, \texttt{prediction answer}, \texttt{golden answer} dari \texttt{PredictionOutput} hasil dari prediksi model dan diubah dalam bentuk \texttt{DataFrame}. 
-
-Proses pemisahan antara \texttt{question} dan \texttt{context} menggunakan properti \texttt{token\char`_type\char`_ids}, dimana bila \texttt{token\char`_type\char`_ids} bernilai 0, maka \texttt{input\char`_ids} yang bersangkutan merupakan sebuah bagian dari \texttt{question}, sebaliknya bila \texttt{token\char`_type\char`_ids} bernilai 1, maka \texttt{input\char`_ids} yang bersangkutan merupakan sebuah bagian dari \texttt{question}; hal tersebut sesuai dengan urutan \emph{preprocess} dan tokenisasi dimana urutannya \texttt{question} lalu \texttt{question}. Namun agak berbeda sedikit dengan model \texttt{xlm-roberta-large}, karena model tersebut tidak mengenal konsep \texttt{return\char`_token\char`_type\char`_ids}, maka cara untuk membedakan antara \texttt{question} dan \texttt{context}-nya dengan menggunakan fungsi \texttt{index} bawaan Python dengan mencari ID = 2 (\texttt{</s>}) pada \texttt{input\char`_ids} sebagai pemisahnnya. 
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.2.10}, tanpa ada perubahan apapun.
 
 %-----------------------------------------------------------------------------%
 \subsection{Melakukan \emph{Push} ke Akun Hugging Face}
+\label{4.3.13}
 %-----------------------------------------------------------------------------%
-Pada tahapan ini, sederhananya, penulis hanya melakukan \emph{push} hasil eksperimen, meliputi: model, evaluasi, dan keluaran dari eksperimen ke akun Hugging Face yang telah disuplai \texttt{TOKEN}-nya pada bagian parameter sebelumnya. Proses \emph{push} menggunakan API khusus Hugging Face, yaitu: \texttt{HfApi} dimana pengunggahan dilakukan dengan fungsi \texttt{upload\char`_folder}, kemudian hanya untuk folder \emph{output} dan folder \emph{metric result} saja yang diunggah ke repositori Hugging Face karena hanya folder-folder tersebut saja yang dirasa berguna untuk evaluasi dan analisis kedepannya. Untuk folder \emph{model} sudah otomatis diunggah saat \emph{training} karena penggunaan parameter \texttt{push\char`_to\char`_hub=True} pada pendefinisian \emph{TrainingArguments} sebelumnya.
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.1.11}, tanpa ada perubahan apapun.
 
 %-----------------------------------------------------------------------------%
 \section{Metode \emph{Task Recasting} Dengan IndoNLI Sebagai Verifikator}
+\label{4.4}
 %-----------------------------------------------------------------------------%
 Pada sub-bab ini, akan dijelaskan mengenai \emph{training} model pada tugas \emph{question answering task} dalam belajar tiga \emph{dataset} sistem tanya jawab dengan metode \emph{task recasting} dengan IndoNLI sebagai verifikator yang penulis lakukan pada pada penelitian ini. Secara keseluruhan, sub-bab ini cenderung mirip dengan sub-bab \emph{training} \emph{baseline} model \emph{question answering task}, namun ada beberapa perbedaan mendasar diantara kedua sub-bab ini.
 
 %-----------------------------------------------------------------------------%
 \subsection{Pengambilan Parameter Untuk Verifikasi \emph{Question Answering Task}}
+\label{4.4.1}
 %-----------------------------------------------------------------------------%
-Pengambilan parameter untuk verifikasi \emph{question answering task} menggunakan bantuan \emph{library} dari \texttt{argparse}. Penulis gunakan \texttt{argparse} agar dapat menjalankan eksperimen via \emph{terminal} bukan dengan satu-satu menjalankan via \emph{notebook}. Parameter yang dapat digunakan dalam verifikasi \emph{question answering task} ini meliputi: nama model, nama \emph{dataset}, jumlah iterasi maksimum pencarian jawaban, tipe \emph{filtering}, tipe \emph{smoothing}, tipe variasi, nilai \emph{threshold}, dan token akun Hugging Face agar dapat otomatis \emph{push} ke akun Hugging Face-nya. Untuk pilihan nilai dari masing-masing parameternya, penulis sertakan di tabel bawah ini.
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.2.1}, namun ada beberapa perbedaan pada tahap ini, antara lain: parameter yang dapat digunakan dalam metode verifikasi \emph{question answering task} ini meliputi: nama model, nama \emph{dataset}, jumlah iterasi maksimum pencarian jawaban, tipe \emph{filtering}, tipe perubahan format kalimat, tipe variasi pengambilan jawaban akhir, nilai \emph{threshold}, dan token akun Hugging Face agar dapat otomatis \emph{push} ke akun Hugging Face-nya. Untuk pilihan nilai dari masing-masing parameternya, penulis sertakan di tabel bawah ini.
 
-\begin{table}[h!]
+\begin{table}[H]
 \centering
-\begin{tabular}{|P{2.0in}|P{4.0in}|}
- \hline
- Parameter & Pilihan Nilai \\ [0.5ex] 
- \hline
- Nama model & \texttt{indobert-base-uncased}, \texttt{indobert-large-p2}, \texttt{xlm-roberta-large} \\ 
- Nama data & SQuAD-ID, TyDI-QA-ID, IDK-MRC \\
+\begin{tabularx}{\textwidth}{XX}
+ \toprule
+ Parameter & Pilihan Nilai \\
+ \midrule
+ Nama model & [\texttt{indobert-base-uncased}, \texttt{indobert-large-p2}, \texttt{xlm-roberta-large}] \\ 
+ Nama data & [SQuAD-ID, TyDI-QA-ID, IDK-MRC] \\
  Jumlah iterasi maksimal pencarian & Isi dengan \emph{integer} berapapun \\
- Tipe \texttt{filtering} & \texttt{entailment\char`_only} atau \texttt{entailment\char`_or\char`_neutral} \\
- Tipe perubahan format kalimat & \texttt{[replace\_first, replace\_question\_word, add\_adalah, just\_concat\_answer\_and\_question, rule\_based, machine\_generation\_with\_rule\_based, pure\_machine\_generation, machine\_generation\_with\_translation]} \\
- Variasi & [1, 2, 3] \\
+ Tipe \emph{filtering} & [\texttt{entailment\char`_only}, \texttt{entailment\char`_or\char`_neutral}] \\
+ Tipe perubahan format kalimat & [\texttt{replace\_first, replace\_question\_word, add\_adalah, just\_concat\_answer\_and\_question, rule\_based, machine\_generation\_with\_rule\_based, pure\_machine\_generation, machine\_generation\_with\_translation}] \\
+ Variasi pengambilan jawaban akhir & [1, 2, 3] \\
  \emph{Threshold} & Isi dengan \emph{float} berapapun \\
- \emph{Token} & Isi dengan \emph{string} \emph{token} yang tertera pada Hugging Face \\[1ex] 
- \hline
-\end{tabular}
+ \emph{Token} & Isi dengan \emph{string} \emph{token} yang tertera pada Hugging Face \\
+ \bottomrule
+\end{tabularx}
 \caption{Tabel parameter dan pilihan nilai pada verifikasi \emph{question answering} model \emph{question answer task}. Catatan: Jumlah iterasi maksimal pencarian bisa disebut sebagai \texttt{MSI}, tipe \emph{filtering} bisa disebut sebagai \texttt{Type QAS}, tipe perubahan format kalimat bisa disebut sebagai \texttt{Type Smoothing}.}
 \end{table}
 
 %-----------------------------------------------------------------------------%
 \subsection{Pemilihan \emph{Hyperparameter} Untuk Verifikasi \emph{Question Answering Task}}
+\label{4.4.2}
 %-----------------------------------------------------------------------------%
-Selain dari \emph{hyperparameter} yang dapat diatur pada pengambilan parameter di atas, terdapat beberapa \emph{hyperparameter} permanen untuk penelitian ini, berikut \emph{hyperparameter} yang tidak bisa diubah-ubah via \texttt{argparse}.
-
-\begin{table}[h]
-\centering
-\begin{tabular}{||c | c||} 
- \hline\hline
- \emph{Hyperparameter} & Nilai \\ [0.5ex] 
- \hline\hline
- MAX LENGTH & 512 \\ 
- STRIDE & 128 \\
- LOGGING STEPS & 50 \\
- WARMUP RATIO & 0.0 \\
- WEIGHT DECAY & 0.0 \\ 
- EVAL STEPS RATIO & 0.5 \\ [1ex] 
- \hline\hline
-\end{tabular}
-\caption{Tabel \emph{hyperparameter} pada \emph{training question answering} sistem tanya jawab}
-\end{table}
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.2.2}, tanpa ada perubahan apapun.
 
 %-----------------------------------------------------------------------------%
 \subsection{Mengimpor \emph{Dataset} Sistem Tanya Jawab}
+\label{4.4.3}
 %-----------------------------------------------------------------------------%
-Pada tahap ini, akan dijalankan pengambilan semua \emph{dataset} sistem tanya jawab yang akan dieksperimenkan dari \href{https://github.com/IndoNLP/nusa-crowd/tree/master/nusacrowd/nusa_datasets/}{\texttt{nusacrowd}} dan penyamaan format \texttt{DatasetDict}. Tujuan dilakukan hal tersebut agar dapat lebih mempermudah eksperimen kedepannya. Untuk \emph{dataset} SQuAD-ID, penulis hanya mengambil via \href{https://github.com/IndoNLP/nusa-crowd/tree/master/nusacrowd/nusa_datasets/}{\texttt{nusacrowd}} dengan bantuan modul \texttt{NusantaraConfigHelper()} dengan fungsi \texttt{load\char`_dataset} dengan nama \emph{dataset}-nya adalah: \texttt{squad\char`_id}. 
-
-\emph{Preprocess} yang penulis lakukan untuk \emph{dataset} SQuAD-ID meliputi: melakukan format ulang kolom \emph{context}, \emph{question}, \emph{answer}, \emph{answer\_start}, dan \emph{answer\_end}, dimana  \emph{answer\_start} dan \emph{answer\_end} merupakan bagian dari \emph{dictionary answer}; kemudian, penulis melakukan pemecahan \emph{dataset} menjadi tiga bagian, yaitu: data \emph{train}, data \emph{validation}, dan data \emph{test}. Pembagian tersebut dilakukan secara manual, karena pada \emph{library} \href{https://github.com/IndoNLP/nusa-crowd/tree/master/nusacrowd/nusa_datasets/}{\texttt{nusacrowd}} tidak menyediakan data \emph{test}. Untuk mencapai perbandingan yang seimbang dengan data \emph{validation} (perbandingan 8:1:1), maka untuk data \emph{train} penulis pecah menjadi dua, menjadi data \emph{train} dan data \emph{validation}, dan data \emph{validation} yang sebelumnya didapatkan dari \emph{library} \href{https://github.com/IndoNLP/nusa-crowd/tree/master/nusacrowd/nusa_datasets/}{\texttt{nusacrowd}} diubah menjadi data \emph{test}-nya. Pemecahan (\emph{splitting}) tersebut mempertahankan perbandingan 8:1:1 antara data \emph{train}, data \emph{validation}, dan data \emph{test} dan juga tetap mempertahankan persebaran jenis pertanyaan diantara ketiga bagian data tersebut; kemudian, mengubah ketiga bagian data tersebut menjadi format \texttt{Dataset}, sehingga ketiganya bisa digabung dalam format \texttt{DatasetDict}.
-
-Lalu, untuk \emph{dataset} TyDI-QA-ID, penulis hanya mengambil via \href{https://github.com/IndoNLP/nusa-crowd/tree/master/nusacrowd/nusa_datasets/}{\texttt{nusacrowd}} dengan bantuan modul \texttt{NusantaraConfigHelper()} dengan fungsi \texttt{load\char`_dataset} dengan nama \emph{dataset}-nya adalah: \texttt{tydiqa\char`_id}. \emph{Preprocess} yang penulis lakukan untuk \emph{dataset} TyDI-QA-ID meliputi: membuat kolom \emph{answer\_end} dengan menambahkan nilai dari \emph{answer\_start} dengan panjang \emph{answer}, hal ini bertujuan untuk mempermudah tokenisasi nantinya; lalu, melakukan format ulang kolom \emph{context}, \emph{question}, \emph{answer}, \emph{answer\_start}, dan \emph{answer\_end}, dimana  \emph{answer\_start} dan \emph{answer\_end} merupakan bagian dari \emph{dictionary answer}; kemudian, penulis melakukan pemecahan \emph{dataset} menjadi tiga bagian, yaitu: data \emph{train}, data \emph{validation}, dan data \emph{test}. Pembagian tersebut dilakukan secara otomatis, karena pada \emph{library} \href{https://github.com/IndoNLP/nusa-crowd/tree/master/nusacrowd/nusa_datasets/}{\texttt{nusacrowd}} telah menyediakan ketiga bagian data tersebut; kemudian, mengubah ketiga bagian data tersebut menjadi format \texttt{Dataset}, sehingga ketiganya bisa digabung dalam format \texttt{DatasetDict}.
-
-Terakhir, untuk \emph{dataset} IDK-MRC, penulis hanya mengambil via \href{https://github.com/IndoNLP/nusa-crowd/tree/master/nusacrowd/nusa_datasets/}{\texttt{nusacrowd}} dengan bantuan modul \texttt{NusantaraConfigHelper()} dengan fungsi \texttt{load\char`_dataset} dengan nama \emph{dataset}-nya adalah: \texttt{idk\char`_mrc}. \emph{Preprocess} yang penulis lakukan untuk \emph{dataset} IDK-MRC mirip dengan \emph{preprocess} yang dilakukan pada \emph{dataset} TyDI-QA-ID, yaitu meliputi: membuat kolom \emph{answer\_end} dengan menambahkan nilai dari \emph{answer\_start} dengan panjang \emph{answer}, hal ini bertujuan untuk mempermudah tokenisasi nantinya; lalu, melakukan format ulang kolom \emph{context}, \emph{question}, \emph{answer}, \emph{answer\_start}, dan \emph{answer\_end}, dimana  \emph{answer\_start} dan \emph{answer\_end} merupakan bagian dari \emph{dictionary answer}; kemudian, penulis melakukan pemecahan \emph{dataset} menjadi tiga bagian, yaitu: data \emph{train}, data \emph{validation}, dan data \emph{test}. Pembagian tersebut dilakukan secara otomatis, karena pada \emph{library} \href{https://github.com/IndoNLP/nusa-crowd/tree/master/nusacrowd/nusa_datasets/}{\texttt{nusacrowd}} telah menyediakan ketiga bagian data tersebut; kemudian, mengubah ketiga bagian data tersebut menjadi format \texttt{Dataset} sehingga ketiganya bisa digabung dalam format \texttt{DatasetDict}.
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.2.3}, tanpa ada perubahan apapun.
 
 %-----------------------------------------------------------------------------%
 \subsection{Proses \emph{Preprocess} dan Tokenisasi \emph{Dataset} Sistem Tanya Jawab}
+\label{4.4.4}
 %-----------------------------------------------------------------------------%
-Pada tahap ini, akan dijalankan  \emph{preprocess} dan tokenisasi \emph{dataset} sistem tanya jawab. Tokenisasi dijalankan dengan melakukan tokenisasi pada bagian \texttt{question} dan \texttt{context} saja, dengan menggunakan \emph{hyperparameter} yang sebelumnya sudah ditentukan. \emph{Preprocess} dijalankan dengan beberapa parameter tambahan, seperti: \texttt{truncation=True}, \texttt{return\char`_token\char`_type\char`_ids=True}, \texttt{return\char`_overflowing\char`_tokens=True}, \texttt{return\char`_offsets\char`_mapping=True}, \texttt{padding="max\char`_length"}, \texttt{return\char`_tensors='np'}.Parameter \texttt{truncation} berfungsi untuk memotong (\emph{truncate}) karakter sesuai parameter \texttt{MAX LENGTH} yang dijelaskan sebelumnya, lalu parameter \texttt{return\char`_token\char`_type\char`_ids} digunakan untuk mengembalikan \texttt{TOKEN\char`_IDS} yang berguna untuk membedakan antara \texttt{premise} dan \texttt{hypothesis}-nya. agak berbeda sedikit dengan model \texttt{xlm-roberta-large}, karena model tersebut tidak mengenal konsep \texttt{return\char`_token\char`_type\char`_ids}, maka cara untuk membedakan antara \texttt{premise} dan \texttt{hypothesis}-nya dengan menggunakan fungsi \texttt{index} bawaan Python dengan mencari ID = 2 (\texttt{</s>}) pada \texttt{input\char`_ids} sebagai pemisahnnya. 
-
-Kemudian, parameter \texttt{return\char`_overflowing\char`_tokens} berfungsi untuk mendapatkan token-token yang berlebihan dari \texttt{MAX LENGTH} yang telah ditentukan (\emph{overflowing}), lalu, parameter \texttt{return\char`_offsets\char`_mapping} berfungsi untuk mengembalikan index (dalam level \emph{char}) dari suatu ID pada \texttt{input\char`_ids}, kemudian, parameter \texttt{padding} berfungsi untuk melakukan "pengisian" (\emph{pad}) untuk menyesuaikan panjang \texttt{input\char`_ids}-nya, dalam konteks \texttt{padding='max\char`_length'}, maka \texttt{padding} dilakukan sampai ID sama panjang dengan \texttt{MAX LENGTH}-nya; terakhir, parameter \texttt{return\char`_tensors} berfungsi untuk mengembalikan keluaran dalam bentuk \emph{tensor} agar mempermudah perubahan ke format \texttt{torch} nantinya. Sederhananya, pada tahap \emph{preprocess} ini, penulis menyuplai \texttt{answer\char`_start\char`_position} dan \texttt{answer\char`_end\char`_position} dengan menggunakan properti \texttt{offset\char`_mapping}, \texttt{overflow\char`_to\char`_sample\char`_mapping}, dan fungsi \texttt{sequence\char`_ids}.
-
-Kemudian, untuk proses tokenisasi penulis menggunakan fungsi \texttt{map} bawaan dari \emph{library} \texttt{datasets}, dengan tambahan parameter \texttt{batched=True} dan \texttt{remove\char`_columns=['context', 'question', 'answer', 'offset\char`_mapping', 'overflow\char`_to\char`_sample\char`_mapping']}. Parameter \texttt{batched} berfungsi untuk memecah (\emph{batch}) \emph{dataset} agar dapat diproses per-\emph{batch} demi efisiensi penggunaan memori dan \texttt{remove\char`_columns} digunakan untuk menghapus kolom yang tidak digunakan dalam proses \emph{training} hal tersebut ditujukan untuk agar \emph{dataset} lebih terfokus kepada hal-hal yang penting saja, seperti \texttt{answer\char`_start\char`_position}, \texttt{answer\char`_end\char`_position} dan data hasil tokenisasi dari \texttt{context} dan   \texttt{question} yang sudah tersimpan di variabel \texttt{input\char`_ids} saja disamping untuk efisiensi penggunaan memori.
-
-Terakhir, penulis mengubah format kolom \texttt{input\char`_ids} dan \texttt{token\char`_type\char`_ids} keluaran dari tokenisasi dengan fungsi \texttt{set\char`_format} agar hasil tokenisasi berformat \texttt{torch}; format \texttt{torch} digunakan untuk menyuplai variabel ke \texttt{device} GPU yang penulis gunakan, setelah itu, penulis memecah hasil tokenisasi tersebut ke tiga \emph{dataset}, yaitu: \emph{dataset train}, \emph{dataset validation}, dan \emph{dataset test}; yang disimpan dalam bentuk \texttt{DatasetDict}.
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.2.4}, tanpa ada perubahan apapun.
 
 %-----------------------------------------------------------------------------%
 \subsection{Mengimpor Model \emph{Question Answering}}
+\label{4.4.5}
 %-----------------------------------------------------------------------------%
-Pada tahapan ini, penulis menyuplai \texttt{pretrained\char`_model\char`_name\char`_or\char`_path} sesuai dengan parameter yang telah dipilih via \texttt{argparse} sebelumnya dan penulis menyuplai banyak label sebanyak 2, karena pada \emph{question answering task} membutuhkan dua label, yaitu: \texttt{answer\char`_start\char`_position} dan \texttt{answer\char`_end\char`_position}. Hal tersebut digunakan agar hasil dari klasifier akhir model yang telah dipilih menghasilkan dua \emph{unit} saja sesuai dengan kebutuhan \emph{task} yang sedang dilakukan, yaitu: \emph{question answering task}. 
-
-Pendefinisian model \emph{question answering} ini menggunakan modul \texttt{AutoModelForQuestionAnswering}. Terakhir, penulis juga memindahkan model yang sudah dibuat tersebut ke \texttt{device} GPU yang penulis pilih dengan fungsi \texttt{.to(device)}. Parameter \texttt{pretrained\char`_model\char`_name\char`_or\char`_path} diisi dengan model-model yang sudah dilatih pada metode \emph{baseline question answering task} pada metode sebelumnya, karena fokus dari metode verifikasi ini bukan untuk melakukan \emph{training} ulang, namun verifikasi hasil dari model yang sudah dilatih (\emph{training}) sebelumnya.
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.2.5}, tanpa ada perubahan apapun.
 
 %-----------------------------------------------------------------------------%
 \subsection{Perancangan Metrik Komputasi Untuk Penilaian Verifikasi \emph{Question Answering Task}}
+\label{4.4.6}
 %-----------------------------------------------------------------------------%
-Pada perancangan metrik komputasi \emph{question answering task}, penulis melakukan kalkulasi skor \emph{exact match} dan skor F1 secara manual, tanpa menggunakan \emph{library} apapun, termasuk \emph{library} \texttt{evaluate}. Perhitungan metrik skor \emph{exact match} dan skor F1 dilakukan secara bersamaan. Perhitungan skor \emph{exact match} hanya dengan melakukan perbandingan antara jawaban prediksi dengan jawaban \emph{golden truth} dalam bentuk \emph{string}, jika sama persis maka skor \emph{exact match} akan ditambah dengan 1. 
-
-Kemudian, perhitungan skor F1 lebih rumit dibandingkan perhitungan skor \emph{exact match}, berikut alurnya: melakukan normalisasi teks (menghapus kata-kata spesifik, menghapus spasi berlebih, menghapus tanda baca, mengganti huruf kapital dengan huruf kecil) jawaban prediksi dan jawaban \emph{golden truth}, lalu, setiap jawaban prediksi dan jawaban \emph{golden truth} akan dipecah menjadi token, pada token tersebutlah akan dihitung nilai \emph{confusion matrix}-nya (\emph{true positive}, \emph{true negative}, \emph{false positive}, dan \emph{false negative}), sehingga mendapatkan skor F1-nya, pada akhirnya, hasil metrik skor \emph{exact match} dan skor F1 akan dirata-ratakan sebagai metrik komputasi akhirnya. Hasil prediksi dari model didapatkan dari hasil fungsi \texttt{np.argmax} terhadap properti \texttt{predictions} dengan parameter \texttt{axis=2}; dan \emph{golden truth} didapatkan dari properti \texttt{label\char`_ids}. 
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.2.6}, tanpa ada perubahan apapun.
 
 %-----------------------------------------------------------------------------%
 \subsection{Perancangan Penamaan Eksperimen Verifikasi \emph{Question Answering Task}}
+\label{4.4.7}
 %-----------------------------------------------------------------------------%
-Pada tahap ini, penulis merancang penamaan eksperimen agar dapat melakukan evaluasi \& analisis terkait eksperimen dengan lebih mudah, rapih, dan teratur. Pada penamaan eksperimen \emph{question answering task} ini, penulis memastikan untuk memberikan nama yang memenuhi berisi: nama model, nama \emph{dataset} yang digunakan, jumlah iterasi maksimal, tipe \emph{filtering}, tipe perubahan format kalimat, variasi, dan \emph{threshold}. Penamaan tersebut berguna untuk melakukan penyimpanan eksperimen ke lokal dan saat \emph{push} ke repositori Hugging Face. 
-
-Untuk pengarsipan eksperimen ke lokal, penulis memasukan ke dalam satu folder besar yang didalamnya berisi empat folder-folder kecil; nama folder besar tersebut merupakan gabungan dari \emph{prefix} \texttt{FilteringNLI}, nama \emph{dataset} yang digunakan, nama model, jumlah iterasi maksimal, tipe \emph{filtering}, tipe perubahan format kalimat, variasi, dan \emph{threshold}, dan juga waktu saat mulai menjalankan \emph{training}. Kemudian, folder-folder kecilnya terdiri dari folder \emph{checkpoint}, \emph{model}, \emph{output}, \emph{metric result}. Dimana, folder \emph{checkpoint} digunakan untuk menyimpan \emph{checkpoint} saat \emph{training} \emph{question answering task}; kemudian, folder \emph{model} digunakan untuk menyimpan \emph{model} akhir setelah \emph{training} \emph{question answering task}; lalu, folder \emph{output} digunakan untuk menyimpan \emph{output} akhir hasil dari prediksi model yang sudah dilatih tersebut terhadap data \emph{validation}; terakhir, folder \emph{metric result} berisi terkait perhitungan metrik dari model yang sudah dilatih tersebut terhadap data \emph{test}. 
-
-Untuk nama repositori pada Hugging Face memiliki beberapa syarat penamaan, antara lain: memiliki \emph{prefix} "\emph{fine-tuned} \texttt{DatasetQAS}", nama \emph{dataset} yang digunakan, nama model, jumlah iterasi maksimal, tipe \emph{filtering}, tipe perubahan format kalimat, variasi, dan \emph{threshold}, tanpa waktu saat mulai menjalankan \emph{training}, dan juga dibatasi hingga 96 karakter saja mengikuti aturan penamaan repositori dari Hugging Face. Untuk menghindari nama eksperimen yang terlalu panjang pada lokal dan repositori Hugging Face, setiap parameter jumlah iterasi maksimal, tipe \emph{filtering}, tipe perubahan format kalimat, variasi, dan \emph{threshold} diubah menjadi suatu kode tersendiri, seperti, misal: tipe \emph{filtering} \texttt{entailment\char`_only} diubah menjadi \texttt{TQ1}, kemudian, tipe perubahan format kalimat \texttt{rule\char`based} diubah menjadi \texttt{TS5}.
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.2.7}, namun pada sub-bab penamaan eksperimen \emph{task recasting} sebagai verifikator ini, ada beberapa perbedaan minor, yaitu: penamaan folder besar merupakan gabungan dari \emph{prefix} \texttt{FilteringNLI}, nama \emph{dataset} yang digunakan, nama model, jumlah iterasi maksimal, tipe \emph{filtering}, tipe perubahan format kalimat, variasi pengambilan jawaban akhir, dan \emph{threshold} dan juga waktu saat mulai menjalankan \emph{training}. Untuk nama repositori pada Hugging Face memiliki beberapa syarat penamaan, antara lain: memiliki \emph{prefix} "\emph{fine-tuned} \texttt{FilteringNLI}", nama \emph{dataset} yang digunakan, nama model, jumlah iterasi maksimal, tipe \emph{filtering}, tipe perubahan format kalimat, variasi pengambilan jawaban akhir, dan \emph{threshold}, tanpa waktu saat mulai menjalankan \emph{training}, dan juga dibatasi hingga 96 karakter saja mengikuti aturan penamaan repositori dari Hugging Face. Untuk menghindari nama eksperimen yang terlalu panjang pada lokal dan repositori Hugging Face, setiap parameter jumlah iterasi maksimal, tipe \emph{filtering}, tipe perubahan format kalimat, variasi pengambilan jawaban akhir, dan \emph{threshold} diubah menjadi suatu kode tersendiri, seperti, misal: tipe \emph{filtering} \texttt{entailment\char`_only} diubah menjadi \texttt{TQ1}, kemudian, tipe perubahan format kalimat \texttt{rule\char`_based} diubah menjadi \texttt{TS5}. Kemudian, karena bagian ini merupakan \emph{task recasting}, maka tidak ada nama tambahan apapun yang disimpan di lokal maupun pada repositori Hugging Face, kecuali kode-kode parameter seperti contoh di atas.
 
 %-----------------------------------------------------------------------------%
 \subsection{Perancangan Argumen Latih (\emph{Training Arguments})}
+\label{4.4.8}
 %-----------------------------------------------------------------------------%
-Pada tahap ini, penulis merancang \emph{training arguments} dengan modul \texttt{TrainingArguments} agar jalannya eksperimen sesuai dengan \emph{hyperparameter} permanen, seperti: \texttt{LOGGING STEPS}, \texttt{WEIGHT DECAY}, \texttt{WARMUP RATIO}. Pemilihan \emph{best model} dipilih ke metrik skor F1, karena metrik F1 dapat mengatasi permasalahan \emph{label imbalance}.
-
-Pada bagian ini juga dilakukan penyimpanan terkait data (\emph{data-ops}) yang juga disuplai kepada parameter \texttt{TrainingArguments}, seperti: direktori \emph{checkpoint}, \emph{logging platform} yang otomatis diatur ke \texttt{tensorboard}, strategi \emph{logging}, strategi penyimpanan, dan strategi evaluasi yang otomatis diatur ke \texttt{steps}, Kecenderungan penulis untuk menggunakan \texttt{steps} pada bagian ini dikarenakan nantinya penulis akan menggunakan parameter \texttt{load\char`_best\char`_model\char`_at\char`_end} sebagai \texttt{True}, dan dimana strategi penyimpanan dan strategi evaluasi harus diatur ke \texttt{steps} sesuai dengan aturan dari modul \texttt{TrainingArguments}.
-
-Kemudian, pada sisi memori saat melakukan \emph{training}, penulis menyuplai parameter \texttt{dataloader\char`_num\char`_workers=cpu\char`_count()} agar dapat menggunakan subproses (paralelisme) yang digunakan untuk memuat data sesuai dengan banyaknya CPU pada sistem; dan juga penulis menyuplai parameter \texttt{push\char`_to\char`_hub=True} untuk otomatis \emph{push} ke repositori Hugging Face saat menjalankan \emph{training}, sesuai dengan nama repositori yang telah dijelaskan di sub-bab sebelumnya, dan suplai parameter \texttt{load\char`_best\char`_model\char`_at\char`_end=True} agar model yang nanti diambil merupakan hasil model yang terbaik dari sepanjang proses \emph{training}.
-
-Sederhananya, pada tahap ini pendefinisian argumen latih tidak sekompleks \texttt{TrainingArguments} metode sebelumnya, karena fokus dari metode verifikasi ini bukan untuk melakukan \emph{training} ulang, namun verifikasi hasil dari model yang sudah dilatih (\emph{training}) sebelumnya, seperti yang telah dijelaskan pada bagian sebelumnya.
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.1.8}, namun pada tahap ini terdapat beberapa perbedaan, antara lain: penulis hanya merancang \emph{training arguments} dengan modul \texttt{TrainingArguments} agar jalannya eksperimen sesuai dengan \emph{hyperparameter} permanen, seperti: \texttt{LOGGING STEPS}, \texttt{WEIGHT DECAY}, \texttt{WARMUP RATIO}; tanpa menggunakan parameter lainnya, seperti: jumlah \emph{epoch}, jumlah \emph{learn rate}, jumlah \emph{seed}, jumlah \emph{batch size}, jumlah \emph{gradient accumulation}, \emph{token}; kemudian, pada tahap ini penulis tidak mengatur variabel \texttt{STEP}. Sederhananya, pada tahap ini pendefinisian argumen latih tidak sekompleks \texttt{TrainingArguments} metode sebelumnya, karena fokus dari metode verifikasi ini bukan untuk melakukan \emph{training} ulang, namun verifikasi hasil dari model yang sudah dilatih (\emph{training}) sebelumnya, seperti yang telah dijelaskan pada bagian sebelumnya.
 
 %-----------------------------------------------------------------------------%
 \subsection{Melakukan Prediksi Jawaban}
+\label{4.4.9}
 %-----------------------------------------------------------------------------%
 Pada tahap ini, \emph{training} tidak dilakukan lagi, penulis hanya tinggal mengambil model dari Hugging Face. \texttt{Trainer} hanya dibutuhkan untuk prediksi terhadap data \emph{test} dengan fungsi \texttt{predict}. Namun, model yang diambil tersebut tetap harus berbentuk \texttt{Trainer}, oleh sebab itu, penulis tetap menyuplai model yang digunakan, \emph{training arguments} yang sebelumnya sudah didefinisikan, dan \emph{tokenizer} yang digunakan.
 
 %-----------------------------------------------------------------------------%
 \subsection{Melakukan \emph{Filtering} Jawaban}
+\label{4.4.10}
 %-----------------------------------------------------------------------------%
-Pada tahap ini, penulis melakukan \emph{filtering} jawaban sesuai dengan parameter yang sebelumnya telah diberikan. \emph{Filtering} dilakukan pada \texttt{PredictionOutput} hasil dari prediksi model menjadi sebuah \texttt{DataFrame}. Kemudian, dalam bentuk \texttt{DataFrame}, dilakukan \emph{filtering} dengan beberapa parameter ini: 
+Pada tahap ini, penulis melakukan \emph{filtering} jawaban sesuai dengan parameter yang sebelumnya telah diberikan. \emph{Filtering} dilakukan pada \texttt{PredictionOutput} hasil dari prediksi model menjadi sebuah \texttt{DataFrame}. Kemudian, dalam bentuk \texttt{DataFrame}, dilakukan \emph{filtering} dengan beberapa parameter, antara lain: jumlah iterasi maksimum, tipe \emph{filtering}, tipe perubahan format kalimat, variasi pengambilan jawaban akhir, dan \emph{threshold} skor toleransi. Sederhananya, penulis mengambil konteks, pertanyaan, jawaban prediksi, dan jawaban \emph{golden truth} dari prediksi model, kemudian dilakukan pengubahan format kalimat (dari pasangan jawaban dan pertanyaan) menjadi kalimat hipotesis deklaratif, dan konteks menjadi premis-nya; setelah itu akan dicek labelnya, apakah label (dan skor \emph{probability distribution}) sesuai dengan parameter yang telah disuplai sebelumnya, iterasi pencarian jawaban akan terus berjalan sesuai dengan parameter jumlah iterasi maksimum (disini, penulis melakukan pencarian dengan fungsi \texttt{argsort}, bila sudah selesai; jawaban akhir yang sudah disaring (\emph{filtered}) akan disimpan sebagai jawaban akhir dalam bentuk \texttt{DataFrame} bersama dengan beberapa informasi lainnya.
 
-\begin{itemize}
-    \item Jumlah iterasi maksimum: berapa kali akan dilakukan iterasi pencarian kemungkinan pilihan jawaban terbesar bila jawaban tidak sesuai dengan label yang dipilih pada tipe \emph{filtering}.
-    
-    \item Tipe \emph{filtering}:
-    \begin{itemize}
-        \item Bila \texttt{entailment\char`_only} dipilih, maka prediksi jawaban hanya akan diterima dan dijadikan prediksi jawaban akhir bila label NLI-nya merupakan label \texttt{entailment}; dan akan melakukan iterasi pencarian kemungkinan pilihan jawaban terbesar bila mendapatkan label \texttt{contradiction} atau label \texttt{neutral}.
-        
-        \item Bila \texttt{entailment\char`_or\char`_neutral} dipilih, maka prediksi jawaban hanya akan diterima dan dijadikan prediksi jawaban akhir bila label NLI-nya merupakan label \texttt{entailment} atau label \texttt{neutral}; dan akan melakukan iterasi pencarian kemungkinan pilihan jawaban terbesar bila mendapatkan label \texttt{contradiction}. 
-    \end{itemize}
-    
-    \item Tipe perubahan format kalimat:
-    \begin{itemize}
-        \item Bila memilih \texttt{replace\_first}, maka pasangan kalimat \texttt{question-answer} dan \texttt{context} akan diubah menjadi pasangan kalimat \texttt{premise-hypothesis} dengan mengubah \textbf{kata terdepan} dari \texttt{question} dengan \texttt{answer} dan menghapus tanda tanya sebagai \texttt{hypothesis}; dan \texttt{context} diubah menjadi \texttt{premise}.
-        
-        \item Bila memilih \texttt{replace\_question\_word}, maka pasangan kalimat \texttt{question-answer} dan \texttt{context} akan diubah menjadi pasangan kalimat \texttt{premise-hypothesis} dengan mengubah \textbf{kata tanya} dari \texttt{question} dengan \texttt{answer} dan menghapus tanda tanya sebagai \texttt{hypothesis}; dan \texttt{context} diubah menjadi \texttt{premise}.
-        
-        \item  Bila memilih \texttt{add\_adalah}, maka pasangan kalimat \texttt{question-answer} dan \texttt{context} akan diubah menjadi pasangan kalimat \texttt{premise-hypothesis} dengan \textbf{menghapus} \textbf{kata terdepan} dari \texttt{question}, menghapus tanda tanya, dan menambahkan \texttt{answer} diakhir \texttt{question} sebagai \texttt{hypothesis}; dan \texttt{context} diubah menjadi \texttt{premise}.
-        
-        \item Bila memilih \texttt{just\_concat\_answer\_and\_question}, maka pasangan kalimat \texttt{question-answer} dan \texttt{context} akan diubah menjadi pasangan kalimat \texttt{premise-hypothesis} dengan menambahkan \emph{string} \texttt{answer} setelah \texttt{question} sebagai \texttt{hypothesis}; dan \texttt{context} diubah menjadi \texttt{premise}.
-        
-        \item  Bila memilih \texttt{rule\_based}, maka pasangan kalimat \texttt{question-answer} dan \texttt{context} akan diubah menjadi pasangan kalimat \texttt{premise-hypothesis} dengan menyesuaikan template yang telah penulis rancang manual dengan melihat contoh-contoh data pada ketiga \emph{dataset} sistem tanya jawab yang digunakan untuk setiap tipe pertanyaan, hal tersebut sebagai \texttt{hypothesis}; dan \texttt{context} diubah menjadi \texttt{premise}.
-        
-        \item Bila memilih \texttt{machine\_generation\_with\_rule\_based}, maka pasangan kalimat \texttt{question-answer} dan \texttt{context} akan diubah menjadi pasangan kalimat \texttt{premise-hypothesis} dengan melakukan tipe perubahan format kalimat \textbf{\texttt{rule\_based}}, lalu dilakukan \emph{paraphrase} menggunakan model \emph{paraphraser} berbahasa Indonesia untuk "menghaluskan" kalimat, hal tersebut sebagai \texttt{hypothesis}; dan \texttt{context} diubah menjadi \texttt{premise}.
-        
-        \item  Bila memilih \texttt{pure\_machine\_generation}, maka pasangan kalimat \texttt{question-answer} dan \texttt{context} akan diubah menjadi pasangan kalimat \texttt{premise-hypothesis} dengan melakukan tipe perubahan format kalimat \textbf{\texttt{just\_concat\_answer\_and\_question}}, lalu dilakukan \emph{paraphrase} menggunakan model \emph{paraphraser} berbahasa Indonesia untuk "menghaluskan" kalimat agar dapat murni mendapatkan hasil yang lebih murni dari \emph{paraphraser}-nya, hal tersebut sebagai \texttt{hypothesis}; dan \texttt{context} diubah menjadi \texttt{premise}.
-        
-        \item Bila memilih \texttt{machine\_generation\_with\_translation}, maka pasangan kalimat \texttt{question-answer} dan \texttt{context} akan diubah menjadi pasangan kalimat \texttt{premise-hypothesis} dengan melakukan tipe perubahan format kalimat \textbf{\texttt{rule\_based}}, lalu dilakukan penerjemahan ke bahasa Inggris, kemudian dilakukan \emph{paraphrase} menggunakan model \emph{paraphraser} berbahasa Inggris untuk "menghaluskan" kalimat, terakhir, diterjemahkan lagi ke bahasa Indonesia, hal tersebut dilakukan karena lebih banyak model \emph{paraphraser} berbahasa Inggris yang jauh lebih baik daripada model \emph{paraphraser} berbahasa Indonesia; hal tersebut sebagai \texttt{hypothesis}; dan \texttt{context} diubah menjadi \texttt{premise}.
-    \end{itemize}
-    
-    \item Variasi:
-    \begin{itemize}
-        \item Bila memilih variasi 1, maka \emph{filtering} akan dibasiskan dengan label dari hasil NLI-nya saja, bila labelnya sudah sesuai tipe \emph{filtering}, maka akan masuk sebagai jawaban prediksi akhir. Bila setelah jumlah iterasi maksimum yang sudah didefinisikan sebelumnya tetap tidak memenuhi label tipe \emph{filtering}, maka akan dijawab kosong, atau dalam kata lain model tidak dapat menjawab pertanyaan tersebut \emph{unanswerable}.
-        
-        \item Bila memilih variasi 2, maka \emph{filtering} akan dibasiskan dengan dengan label dan skor \emph{probability distribution} dari hasil NLI-nya, bila labelnya sudah sesuai tipe \emph{filtering} dan nilai skornya memenuhi \emph{threshold}, maka akan masuk sebagai jawaban prediksi akhir. Bila setelah jumlah iterasi maksimum yang sudah didefinisikan sebelumnya tetap tidak memenuhi label tipe \emph{filtering} dan nilai skornya masih belum memenuhi \emph{threshold}, maka akan dijawab kosong, atau dalam kata lain model tidak dapat menjawab pertanyaan tersebut \emph{unanswerable}.
-        
-        \item Bila memilih variasi 3, maka \emph{filtering} akan dibasiskan dengan dengan label dan skor \emph{probability distribution} dari hasil NLI-nya, bila labelnya sudah sesuai tipe \emph{filtering} dan nilai skornya memenuhi \emph{threshold}, maka akan masuk sebagai jawaban prediksi akhir. Bila setelah jumlah iterasi maksimum yang sudah didefinisikan sebelumnya tetap tidak memenuhi label tipe \emph{filtering} dan nilai skornya masih belum memenuhi \emph{threshold}, maka akan dijawab dengan skor \emph{probability distribution} yang terbesar dari iterasi pencarian jawaban yang telah dilakukan, hal ini tidak membuat model verifikasi otomatis menjawab kosong, atau dalam kata lain model masih ada kemungkinan untuk menjawab pertanyaan tersebut \emph{answerable} (bila skor \emph{probability distribution} yang terbesar bukan jawaban kosong). 
-    \end{itemize}
-    
-    \item \emph{Threshold}: berapa batas yang masih ditolerir oleh model verifikasi, untuk menentukan \emph{confidence} yang tepat untuk suatu label yang didapatkan.
-\end{itemize}
+Pada tahap ini juga akan dilakukan parafrase dan penerjemahan, pada tipe perubahan format \texttt{machine\char`_generation\char`_with\char`_rule\char`_based}, \texttt{pure\char`_machine\char`_generation}, dan \texttt{machine\char`_generation\char`_with\char`_translation}. Penulis menggunakan model \href{https://huggingface.co/Wikidepia/IndoT5-base-paraphrase}{\texttt{Wikidepia/IndoT5-base-paraphrase}} sebagai model parafrase bahasa Indonesia, model \href{https://huggingface.co/humarin/chatgpt_paraphraser_on_T5_base}{\texttt{humarin/chatgpt\char`_paraphraser\char`_on\char`_T5\char`_base}} sebagai model parafrase bahasa Inggris, dan \emph{library} \texttt{GoogleTranslator} sebagai penerjemah dari bahasa Indonesia ke bahasa Inggris maupun sebaliknya. Pemilihan model-model tersebut didasari oleh ketersediaannya pada repositori Hugging Face dan memiliki performa yang cenderung lebih baik dibandingkan model lainnya.
 
 %-----------------------------------------------------------------------------%
 \subsection{Representasi Prediksi Jawaban Untuk Evaluasi dan Analisis}
+\label{4.4.11}
 %-----------------------------------------------------------------------------%
-Pada tahap ini, penulis mengekstrak \texttt{context}, \texttt{question}, \texttt{prediction answer}, \texttt{golden answer} dari \texttt{PredictionOutput} hasil dari prediksi model dan diubah dalam bentuk \texttt{DataFrame}. Tahapan ini berguna untuk evaluasi dan analisis kedepannya. Proses pemisahan antara \texttt{question} dan \texttt{context} menggunakan properti \texttt{token\char`_type\char`_ids}, dimana bila \texttt{token\char`_type\char`_ids} bernilai 0, maka \texttt{input\char`_ids} yang bersangkutan merupakan sebuah bagian dari \texttt{question}, sebaliknya bila \texttt{token\char`_type\char`_ids} bernilai 1, maka \texttt{input\char`_ids} yang bersangkutan merupakan sebuah bagian dari \texttt{question}; hal tersebut sesuai dengan urutan \emph{preprocess} dan tokenisasi dimana urutannya \texttt{question} lalu \texttt{question}. Namun agak berbeda sedikit dengan model \texttt{xlm-roberta-large}, karena model tersebut tidak mengenal konsep \texttt{return\char`_token\char`_type\char`_ids}, maka cara untuk membedakan antara \texttt{question} dan \texttt{context}-nya dengan menggunakan fungsi \texttt{index} bawaan Python dengan mencari ID = 2 (\texttt{</s>}) pada \texttt{input\char`_ids} sebagai pemisahnnya. 
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.2.10}, tanpa ada perubahan apapun.
 
 %-----------------------------------------------------------------------------%
 \subsection{Melakukan \emph{Push} ke Akun Hugging Face}
+\label{4.4.12}
 %-----------------------------------------------------------------------------%
-Pada tahapan ini, sederhananya, penulis hanya melakukan \emph{push} hasil eksperimen, meliputi: model, evaluasi, dan keluaran dari eksperimen ke akun Hugging Face yang telah disuplai \texttt{TOKEN}-nya pada bagian parameter sebelumnya. Proses \emph{push} menggunakan API khusus Hugging Face, yaitu: \texttt{HfApi} dimana pengunggahan dilakukan dengan fungsi \texttt{upload\char`_folder}, kemudian hanya untuk folder \emph{output} dan folder \emph{metric result} saja yang diunggah ke repositori Hugging Face karena hanya folder-folder tersebut saja yang dirasa berguna untuk evaluasi dan analisis kedepannya. Penulis menggunakan \emph{statement} \texttt{try/except} agar dapat membuat repositori bila belum ada repositori yang diinginkan, tidak seperti eksperimen-eksperimen sebelumnya, hal ini harus dilakukan karena kita hanya mengambil model dari Hugging Face, bukan melakukan \emph{training} dari awal dengan parameter \texttt{push\char`_to\char`_hub=True}..
+Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.1.11}, namun ada satu perbedaan, yaitu: pada tahap ini penulis menggunakan \emph{statement} \texttt{try/except} agar dapat membuat repositori bila belum ada repositori yang diinginkan, tidak seperti eksperimen-eksperimen sebelumnya, hal ini harus dilakukan karena kita hanya mengambil model dari Hugging Face, bukan melakukan \emph{training} dari awal dengan parameter \texttt{push\char`_to\char`_hub=True}.

@@ -2,10 +2,11 @@
 \chapter{\babDua}
 \label{bab:2}
 %-----------------------------------------------------------------------------%
-Bab kedua ini menjelaskan mengenai studi literatur yang telah penulis telusuri dan kaji untuk penelitian ini. Sub-bab 2.1 menjelaskan mengenai sistem tanya jawab, \emph{question answering task}, bidang khusus yang menjadi domain penelitian ini. Sub-bab 2.2 menjelaskan tentang \emph{dataset} sistem tanya jawab, \emph{dataset} tersebut ada yang berbahasa Indonesia maupun berbahasa Inggris. Sub-bab 2.3 menjelaskan tentang \emph{natural language inference}, salah satu alat (\emph{tools}) eksperimen untuk meningkatkan performa dari sistem tanya jawab dan \emph{dataset} NLI berbahasa Indonesia yang digunakan, yaitu: IndoNLI. Sub-bab 2.4 menjelaskan tentang \emph{transformer}, salah satu arsitektur model kecerdasan buatan terbaru untuk dapat memprediksi jawaban. Sub-bab 2.5 menjelaskan tentang \emph{pre-trained language model} yang digunakan pada penelitian ini. Sub-bab 2.6 dan sub-bab 2.7 menjelaskan tentang \emph{intermediate-task transfer learning} dan \emph{task recasting}, yaitu metode-metode eksperimen yang akan dilakukan pada penelitian ini. Terakhir, sub-bab 2.8 menjelaskan tentang metrik evaluasi yang digunakan pada penelitian ini.
+Bab kedua ini menjelaskan mengenai studi literatur yang telah penulis telusuri dan kaji untuk penelitian ini. Sub-bab \ref{2.1} menjelaskan mengenai sistem tanya jawab, \emph{question answering task}, bidang khusus yang menjadi domain penelitian ini. Sub-bab \ref{2.2} menjelaskan tentang \emph{dataset} sistem tanya jawab, \emph{dataset} tersebut ada yang berbahasa Indonesia maupun berbahasa Inggris. Sub-bab \ref{2.3} menjelaskan tentang \emph{natural language inference}, salah satu alat (\emph{tools}) eksperimen untuk meningkatkan performa dari sistem tanya jawab dan \emph{dataset} NLI berbahasa Indonesia yang digunakan, yaitu: IndoNLI. Sub-bab \ref{2.4} menjelaskan tentang \emph{transformer}, salah satu arsitektur model kecerdasan buatan terbaru untuk dapat memprediksi jawaban. Sub-bab \ref{2.5} menjelaskan tentang \emph{pre-trained language model} yang digunakan pada penelitian ini. Sub-bab \ref{2.6} dan sub-bab \ref{2.7} menjelaskan tentang \emph{intermediate-task transfer learning} dan \emph{task recasting}, yaitu metode-metode eksperimen yang akan dilakukan pada penelitian ini. Terakhir, sub-bab \ref{2.8} menjelaskan tentang metrik evaluasi yang digunakan pada penelitian ini.
 
 %-----------------------------------------------------------------------------%
 \section{Sistem Tanya Jawab (\emph{Question Answering System})}
+\label{2.1}
 %-----------------------------------------------------------------------------%
 
 \begin{figure}[h]
@@ -32,11 +33,13 @@ Jenis-jenis tugas (\emph{task}) yang dapat diselesaikan oleh suatu sistem tanya 
 
 %-----------------------------------------------------------------------------%
 \section{\emph{Dataset} Umum Pada Sistem Tanya Jawab}
+\label{2.2}
 %-----------------------------------------------------------------------------%
 Pada bagian ini, akan dipaparkan berbagai macam \emph{dataset} yang biasa dan umum digunakan pada pengembangan suatu sistem tanya jawab.
 
 %-----------------------------------------------------------------------------%
 \subsection{SQuAD}
+\label{2.2.1}
 %-----------------------------------------------------------------------------%
 \emph{Stanford Question Answering Dataset} atau disingkat dengan SQuAD (versi 1.1) merupakan suatu kumpulan data (\emph{dataset}) yang berisi pasangan dari 100.000 lebih pertanyaan dan jawaban \citep{rajpurkar-etal-2016-squad}. Pertanyaan diajukan kepada anotator dari sebuah konteks dari halaman Wikipedia, yang dimana jawabannya harus dapat diekstrak dari konteks halaman Wikipedia tersebut. Konteks tersebut dipilih dari 536 halaman Wikipedia. Bentuk jawaban beragam dan butuh alasan (\emph{reasoning}) untuk dapat menjawabnya. Alur pengumpulan data dilakukan dalam alur sebagai berikut: pencarian 10.000 halaman teratas pada Wikipedia, lalu dilakukan pengambilan contoh/sampel (\emph{sampling}) sebanyak 536 halaman, lalu dari halaman-halaman tersebut ditanyakan kepada anotator untuk dicari jawabannya, terakhir; untuk evaluasi model yang lebih kokoh (\emph{robust}) maka dicari lagi anotator baru untuk menambahkan jawaban baru pada sebagian pertanyaan.
 
@@ -44,6 +47,7 @@ Saat ini, SQuAD sudah sampai versi 2.0, perbedaan SQuAD versi ini dengan sebelum
 
 %-----------------------------------------------------------------------------%
 \subsection{TyDi-QA}
+\label{2.2.2}
 %-----------------------------------------------------------------------------%
 \emph{Typologically Diverse Languages Question Answer} atau disingkat dengan TyDi-QA merupakan suatu kumpulan data (\emph{dataset}) yang berisi pasangan dari 204.000 lebih pertanyaan dan jawaban dalam 11 bahasa yang beragam secara tipologis \citep{clark-etal-2020-tydi}. Tujuan dari penggunaan bahasa yang beragam ini agar dapat menangkap beragam fenomena bahasa dan fenomena linguistik yang tidak ditemukan pada dokumen yang hanya memiliki bahasa Inggris saja. Kemudian, menurut \citet{clark-etal-2020-tydi} \emph{dataset} TyDi-QA ini lebih berkualitas dan realistis, sebab anotator yang menulis pertanyaan memang benar-benar ingin tahu jawaban dari suatu petunjuk tema (\emph{prompt}) yang diberikan, bukan sekadar menulis pertanyaan sederhana yang jawabannya dengan mudah diekstrak dari petunjuk tema (\emph{prompt}) yang diberikan. Pada \emph{dataset} ini, terdapat \emph{dataset} berbahasa Indonesia, yang terdapat pada \emph{secondary gold passage task dataset} TyDi-QA ini, bagian ini yang \citet{cahyawijaya-etal-2021-indonlg} sebut sebagai TyDi-QA-ID , dengan pembagian 15\% dari data pelatihan (\emph{training}) digunakan sebagai set pengujian (\emph{testing}).
 
@@ -51,6 +55,7 @@ Alur pengumpulan data dilakukan dalam alur sebagai berikut: anotator diberikan s
 
 %-----------------------------------------------------------------------------%
 \subsection{IDK-MRC}
+\label{2.2.3}
 %-----------------------------------------------------------------------------%
 \emph{I Don’t Know Machine Reading Comprehension} atau yang disingkat dengan IDK-MRC merupakan suatu kumpulan data (\emph{dataset}) yang berisi dengan 5.000 lebih pertanyaan dan jawaban berbahasa Indonesia yang mayoritas pertanyaannya sengaja agar tidak bisa dijawab (\emph{unanswerable}) dari konteks yang diberikan \citep{putri-oh-2022-idk}. Sebenarnya ide pembuatan \emph{dataset} ini mirip dengan ide \emph{dataset} SQuAD versi 2.0, yang bertujuan untuk memaksa model pembelajaran mesin (\emph{machine learning}) agar dapat menjawab “tidak ada jawaban” dibandingkan harus mengarang jawaban. Namun karena SQuAD tidak memfasilitasi bahasa Indonesia, maka IDK-MRC dapat menjadi solusinya. \emph{Dataset} IDK-MRC ini dibangun di atas hasil penerjemahan dari SQuAD versi 2.0.
 
@@ -58,6 +63,7 @@ Alur pengumpulan data dilakukan dalam alur sebagai berikut: awalnya akan dihasil
 
 %-----------------------------------------------------------------------------%
 \subsection{SQuAD-ID}
+\label{2.2.4}
 %-----------------------------------------------------------------------------%
 \emph{Stanford Question Answering Dataset Indonesia} atau yang disingkat dengan SQuAD-ID merupakan kumpulan data (\emph{dataset}) yang berisi pasangan dari 100.000 lebih pertanyaan dan jawaban dalam bahasa Indonesia yang terdapat juga pertanyaan yang tidak terjawab di dalamnya \citep{muis2020sequencetosequence}. Mirip dengan \emph{dataset} IDK-MRC, \emph{dataset} SQuAD-ID juga merupakan hasil penerjemahan dari \emph{dataset} SQuAD versi 2.0, namun pada \emph{dataset} SQuAD-ID penerjemahan dilakukan secara otomatis, tidak menggunakan penerjemahan manual oleh anotator yang dimana \emph{dataset} IDK-MRC melakukannya. Otomasi penerjemahan \emph{dataset} SQuAD yang berbahasa Inggris menjadi SQuAD yang berbahasa Indonesia dilakukan dengan metode: \emph{Sequence-to-Sequence Learning}. Pemilihan metode tersebut dikarenakan metode tersebut adalah \emph{state-of-the-art} dari pembuatan model \emph{Automatic Question Generator} (AQG). 
 
@@ -65,6 +71,7 @@ Alur pengumpulan data dilakukan dalam alur sebagai berikut: penerjemahan \emph{d
 
 %-----------------------------------------------------------------------------%
 \section{\emph{Natural Language Inference}}
+\label{2.3}
 %-----------------------------------------------------------------------------%
 
 \begin{figure}[h]
@@ -116,6 +123,7 @@ Alur pengumpulan data IndoNLI mengikuti protokol pengumpulan data \emph{Multi-Ge
 
 %-----------------------------------------------------------------------------%
 \section{\emph{Transformer}}
+\label{2.4}
 %-----------------------------------------------------------------------------%
 
 \begin{figure}[h]
@@ -126,15 +134,17 @@ Alur pengumpulan data IndoNLI mengikuti protokol pengumpulan data \emph{Multi-Ge
 
 \emph{Transformer} merupakan tipe arsitektur \emph{artificial neural networks} yang digunakan untuk memecahkan masalah transformasi dari urutan masukan (\emph{input}) menjadi urutan keluaran (\emph{output}) dalam suatu aplikasi \emph{deep learning} \citep{transformers-self-attention-to-the-rescue}. Keberadaan Transformer dianggap sebagai solusi dari permasalahan-permasalahan pada \emph{recurrent neural network} (RNN) dan \emph{long short-term memory} (LSTM), yang berkaitan dengan \emph{vanishing \& exploding gradient problem} pada RNN dan keterkaitan antar kata (\emph{relationship between words}) pada LSTM. Cara \emph{transformer} mengatasi masalah-masalah tersebut adalah dengan menggunakan \emph{self-attention}. \emph{Self-attention} merupakan mekanisme perhatian (\emph{attention}) yang menghubungkan posisi yang berbeda dari suatu urutan untuk menghitung representasi urutan tersebut \citep{DBLP:journals/corr/VaswaniSPUJGKP17}; sederhananya \emph{self-attention} merupakan mekanisme yang mempelajari keterkaitan antar kata (\emph{relationship between words}) yang gagal diatasi oleh LSTM. 
 
-Kemudian, alasan mengapa \emph{transformer} dapat mengatasi \emph{vanishing \& exploding gradient problem}, adalah karena \emph{Transformer} tidak bergantung pada perulangan (\emph{recurrent}) seperti yang dilakukan pada RNN, namun \emph{Transformer} bergantung kepada mekanisme perhatian (\emph{attention}) sepenuhnya, sehingga \emph{transformer} dapat terhindar dari perkalian angka-angka gradien kecil maupun besar yang dapat menyebabkan \emph{vanishing \& exploding gradient problem}. Kemudian, \emph{transformer} memungkinkan paralelisasi yang lebih signifikan dari arsitektur-arsitektur lainnya. Hal tersebut yang membuat \emph{Transformer} menjadi \emph{state-of-the-art} model dari perkembangan arsitektur \emph{artificial neural networks} sampai saat ini.
+Kemudian, alasan mengapa \emph{transformer} dapat mengatasi \emph{vanishing \& exploding gradient problem}, adalah karena \emph{transformer} tidak bergantung pada perulangan (\emph{recurrent}) seperti yang dilakukan pada RNN, namun \emph{Transformer} bergantung kepada mekanisme perhatian (\emph{attention}) sepenuhnya, sehingga \emph{transformer} dapat terhindar dari perkalian angka-angka gradien kecil maupun besar yang dapat menyebabkan \emph{vanishing \& exploding gradient problem}. Kemudian, \emph{transformer} memungkinkan paralelisasi yang lebih signifikan dari arsitektur-arsitektur lainnya. Hal tersebut yang membuat \emph{transformer} menjadi \emph{state-of-the-art} model dari perkembangan arsitektur \emph{artificial neural networks} sampai saat ini.
 
 %-----------------------------------------------------------------------------%
 \section{\emph{Pre-trained Language Model}}
+\label{2.5}
 %-----------------------------------------------------------------------------%
 Pada bagian ini, akan dipaparkan berbagai macam \emph{pre-trained language model} yang akan digunakan pada penelitian saat ini. Sederhananya, \emph{pre-trained language model} adalah model bahasa yang telah dilatih terlebih dahulu pada korpus teks yang besar untuk mempelajari pola bahasa dan representasi dari suatu kata. Proses \emph{training} model biasa dilakukan dengan teknik: belajar untuk memprediksi atau menghasilkan kata berikutnya dalam sebuah kalimat berdasarkan konteks kata sebelumnya dan/atau setelahnya (\emph{masked language modelling}) ataupun dengan memprediksi apakah suatu kalimat ada setelah kalimat lainnya (\emph{next sentence prediction}), hal tersebut bertujuan untuk menangkap pola statistik dan hubungan semantik dalam suatu bahasa. Proses ini memungkinkan model untuk mempelajari "\emph{word embeddings}" dan representasi kontekstual yang menyimpan informasi tentang makna kata, struktur sintaksis, dan beragam hal lainnya \citep{radford2018improving}.
 
 %-----------------------------------------------------------------------------%
 \subsection{BERT}
+\label{2.5.1}
 %-----------------------------------------------------------------------------%
 
 BERT yang merupakan singkatan dari \emph{Bidirectional Encoder Representations from Transformers} merupakan salah satu \emph{pre-trained language model} yang dikembangkan oleh Google dan secara spesifik bertujuan sebagai representasi suatu bahasa atau dalam kata lain sebagai \emph{language representation models}. BERT sengaja dirancang untuk belajar representasi bahasa secara dua arah, yaitu: kiri ke kanan, dan kanan ke kiri. BERT dapat digunakan sebagai model untuk menjawab pertanyaan (\emph{question answering task}), inferensi bahasa, dan lain-lain \citep{devlin-etal-2019-bert}. Untuk jumlah komponen dalam model BERT itu sendiri, dapat dipaparkan sebagai berikut: untuk jenis BERT-\emph{base}, \emph{layer}-nya sebanyak 12 \emph{layer}, \emph{hidden-size} sebanyak 768, dan banyaknya \emph{self-attention heads} sebanyak 12, dan terakhir, banyaknya parameter sebanyak 110 juta parameter; kemudian untuk jenis BERT-\emph{large}, \emph{layer}-nya sebanyak 24 \emph{layer}, \emph{hidden-size} sebanyak 1024, dan banyaknya \emph{self-attention heads} sebanyak 16, dan terakhir, banyaknya parameter sebanyak 340 juta parameter. BERT sendiri secara orisinil dilatih dengan bahasa Inggris saja, namun, untuk kepentingan penelitian ini, kita menggunakan IndoBERT, yaitu BERT yang dilatih dengan bahasa Indonesia \citep{koto2020indolem}.
@@ -144,6 +154,7 @@ Arsitektur dari model BERT itu sendiri mengusung arsitektur \emph{multi-layer bi
 
 %-----------------------------------------------------------------------------%
 \subsection{RoBERTa}
+\label{2.5.2}
 %-----------------------------------------------------------------------------%
 RoBERTa yang merupakan singkatan dari \emph{A Robustly Optimized BERT Pretraining Approach} adalah salah satu model yang merupakan suatu \emph{pre-trained language model} pengembangan dari \emph{pre-trained language model} BERT. Modifikasi yang dilakukan oleh \citet{liu2019roberta} pada model BERT antara lain: memperbanyak waktu \emph{training} dengan jumlah \emph{batch} yang lebih besar, menghapus objektif \emph{next-sentence-prediction}, melatih model untuk \emph{sequence} yang lebih panjang, mengubah secara dinamis \emph{masking pattern} pada data latih, dan dilatih dengan \emph{dataset} baru yang lebih besar. 
 
@@ -151,6 +162,7 @@ Alasan mengapa dilakukan modifikasi tersebut adalah karena menurut \citet{liu201
 
 %-----------------------------------------------------------------------------%
 \subsection{XLM-RoBERTa}
+\label{2.5.3}
 %-----------------------------------------------------------------------------%
 XLM-RoBERTa yang merupakan singkatan dari \emph{Cross-lingual Language Model For Robustly Optimized BERT Pretraining Approach} adalah salah satu \emph{pre-trained language model} yang merupakan suatu model pengembangan dari \emph{pre-trained language model} RoBERTa. Modifikasi yang dilakukan oleh \citet{conneau2020unsupervised} pada model RoBERTa adalah penggunaan banyak bahasa pada data latih model XLM-RoBERTa, yang mencakup sekitar 100 bahasa yang disadur dari halaman Wikipedia dengan beragam bahasa yang tersedia. Penggunaan banyak bahasa ini dipengaruhi oleh adanya model mBERT yang menggunakan data latih dari 104 bahasa.
 
@@ -158,6 +170,7 @@ Alasan mengapa dilakukan modifikasi tersebut adalah untuk menguji \emph{cross-li
 
 %-----------------------------------------------------------------------------%
 \section{\emph{Intermediate-Task Transfer Learning}}
+\label{2.6}
 %-----------------------------------------------------------------------------%
 
 \begin{figure}[h]
@@ -172,6 +185,7 @@ Namun, menurut \citet{pruksachatkun-etal-2020-intermediate}, masih belum mengeta
 
 %-----------------------------------------------------------------------------%
 \section{\emph{Task Recasting}}
+\label{2.7}
 %-----------------------------------------------------------------------------%
 \emph{Task recasting} merupakan teknik untuk mengubah bentuk \emph{dataset} (atau model), dari satu \emph{task} ke \emph{task} lainnya. \emph{Task recasting} biasanya digunakan untuk menurunkan (\emph{derive}) \emph{dataset task} untuk dapat digunakan pada \emph{task} lainnya, karena ada kecenderungan untuk mendapatkan \emph{dataset} yang lebih bagus dan lebih \emph{robust}, bila diturunkan dari \emph{dataset task} lain \citep{DBLP:journals/corr/abs-1809-02922}. Pada konteks penelitian ini, akan dilakukan \emph{task recasting} antar \emph{question answering task} dengan \emph{sequence classification task (natural language inference)} sebagai alternatif metode eksperimen yang nanti akan dilaksanakan.
 
@@ -179,11 +193,13 @@ Namun, penggunaan \emph{task recasting} tidak hanya sebatas menggunakan teknik i
 
 %-----------------------------------------------------------------------------%
 \section{Sistem Metrik Evaluasi}
+\label{2.8}
 %-----------------------------------------------------------------------------%
 Pada bagian ini, akan dipaparkan dua metrik evaluasi utama yang akan digunakan pada penelitian saat ini.
 
 %-----------------------------------------------------------------------------%
 \subsection{Metrik \emph{Exact Match}}
+\label{2.8.1}
 %-----------------------------------------------------------------------------%
 
 \begin{figure}[h]
@@ -234,7 +250,7 @@ Pada bagian ini, akan dipaparkan dua metrik evaluasi utama yang akan digunakan p
 \textbf{Skor Akhir \emph{Exact Match}}: $\frac{1+0+1+0+1}{5}=0.6$
 
 \centering
-\caption{Cara perhitungan skor akhir metrik \emph{exact match}.}
+\caption{Contoh cara perhitungan skor akhir metrik \emph{exact match}.}
 \end{figure}
 
 Metrik \emph{exact match} pada suatu sistem tanya jawab mengukur persentase dari jawaban prediksi yang sama persis dengan jawaban \emph{ground truth}-nya \citep{rajpurkar-etal-2016-squad}. Saat melakukan evaluasi sistem tanya jawab, biasanya jawaban prediksi model akan dibandingkan dengan jawaban \emph{ground truth} yang didapatkan dari anotator manusia atau anotator ahli, bila jawaban prediksi model sistem tanya jawab sama persis hingga detail terkecil tanpa ada \emph{typo}, variasi, perbedaan format penulisan, dan kesalahan (\emph{error}) apapun, maka akan dihitung sebagai \emph{exact match}.
@@ -243,6 +259,7 @@ Contohnya, misal: suatu pertanyaan hanya memiliki satu jawaban \emph{ground trut
 
 %-----------------------------------------------------------------------------%
 \subsection{Metrik Skor F1}
+\label{2.8.2}
 %-----------------------------------------------------------------------------%
 
 \begin{figure}[h]
@@ -303,7 +320,7 @@ Contohnya, misal: suatu pertanyaan hanya memiliki satu jawaban \emph{ground trut
 \textbf{Skor Akhir \emph{F1}}: $\frac{1+0.857+1+0+1}{5}=0.771$
 
 \centering
-\caption{Cara perhitungan skor akhir metrik F1.}
+\caption{Contoh cara perhitungan skor akhir metrik F1.}
 \end{figure}
 
 Metrik skor F1  pada suatu sistem tanya jawab mengukur rata-rata tumpang-tindih (\emph{average overlap}) antara jawaban prediksi dan jawaban \emph{ground truth} \citep{rajpurkar-etal-2016-squad}. Berbeda dengan skor F1 pada umumnya, bagi \citeauthor{rajpurkar-etal-2016-squad} skor F1 pada sistem tanya jawab, jawaban prediksi dan jawaban \emph{ground truth} diperlakukan sebagai kumpulan token (\emph{bag of token}), Skor F1 sejatinya juga mengukur bagaimana performa dari suatu sistem tanya jawab dengan memperhatikan nilai \emph{precision} dan \emph{recall}-nya masing-masing. 

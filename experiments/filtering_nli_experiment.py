@@ -8,7 +8,7 @@ parser.add_argument('-d', '--data_name', type=str, metavar='', required=True, he
 parser.add_argument('-t', '--token', type=str, metavar='', required=False, help="Token Hugging Face Anda; String; choice=[all string token]; default=(TOKEN_HF_muhammadravi251001)", default="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")
 parser.add_argument('-msi', '--maximum_search_iter', type=int, metavar='', required=False, help="Jumlah maximum search iter Anda; Integer; choice=[all integer]; default=2", default=2)
 parser.add_argument('-tq', '--type_qas', type=str, metavar='', required=False, help="Tipe filtering QAS Anda; String; choice=[entailment_only, entailment_or_neutral]; default=entailment_or_neutral", default="entailment_or_neutral")
-parser.add_argument('-ts', '--type_smoothing', type=str, metavar='', required=False, help="Tipe smoothing hypothesis Anda; String; choice=[replace_first, replace_question_mark, add_adalah, just_concat_answer_and_question, rule_based, machine_generation_with_rule_based, pure_machine_generation, machine_generation_with_translation]; default=rule_based", default="rule_based")
+parser.add_argument('-ts', '--type_smoothing', type=str, metavar='', required=False, help="Tipe smoothing hypothesis Anda; String; choice=[replace_first, replace_question_word, add_adalah, just_concat_answer_and_question, rule_based, machine_generation_with_rule_based, pure_machine_generation, machine_generation_with_translation]; default=rule_based", default="rule_based")
 parser.add_argument('-va', '--variation', type=int, metavar='', required=False, help="Jenis variasi filtering Anda; Integer; choice=[1, 2, 3]; default=1", default=1)
 parser.add_argument('-th', '--threshold', type=float, metavar='', required=False, help="Berapa threshold skor confidence filtering Anda; Integer; choice=[all integer]; default=0.5", default=0.5)
 args = parser.parse_args()
@@ -476,7 +476,7 @@ if __name__ == "__main__":
     elif TYPE_QAS == "entailment_or_neutral": TQ_CODE = "TQ2"
 
     if TYPE_SMOOTHING == "replace_first": TS_CODE = "TS1"
-    elif TYPE_SMOOTHING == "replace_question_mark": TS_CODE = "TS2"
+    elif TYPE_SMOOTHING == "replace_question_word": TS_CODE = "TS2"
     elif TYPE_SMOOTHING == "add_adalah": TS_CODE = "TS3"
     elif TYPE_SMOOTHING == "just_concat_answer_and_question": TS_CODE = "TS4"
     elif TYPE_SMOOTHING == "rule_based": TS_CODE = "TS5"
@@ -737,7 +737,14 @@ if __name__ == "__main__":
                             gold_hypothesis = f"{gold_hypothesis} berjumlah {gold_answer}"
                             
                         else: gold_hypothesis = f"{gold_hypothesis} adalah {gold_answer}"
-                            
+                        break
+                    
+                    else: 
+                        pred_hypothesis = question.replace('?', '')
+                        pred_hypothesis = f"{pred_hypothesis.lstrip()} adalah {pred_answer}"
+
+                        gold_hypothesis = question.replace('?', '')
+                        gold_hypothesis = f"{gold_hypothesis.lstrip()} adalah {gold_answer}"
                         break
                         
                 else:
@@ -762,14 +769,21 @@ if __name__ == "__main__":
         elif type == 'machine_generation_with_translation':
             pred_hypothesis, gold_hypothesis = smoothing(question, pred_answer, gold_answer, type="rule_based")
 
-            pred_hypothesis = GoogleTranslator(source='id', target='en').translate(pred_hypothesis)
-            gold_hypothesis = GoogleTranslator(source='id', target='en').translate(gold_hypothesis)
+            try:
+                pred_hypothesis = GoogleTranslator(source='id', target='en').translate(pred_hypothesis)
+                gold_hypothesis = GoogleTranslator(source='id', target='en').translate(gold_hypothesis)
 
-            pred_hypothesis = nlp_tg_eng(pred_hypothesis)[0]['generated_text']
-            gold_hypothesis = nlp_tg_eng(gold_hypothesis)[0]['generated_text']
+                pred_hypothesis = nlp_tg_eng(pred_hypothesis)[0]['generated_text']
+                gold_hypothesis = nlp_tg_eng(gold_hypothesis)[0]['generated_text']
 
-            pred_hypothesis = GoogleTranslator(source='en', target='id').translate(pred_hypothesis)
-            gold_hypothesis = GoogleTranslator(source='en', target='id').translate(gold_hypothesis)
+                pred_hypothesis = GoogleTranslator(source='en', target='id').translate(pred_hypothesis)
+                gold_hypothesis = GoogleTranslator(source='en', target='id').translate(gold_hypothesis)
+            
+            except:
+                pred_hypothesis, gold_hypothesis = smoothing(question, pred_answer, gold_answer, type="rule_based")
+
+            if pred_hypothesis is None or gold_hypothesis is None:
+                pred_hypothesis, gold_hypothesis = smoothing(question, pred_answer, gold_answer, type="rule_based")
 
         return pred_hypothesis.strip(), gold_hypothesis.strip()
     
@@ -894,7 +908,16 @@ if __name__ == "__main__":
                 if predicted_label['label'] == 'neutral' and type_qas == 'entailment_or_neutral': continue
 
                 # Bila MAXIMUM_SEARCH_ITER dibawah 2, maka continue langsung
-                if MAXIMUM_SEARCH_ITER < 2: continue
+                if MAXIMUM_SEARCH_ITER < 2: 
+                    question_array.append(question_decoded)
+                    context_array.append(context_decoded)
+                    pred_answer_after_filtering_array.append([pred_answer])
+                    gold_answer_array.append(gold_answer)
+                    answer_types_array.append(assign_answer_types(answer=gold_answer))
+                    pred_hypothesis_after_filtering_array.append([pred_hypothesis])
+                    gold_hypothesis_array.append(gold_hypothesis)
+                    label_after_filtering_array.append([predicted_label])
+                    continue
 
                 # Bila MAXIMUM_SEARCH_ITER diatas 2, maka continue langsung
 
@@ -1128,7 +1151,16 @@ if __name__ == "__main__":
                     and type_qas == 'entailment_or_neutral': continue
 
                 # Bila MAXIMUM_SEARCH_ITER dibawah 2, maka continue langsung
-                if MAXIMUM_SEARCH_ITER < 2: continue
+                if MAXIMUM_SEARCH_ITER < 2:
+                    question_array.append(question_decoded)
+                    context_array.append(context_decoded)
+                    pred_answer_after_filtering_array.append([pred_answer])
+                    gold_answer_array.append(gold_answer)
+                    answer_types_array.append(assign_answer_types(answer=gold_answer))
+                    pred_hypothesis_after_filtering_array.append([pred_hypothesis])
+                    gold_hypothesis_array.append(gold_hypothesis)
+                    label_after_filtering_array.append([predicted_label])
+                    continue
 
                 # Bila MAXIMUM_SEARCH_ITER diatas 2, maka continue langsung
 

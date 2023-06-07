@@ -2,30 +2,49 @@
 \chapter{\kesimpulan}
 \label{bab:6}
 %---------------------------------------------------------------
-Pada bab ini, Penulis akan memaparkan kesimpulan penelitian dan saran untuk penelitian berikutnya.
-
+Bab keenam ini menjelaskan mengenai kesimpulan dari penelitian ini dan juga saran untuk penelitian selanjutnya. Sub-bab \ref{6.1} menjelaskan beberapa poin utama kesimpulan dari penelitian ini. Sub-bab \ref{6.2} menjelaskan saran untuk penelitian selanjutnya.
 
 %---------------------------------------------------------------
 \section{Kesimpulan}
-\label{sec:kesimpulan}
+\label{6.1}
 %---------------------------------------------------------------
-Berikut ini adalah kesimpulan terkait pekerjaan yang dilakukan dalam penelitian ini:
+Pada sub-bab ini, akan dijelaskan mengenai kesimpulan utama dari penelitian ini. Berikut ini adalah poin-poin kesimpulan terkait pekerjaan yang dilakukan dalam penelitian ini:
+
 \begin{enumerate}
-	\item \bo{Poin pertama} \\
-	Penjelasan poin pertama.
-	\item \bo{Poin kedua} \\
-	Penjelasan poin kedua.
+	
+ \item \bo{Peningkatan Performa Dengan Pemanfaatan \emph{Natural Language Inference}.}
+	
+ Pada metode \emph{intermediate-task transfer learning}, dapat dilihat bahwa pemanfaatan metode ini berdampak \textbf{positif} bagi keseluruhan performa sistem tanya jawab, dan juga secara kecenderungan, metode \emph{intermediate-task transfer learning with freezing layer} memiliki skor yang lebih tinggi dibandingkan dengan metode \emph{intermediate-task transfer learning} maupun dengan \emph{baseline}-nya. Model terbaik untuk metode \emph{intermediate-task transfer learning} adalah: model \texttt{xlm-roberta-large} dengan metode \emph{intermediate-task transfer learning with freezing layer}, dengan skor \emph{exact match} dan skor F1 model dan metode tersebut mengungguli semua model dan metode lainnya, dengan mendapatkan skor \emph{exact match} sebesar 78.30 dan skor F1 sebesar 85.14. Namun, kenaikan paling signifikan terhadap \emph{baseline}, terdapat pada model \texttt{IndoBERT-large} dengan metode \emph{intermediate-task transfer learning with freezing layer}, dapat dilihat skor \emph{exact match} naik sekitar 5.66 dan skor F1 naik sekitar 5.69. Hal tersebut membuat model dan metode ini memiliki kenaikan skor paling signifikan di antara model dan metode lainnya. Sedangkan, pada metode \emph{task recasting} sebagai verifikator, dapat dilihat bahwa pemanfaatan metode ini berdampak \textbf{negatif} bagi keseluruhan performa sistem tanya jawab.
+
+ \item \bo{Karakteristik Pasangan Konteks-Pertanyaan-Jawaban Yang Meningkat Dengan Pemanfaatan \emph{Natural Language Inference}.}
+
+ Pada metode \emph{intermediate-task transfer learning}, dapat dilihat karakteristik pasangan konteks-pertanyaan-jawaban yang cenderung meningkat dengan metode ini antara lain pada tipe pertanyaan: apa, dimana, kapan, siapa, bagaimana, dan lainnya; kemudian pada panjang konteks $\leq100$ dan $101-150$; lalu pada panjang pertanyaan $\leq5$ dan $6-10$; kemudian pada panjang jawaban \emph{golden truth} $\leq5$ dan $6-10$; lalu pada keseluruhan \emph{answer type} selain \emph{law} dan \emph{time}; terakhir pada \emph{reasoning type} WM, SSR, dan MSR. Mirip dengan performa dalam metrik skor \emph{exact match} dan skor F1, metode \emph{intermediate-task transfer learning with freezing layer} memiliki skor yang lebih tinggi dibandingkan dengan metode \emph{intermediate-task transfer learning} maupun dengan \emph{baseline}-nya; namun, persentase nilai benarnya cenderung meningkat tidak signifikan kecuali dengan beberapa kasus dengan menggunakan model \emph{IndoBERT-large}. Sedangkan pada metode \emph{task recasting} sebagai verifikator, tidak ditemukan karakteristik pasangan konteks-pertanyaan-jawaban yang meningkat setelah dilakukan eksperimen metode tersebut dengan parameter tipe \emph{filtering} \& tipe perubahan format kalimat.
+
 \end{enumerate}
-
-Tulis kalimat penutup di sini.
-
 
 %---------------------------------------------------------------
 \section{Saran}
-\label{sec:saran}
+\label{6.2}
 %---------------------------------------------------------------
-Berdasarkan hasil penelitian ini, berikut ini adalah saran untuk pengembangan penelitian berikutnya:
+Pada sub-bab ini, akan dijelaskan mengenai saran dari penulis untuk penelitian selanjutnya. Berikut ini adalah saran dari penulis untuk pengembangan penelitian berikutnya:
+
 \begin{enumerate}
-	\item Saran 1.
-	\item Saran 2.
+    
+    \item \textbf{Melakukan proses \emph{hyperparameter tuning} dengan lebih baik}. Pada penelitian ini, penulis tidak sempat untuk melakukan proses \emph{hyperparameter tuning} karena keterbatasan sumber daya (mesin komputasi dan waktu) pada \emph{training sequence classification}, \emph{training question answering baseline}, dan \emph{training question answering intermediate-task transfer learning}. Belum tentu, \emph{hyperparameter} yang penulis gunakan pada penelitian ini merupakan \emph{hyperparameter} yang terbaik. Oleh karena itu, saran penulis untuk penelitian selanjutnya, penelitian selanjutnya dapat melakukan proses \emph{hyperparameter tuning} dengan lebih baik, contohnya dengan menggunakan teknik \texttt{GridSearch}.
+    
+    \item \textbf{Meningkatkan kualitas tipe perubahan format kalimat}. Pada penelitian ini, penulis tidak terlalu memperhatikan kualitas tipe perubahan format, belum ada anotasi dari manusia untuk membuktikan keterbacaan dari tipe perubahan format kalimat yang telah penulis rancang. Sampai saat ini, setidaknya bagi penulis, kalimat yang dirancang sudah cukup terbaca, maka bisa dijadikan salah satu format template tipe perubahan format kalimat. Oleh karena itu, saran penulis untuk penelitian selanjutnya, penelitian selanjutnya dapat lebih memperhatikan kualitas tipe perubahan format kalimat, salah satu caranya adalah dengan membuat anotasi manusia yang dapat dievaluasi berdasarkan skor \emph{cohen kappa}-nya; bila sudah dievaluasi, maka tipe perubahan format kalimat bisa dimodifikasi atau bahkan dirancang ulang.
+    
+    \item \textbf{Eksplorasi parameter yang belum sempat diuji}. Pada penelitian ini, penulis tidak melakukan eksplorasi beberapa parameter pada metode \emph{task recasting} sebagai verifikator, seperti parameter: jumlah iterasi pencarian maksimum, variasi pengambilan jawaban akhir, dan \emph{threshold} batas tolerir pengambilan jawaban. Penulis tidak sempat eksplorasi untuk menguji parameter-parameter tersebut dikarenakan oleh keterbatasan sumber daya (mesin komputasi dan waktu). Oleh karena itu, saran penulis untuk penelitian selanjutnya, penelitian selanjutnya dapat mencoba untuk eksplorasi parameter-parameter tersebut, penelitian selanjutnya bisa saja hanya mengeksplorasi dan menguji parameter-parameter yang telah dibuat tersebut, karena kodenya sudah penulis rancang dan sudah bisa berjalan dengan lancar, sehingga penelitian selanjutnya bisa hanya benar-benar menjalankan kode yang sudah dirancang dan melakukan evaluasi dan analisis dari hasil yang telah didapatkan.
+
+    \item \textbf{Kombinasi parameter eksperimen pada metode \emph{task recasting} sebagai verifikator}. Pada penelitian ini, penulis tidak melakukan kombinasi parameter eksperimen pada metode \emph{task recasting} sebagai verifikator. Penulis hanya melakukan evaluasi dan analisis terhadap satu parameter saja, bukan terhadap hubungan antara satu parameter dengan parameter lainnya, contohnya seperti: hubungan antara parameter jumlah iterasi pencarian maksimum dan \emph{threshold} batas tolerir pengambilan jawaban. Penulis tidak sempat melakukan kombinasi parameter eksperimen tersebut dikarenakan oleh keterbatasan sumber daya (mesin komputasi dan waktu). Oleh karena itu, saran penulis untuk penelitian selanjutnya, penelitian selanjutnya dapat mencoba untuk melakukan kombinasi parameter dan melakukan evaluasi dan analisis terhadap hasil yang telah didapatkan untuk mencari hubungan antar parameter yang telah dirancang, penelitian selanjutnya bisa saja hanya melakukan kombinasi parameter dan melakukan evaluasi dan analisis terhadap hasil yang telah didapatkan untuk mencari hubungan antar parameter yang telah dirancang, karena kodenya sudah penulis rancang dan sudah bisa berjalan dengan lancar, sehingga penelitian selanjutnya bisa hanya benar-benar menjalankan kode yang sudah dirancang dan melakukan evaluasi dan analisis dari hasil yang telah didapatkan.
+    
+    \item \textbf{Eksplorasi model dan \emph{dataset} sistem tanya jawab yang lain}. Pada penelitian ini, penulis hanya menggunakan tiga model dan tiga \emph{dataset} sistem tanya jawab sebagai bahan eksperimen penelitian ini. Bisa saja dengan berjalannya waktu, akan ada model atau \emph{dataset} sistem tanya jawab baru yang menjadi tolak ukur (\emph{benchmark}) yang lebih reliabel daripada model dan \emph{dataset} sistem tanya jawab yang penulis gunakan pada penelitian ini. Oleh karena itu, saran penulis untuk penelitian selanjutnya, penelitian selanjutnya dapat mencoba eksplorasi model dan \emph{dataset} sistem tanya jawab yang lain yang setidaknya lebih baru (\emph{novelty}), untuk menguji generalisasi dari peningkatan performa yang didapatkan dari penelitian ini.
+    
+    \item \textbf{Eksplorasi metode pemanfaatan NLI 
+    untuk sistem tanya jawab lainnya}. Pada penelitian ini, penulis hanya menggunakan dua metode saja, yaitu: \emph{intermediate-task transfer learning} dan \emph{task recasting} sebagai verifikator saja. Kemungkinan besar, masih ada metode lain untuk memanfaatkan NLI pada sistem tanya jawab, mungkin saja bisa seperti: \emph{task recasting} sebagai penghasil jawaban, bukan sekadar sebagai verifikator saja. Oleh karena itu, saran penulis untuk penelitian selanjutnya, penelitian selanjutnya dapat mencoba eksplorasi metode-metode lain pemanfaatan NLI pada sistem tanya jawab, agar peningkatan performa sistem tanya jawab bisa lebih signifikan dibandingkan dengan penelitian ini.
+
+    \item \textbf{Memahami alasan mengapa metode \emph{intermediate-task transfer learning} berhasil meningkatkan performa sistem tanya jawab}. Pada penelitian ini, penulis tidak menjelaskan alasan pasti mengapa metode \emph{intermediate-task transfer learning} berhasil meningkatkan performa sistem tanya jawab (\emph{model explainability}). Penelitian ini hanya sebatas bereksperimen apakah metode \emph{intermediate-task transfer learning} dapat meningkatkan performa sistem tanya jawab? Dan juga, apa karakteristik pasangan konteks-pertanyaan-jawaban apa saja yang bisa meningkat tingkat kebenarannya karena pemanfaatan NLI ini. Oleh karena itu, saran penulis untuk penelitian selanjutnya, penelitian selanjutnya dapat mencoba menjelaskan alasan mengapa dan bagaimana metode \emph{intermediate-task transfer learning} berhasil meningkatkan performa sistem tanya jawab.
+
+    \item \textbf{Memahami alasan mengapa metode \emph{task recasting} sebagai verifikator tidak berhasil meningkatkan performa sistem tanya jawab}. Pada penelitian ini, penulis tidak menjelaskan alasan pasti mengapa metode \emph{task recasting} sebagai verifikator tidak berhasil meningkatkan performa sistem tanya jawab. Penelitian ini hanya sebatas bereksperimen apakah metode \emph{task recasting} sebagai verifikator dapat meningkatkan performa sistem tanya jawab? Dan juga, apa karakteristik pasangan konteks-pertanyaan-jawaban apa saja yang bisa meningkat tingkat kebenarannya karena pemanfaatan NLI ini. Oleh karena itu, saran penulis untuk penelitian selanjutnya, penelitian selanjutnya dapat mencoba menjelaskan alasan mengapa dan bagaimana metode \emph{task recasting} sebagai verifikator tidak berhasil meningkatkan performa sistem tanya jawab.
+    
 \end{enumerate}

@@ -85,15 +85,15 @@ python filtering_nli_experiment.py -m xlmr -d squadid -ts replace_first
 python filtering_nli_experiment.py -m xlmr -d idkmrc -ts replace_first
 python filtering_nli_experiment.py -m xlmr -d tydiqaid -ts replace_first
 
-python filtering_nli_experiment.py -m indolem -d squadid -ts replace_question_mark
-python filtering_nli_experiment.py -m indolem -d idkmrc -ts replace_question_mark
-python filtering_nli_experiment.py -m indolem -d tydiqaid -ts replace_question_mark
-python filtering_nli_experiment.py -m indonlu -d squadid -ts replace_question_mark
-python filtering_nli_experiment.py -m indonlu -d idkmrc -ts replace_question_mark
-python filtering_nli_experiment.py -m indonlu -d tydiqaid -ts replace_question_mark
-python filtering_nli_experiment.py -m xlmr -d squadid -ts replace_question_mark
-python filtering_nli_experiment.py -m xlmr -d idkmrc -ts replace_question_mark
-python filtering_nli_experiment.py -m xlmr -d tydiqaid -ts replace_question_mark
+python filtering_nli_experiment.py -m indolem -d squadid -ts replace_question_word
+python filtering_nli_experiment.py -m indolem -d idkmrc -ts replace_question_word
+python filtering_nli_experiment.py -m indolem -d tydiqaid -ts replace_question_word
+python filtering_nli_experiment.py -m indonlu -d squadid -ts replace_question_word
+python filtering_nli_experiment.py -m indonlu -d idkmrc -ts replace_question_word
+python filtering_nli_experiment.py -m indonlu -d tydiqaid -ts replace_question_word
+python filtering_nli_experiment.py -m xlmr -d squadid -ts replace_question_word
+python filtering_nli_experiment.py -m xlmr -d idkmrc -ts replace_question_word
+python filtering_nli_experiment.py -m xlmr -d tydiqaid -ts replace_question_word
 
 python filtering_nli_experiment.py -m indolem -d squadid -ts add_adalah
 python filtering_nli_experiment.py -m indolem -d idkmrc -ts add_adalah
@@ -155,6 +155,14 @@ python filtering_nli_experiment.py -m xlmr -d squadid -ts machine_generation_wit
 python filtering_nli_experiment.py -m xlmr -d idkmrc -ts machine_generation_with_translation
 python filtering_nli_experiment.py -m xlmr -d tydiqaid -ts machine_generation_with_translation
 
+# Bermasalah
+python filtering_nli_experiment.py -m xlmr -d idkmrc -ts replace_question_word
+python filtering_nli_experiment.py -m xlmr -d tydiqaid -ts replace_question_word
+python filtering_nli_experiment.py -m xlmr -d tydiqaid -ts machine_generation_with_translation
+python filtering_nli_experiment.py -m xlmr -d squadid -ts replace_question_word
+python filtering_nli_experiment.py -m indolem -d squadid -ts machine_generation_with_translation
+python filtering_nli_experiment.py -m indonlu -d squadid -ts machine_generation_with_translation
+
 # Alur 2: MSI
 python filtering_nli_experiment.py -m indolem -d squadid -msi 1
 python filtering_nli_experiment.py -m indolem -d idkmrc -msi 1
@@ -165,16 +173,6 @@ python filtering_nli_experiment.py -m indonlu -d tydiqaid -msi 1
 python filtering_nli_experiment.py -m xlmr -d squadid -msi 1
 python filtering_nli_experiment.py -m xlmr -d idkmrc -msi 1
 python filtering_nli_experiment.py -m xlmr -d tydiqaid -msi 1
-
-python filtering_nli_experiment.py -m indolem -d squadid -msi 2
-python filtering_nli_experiment.py -m indolem -d idkmrc -msi 2
-python filtering_nli_experiment.py -m indolem -d tydiqaid -msi 2
-python filtering_nli_experiment.py -m indonlu -d squadid -msi 2
-python filtering_nli_experiment.py -m indonlu -d idkmrc -msi 2
-python filtering_nli_experiment.py -m indonlu -d tydiqaid -msi 2
-python filtering_nli_experiment.py -m xlmr -d squadid -msi 2
-python filtering_nli_experiment.py -m xlmr -d idkmrc -msi 2
-python filtering_nli_experiment.py -m xlmr -d tydiqaid -msi 2
 
 python filtering_nli_experiment.py -m indolem -d squadid -msi 3
 python filtering_nli_experiment.py -m indolem -d idkmrc -msi 3
@@ -196,27 +194,7 @@ python filtering_nli_experiment.py -m xlmr -d squadid -msi 4
 python filtering_nli_experiment.py -m xlmr -d idkmrc -msi 4
 python filtering_nli_experiment.py -m xlmr -d tydiqaid -msi 4
 
-python filtering_nli_experiment.py -m indolem -d squadid -msi 5
-python filtering_nli_experiment.py -m indolem -d idkmrc -msi 5
-python filtering_nli_experiment.py -m indolem -d tydiqaid -msi 5
-python filtering_nli_experiment.py -m indonlu -d squadid -msi 5
-python filtering_nli_experiment.py -m indonlu -d idkmrc -msi 5
-python filtering_nli_experiment.py -m indonlu -d tydiqaid -msi 5
-python filtering_nli_experiment.py -m xlmr -d squadid -msi 5
-python filtering_nli_experiment.py -m xlmr -d idkmrc -msi 5
-python filtering_nli_experiment.py -m xlmr -d tydiqaid -msi 5
-
 # Alur 2: Variation
-python filtering_nli_experiment.py -m indolem -d squadid -va 1
-python filtering_nli_experiment.py -m indolem -d idkmrc -va 1
-python filtering_nli_experiment.py -m indolem -d tydiqaid -va 1
-python filtering_nli_experiment.py -m indonlu -d squadid -va 1
-python filtering_nli_experiment.py -m indonlu -d idkmrc -va 1
-python filtering_nli_experiment.py -m indonlu -d tydiqaid -va 1
-python filtering_nli_experiment.py -m xlmr -d squadid -va 1
-python filtering_nli_experiment.py -m xlmr -d idkmrc -va 1
-python filtering_nli_experiment.py -m xlmr -d tydiqaid -va 1
-
 python filtering_nli_experiment.py -m indolem -d squadid -va 2
 python filtering_nli_experiment.py -m indolem -d idkmrc -va 2
 python filtering_nli_experiment.py -m indolem -d tydiqaid -va 2
@@ -247,16 +225,6 @@ python filtering_nli_experiment.py -m indonlu -d tydiqaid -th 0.3
 python filtering_nli_experiment.py -m xlmr -d squadid -th 0.3
 python filtering_nli_experiment.py -m xlmr -d idkmrc -th 0.3
 python filtering_nli_experiment.py -m xlmr -d tydiqaid -th 0.3
-
-python filtering_nli_experiment.py -m indolem -d squadid -th 0.5
-python filtering_nli_experiment.py -m indolem -d idkmrc -th 0.5
-python filtering_nli_experiment.py -m indolem -d tydiqaid -th 0.5
-python filtering_nli_experiment.py -m indonlu -d squadid -th 0.5
-python filtering_nli_experiment.py -m indonlu -d idkmrc -th 0.5
-python filtering_nli_experiment.py -m indonlu -d tydiqaid -th 0.5
-python filtering_nli_experiment.py -m xlmr -d squadid -th 0.5
-python filtering_nli_experiment.py -m xlmr -d idkmrc -th 0.5
-python filtering_nli_experiment.py -m xlmr -d tydiqaid -th 0.5
 
 python filtering_nli_experiment.py -m indolem -d squadid -th 0.7
 python filtering_nli_experiment.py -m indolem -d idkmrc -th 0.7
