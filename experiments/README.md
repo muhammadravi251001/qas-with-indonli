@@ -27,6 +27,20 @@ apt-get install -y git-lfs
 git lfs install
 ```
 
+If you are using a new Pod via cloud, you can install all the requirements like this:
+```
+pip install jupyter
+pip install datasets
+pip install transformers
+pip install tensorboard
+pip install evaluate
+pip install git+https://github.com/IndoNLP/nusa-crowd.git@release_exp
+pip install -r requirements.txt
+curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
+apt-get install -y git-lfs
+git lfs install
+```
+
 ## Running experiments for training IndoNLI
 
 Please, check the arguments that can be passed to this code; the datatype, arguments choice, and default value.

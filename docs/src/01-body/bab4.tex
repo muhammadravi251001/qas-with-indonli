@@ -2,7 +2,7 @@
 \chapter{\babEmpat}
 \label{bab:4}
 %-----------------------------------------------------------------------------%
-Bab keempat ini menjelaskan tentang implementasi teknis yang penulis lakukan dalam penelitian ini. Sub-bab \ref{4.1} menjelaskan mengenai \emph{training} \emph{sequence classification task}. Sub-bab \ref{4.2} menjelaskan mengenai  \emph{training} \emph{baseline} model \emph{question answering task}. Sub-bab \ref{4.3} menjelaskan mengenai metode \emph{intermediate-task transfer learning}. Sub-bab \ref{4.4} lalu menjelaskan mengenai metode \emph{task recasting} dengan IndoNLI sebagai verifikator.
+Bab keempat ini menjelaskan tentang implementasi teknis yang penulis lakukan dalam penelitian ini. Sub-bab \ref{4.1} menjelaskan mengenai \emph{training} \emph{sequence classification task}. Sub-bab \ref{4.2} menjelaskan mengenai  \emph{training} \emph{baseline} model \emph{question answering task}. Sub-bab \ref{4.3} menjelaskan mengenai metode \emph{intermediate-task transfer learning}. Sub-bab \ref{4.4} lalu menjelaskan mengenai metode \emph{task recasting} dengan IndoNLI sebagai verifikator. Untuk keseluruhan kode penelitian ini, dapat dilihat pada pranala berikut: \href{https://github.com/muhammadravi251001/qas-with-indonli/}{\texttt{github.com/muhammadravi251001/qas-with-indonli}} atau bisa dilihat sebagian kodenya pada bagian Lampiran \ref{Lampiran Terkait Kode Program: 7.1}.
 
 %-----------------------------------------------------------------------------%
 \section{\emph{Training} \emph{Sequence Classification Task}}
@@ -18,7 +18,7 @@ Pengambilan parameter untuk \emph{training sequence classification task} menggun
 
 \begin{table}[H]
 \centering
-\begin{tabularx}{\linewidth}{XlXX}
+\begin{tabularx}{\linewidth}{lX}
  \toprule
  Parameter & Pilihan Nilai \\
  \midrule
@@ -150,7 +150,7 @@ Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.1.1}, namun ada beberapa per
 
 \begin{table}[h!]
 \centering
-\begin{tabularx}{\linewidth}{XlXX}
+\begin{tabularx}{\linewidth}{lX}
  \toprule
  Parameter & Pilihan Nilai \\
  \midrule
@@ -259,7 +259,7 @@ Pada tahap ini, penulis mengubah \texttt{PredictionOutput} hasil dari prediksi m
 
 Proses pemisahan antara \texttt{question} dan \texttt{context} menggunakan properti \texttt{token\char`_type\char`_ids}, dimana bila \texttt{token\char`_type\char`_ids} bernilai 0, maka \texttt{input\char`_ids} yang bersangkutan merupakan sebuah bagian dari \texttt{question}, sebaliknya bila \texttt{token\char`_type\char`_ids} bernilai 1, maka \texttt{input\char`_ids} yang bersangkutan merupakan sebuah bagian dari \texttt{question}; hal tersebut sesuai dengan urutan \emph{preprocess} dan tokenisasi dimana urutannya \texttt{question} lalu \texttt{question}. Namun agak berbeda sedikit dengan model \texttt{xlm-roberta-large}, karena model tersebut tidak mengenal konsep \texttt{return\char`_token\char`_type\char`_ids}, maka cara untuk membedakan antara \texttt{question} dan \texttt{context}-nya dengan menggunakan fungsi \texttt{index} bawaan Python dengan mencari ID = 2 (\texttt{</s>}) pada \texttt{input\char`_ids} sebagai pemisahnnya. 
 
-Pada tahap ini juga akan dilakukan analisis terhadap beberapa karakteristik pasangan pertanyaan-jawaban-konteks, antara lain: \emph{question type}, panjang konteks, panjang pertanyaan, panjang jawaban \emph{golden truth}, \emph{answer type}, dan \emph{reasoning type}. Evaluasi dan analisis akan dilakukan secara manual, kecuali pada \emph{answer type}, penulis menggunakan model \emph{entity-named recognition} berbahasa Indonesia dengan model \href{https://huggingface.co/cahya/xlm-roberta-base-indonesian-NER}{\texttt{cahya/xlm-roberta-base-indonesian-NER}}, penulis menggunakan model tersebut karena memiliki ketersediannya pada repositori Hugging Face dan memiliki performa yang baik. Sederhananya, akan dilakukan perhitungan persentase jawaban prediksi yang benar (dihitung sebagai \emph{exact match}) dibandingkan jawaban prediksi yang salah, dengan memperhatikan karakteristik pasangan pertanyaan-jawaban-konteks yang telah dijabarkan sebelumnya. Kemudian, hasil analisis ini disimpan dalam format \texttt{txt} dan akan otomatis di-\emph{push} ke repositori Hugging Face pada sub-bab selanjutnya, hal tersebut dilakukan agar mempermudah melihat hasil eksperimen di internet, tanpa perlu mengecek ke penyimpanan (\emph{storage}) lokal.
+Pada tahap ini juga akan dilakukan analisis terhadap beberapa karakteristik pasangan pertanyaan-jawaban-konteks, antara lain: \emph{question type}, panjang konteks, panjang pertanyaan, panjang jawaban \emph{golden truth}, \emph{answer type}, dan \emph{reasoning type}. Sederhananya, akan dilakukan perhitungan persentase jawaban prediksi yang benar (dihitung sebagai \emph{exact match}) dibandingkan jawaban prediksi yang salah, dengan memperhatikan karakteristik pasangan pertanyaan-jawaban-konteks yang telah dijabarkan sebelumnya. Kemudian, hasil analisis ini disimpan dalam format \texttt{txt} dan akan otomatis di-\emph{push} ke repositori Hugging Face pada sub-bab selanjutnya, hal tersebut dilakukan agar mempermudah melihat hasil eksperimen di internet, tanpa perlu mengecek ke penyimpanan (\emph{storage}) lokal.
 
 %-----------------------------------------------------------------------------%
 \subsection{Melakukan \emph{Push} ke Akun Hugging Face}
@@ -394,7 +394,7 @@ Untuk sub-bab ini sudah dibahas pada sub-bab \ref{4.2.1}, namun ada beberapa per
 
 \begin{table}[H]
 \centering
-\begin{tabularx}{\textwidth}{XX}
+\begin{tabularx}{\textwidth}{lX}
  \toprule
  Parameter & Pilihan Nilai \\
  \midrule
