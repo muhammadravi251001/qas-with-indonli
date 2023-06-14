@@ -192,6 +192,8 @@ Alur penelitian tahapan \emph{task} recasting dengan NLI sebagai verifikator yan
         \item Bila sampai iterasi terakhir tidak ditemukan juga hasil prediksi jawaban yang sesuai dengan label hasil pilihan tipe \emph{filtering} di atas, maka akan otomatis menyimpan jawaban kosong sebagai prediksi final atau mengambil jawaban dengan \emph{probability distribution} NLI paling mendekati label yang diinginkan pada tipe \emph{filtering} sebelumnya. Hal ini ditujukan untuk mencakup \emph{unanswerable question} yang terdapat pada tiga \emph{dataset} pilihan sistem tanya jawab penelitian ini.
         
     \end{itemize}
+
+    \item Sebagai catatan, pada penelitian ini, penulis hanya akan bereksperimen dengan tipe \emph{filtering} dan tipe perubahan format jawaban. Sehingga untuk jumlah iterasi maksimum diatur selalu bernilai 2, variasi pengambilan jawaban final diatur selalu variasi 1, dan \emph{threshold} diatur selalu bernilai 0.5.
     
     \item Terakhir, menyimpan keseluruhan hasil eksperimen ini untuk nantinya akan dilakukan evaluasi dan analisis hasil eksperimen.
 

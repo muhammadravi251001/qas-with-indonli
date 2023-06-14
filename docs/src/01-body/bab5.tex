@@ -411,7 +411,7 @@ Dapat dilihat pada tabel di atas, pada \emph{dataset} \emph{translated} mendapat
 \section{Hasil dan Analisis Performa Metode \emph{Intermediate-Task Transfer Learning}}
 \label{5.3}
 %-----------------------------------------------------------------------------%
-Pada sub-bab ini, akan dijelaskan mengenai hasil dan analisis eksperimen metode \emph{intermediate-task transfer learning} yang penulis lakukan pada pada penelitian ini. Sebagai catatan, bahwa ITTL yang dimaksud di bab ini adalah singkatan dari \emph{intermediate-task transfer learning} dan ITTL + F merupakan singkatan dari \emph{intermediate-task transfer learning with freezing layer}. Kemudian, arti S-, T-, dan I- adalah singkatan dari SQuAD-ID, TyDI-QA-ID, dan IDK-MRC secara berurutan, hal tersebut dilakukan agar mempersingkat nama kolom pada tabel. Pada tabel di bawah ini, akan dipaparkan skor \emph{exact match} dan skor F1 pada metode \emph{intermediate-task transfer learning}.
+Pada sub-bab ini, akan dijelaskan mengenai hasil dan analisis eksperimen metode \emph{intermediate-task transfer learning} yang penulis lakukan pada pada penelitian ini. Sebagai catatan, bahwa ITTL yang dimaksud di bab ini adalah singkatan dari \emph{intermediate-task transfer learning} dan ITTL + F merupakan singkatan dari \emph{intermediate-task transfer learning with freezing layer}. Pada tabel di bawah ini, akan dipaparkan skor \emph{exact match} dan skor F1 pada metode \emph{intermediate-task transfer learning}.
 
 
 \begin{table}[H]\centering
@@ -444,7 +444,26 @@ Terakhir, pada model \texttt{xlm-roberta-large}, mengikuti tren pada model \text
 
 Secara kecenderungan, metode \emph{intermediate-task transfer learning with freezing layer} memiliki skor yang lebih tinggi dibandingkan dengan metode \emph{intermediate-task transfer learning}. Maka, dapat disimpulkan, bahwa model terbaik untuk metode \emph{intermediate-task transfer learning} adalah: model \texttt{xlm-roberta-large} dengan metode \emph{intermediate-task transfer learning with freezing layer}, dengan skor \emph{exact match} dan skor F1 model dan metode tersebut mengungguli semua model dan metode lainnya. Namun, kenaikan paling signifikan terdapat pada model \texttt{IndoBERT-large} dengan metode \emph{intermediate-task transfer learning with freezing layer}, dapat dilihat skor \emph{exact match} naik sekitar 5.66 dan skor F1 naik sekitar 5.69. Hal tersebut membuat model dan metode ini memiliki kenaikan skor paling signifikan di antara model dan metode lainnya. 
 
-Kemudian, pada sub-bab selanjutnya akan dijelaskan mengenai perincian karakteristik pasangan konteks-pertanyaan-jawaban yang mengalami peningkatan atau penurunan performa setelah menggunakan metode \emph{intermediate-task transfer learning}.
+\begin{table}[H]\centering
+\begin{tabular}{lrrrrr}\toprule
+Model &Metode &SQuAD-ID &TyDI-QA-ID &IDK-MRC \\\midrule
+IndoBERT-base &Baseline &0.09 &0.0 &0.86 \\
+IndoBERT-base &ITTL &\underline{0.13} &0.0 &\underline{0.87} \\
+IndoBERT-base &ITTL + F &0.10 &0.0 &\underline{0.87} \\
+\hline
+IndoBERT-large &Baseline &0.13 &0.0 &0.54 \\
+IndoBERT-large &ITTL &\underline{0.14} &0.0 &0.54 \\
+IndoBERT-large &ITTL + F &0.12 &0.0 &\underline{0.63} \\
+\hline
+XLMR-large &Baseline &0.10 &0.0 &0.92 \\
+XLMR-large &ITTL &0.09 &0.0 &\underline{0.94} \\
+XLMR-large &ITTL + F &\underline{0.11} &0.0 &0.92 \\
+\bottomrule
+\end{tabular}
+\caption{Tabel perbandingan skor \emph{exact match} dengan metode \emph{intermediate-task transfer learning} pada \emph{unanswerable set}.}
+\end{table}
+
+Dapat dilihat pada contoh tabel di atas, terlihat bahwa setiap model dan setiap \emph{dataset}, metode ITTL dan/atau ITTL + F secara kecenderungan meningkat skor \emph{exact match}-nya pada \emph{unanswerable set}. Maka, dapat disimpulkan bahwa, metode \emph{intermediate-task transfer learning} membantu meningkatkan performa terhadap jenis-jenis pertanyaan \emph{unanswerable} pada suatu \emph{dataset} sistem tanya jawab. Hasil \emph{dataset} TyDI-QA-ID selalu nol, karena pada \emph{dataset} TyDI-QA-ID tidak terdapat \emph{unanswerable set}. Kemudian, pada sub-bab selanjutnya akan dijelaskan mengenai perincian karakteristik pasangan konteks-pertanyaan-jawaban yang mengalami peningkatan atau penurunan performa setelah menggunakan metode \emph{intermediate-task transfer learning}.
 
 %-----------------------------------------------------------------------------%
 \subsection{\emph{Question Type}}
@@ -626,7 +645,7 @@ Secara pasti, metode \emph{intermediate-task transfer learning} tidak berhasil m
 \section{Hasil dan Analisis Performa Metode \emph{Task Recasting} dengan IndoNLI Sebagai Verifikator Dengan Eksperimen Tipe \emph{Filtering}.}
 \label{5.4}
 %-----------------------------------------------------------------------------%
-Pada sub-bab ini, akan dijelaskan mengenai hasil dan analisis eksperimen metode \emph{task recasting} dengan IndoNLI sebagai verifikator dengan eksperimen tipe \emph{filtering} yang penulis lakukan pada pada penelitian ini. Sebagai catatan, arti S-, T-, dan I- adalah singkatan dari SQuAD-ID, TyDI-QA-ID, dan IDK-MRC secara berurutan, hal tersebut dilakukan agar mempersingkat nama kolom pada tabel. Pada tabel di bawah ini, akan dipaparkan skor \emph{exact match} dan skor F1 pada metode \emph{task recasting} sebagai verifikator pada parameter tipe \emph{filtering}.
+Pada sub-bab ini, akan dijelaskan mengenai hasil dan analisis eksperimen metode \emph{task recasting} dengan IndoNLI sebagai verifikator dengan eksperimen tipe \emph{filtering} yang penulis lakukan pada pada penelitian ini. Pada tabel di bawah ini, akan dipaparkan skor \emph{exact match} dan skor F1 pada metode \emph{task recasting} sebagai verifikator pada parameter tipe \emph{filtering}.
 
 \begin{table}[H]\centering
 \small
@@ -658,25 +677,25 @@ Terakhir, pada model \texttt{xlm-roberta-large}, mengikuti tren pada model \text
 Secara kecenderungan, parameter \emph{entailment or neutral} memiliki skor yang lebih tinggi dibandingkan dengan parameter \emph{entailment only}. Maka, dapat disimpulkan, bahwa model terbaik untuk metode \emph{task recasting} sebagai verifikator adalah: model \texttt{xlm-roberta-large} dengan parameter \emph{entailment or neutral}, dengan skor \emph{exact match} dan skor F1 model dan metode tersebut setidaknya lebih baik dibandingkan model dan parameter lainnya. Namun, secara keseluruhan penggunaan metode \emph{task recasting} sebagai verifikator pada semua parameter tipe \emph{filtering}, memberikan penurunan performa dari sistem tanya jawab yang sedang diuji.
 
 \begin{table}[H]\centering
-\footnotesize
-\begin{tabular}{llrrrr}
-\toprule
-         \multirow{2}{*}{Model} &\multirow{2}{*}{Parameter} &\multicolumn{4}{c}{SQuAD-ID} \\\cmidrule{3-6}
-& &Benar-Terima &Salah-Terima &Benar-Tolak &Salah-Tolak \\\midrule
- IndoBERT-base &       Entailment Only & +1.31 & +19.83 & -83.45 & +20.63 \\
- IndoBERT-base & Entailment or Neutral & -0.74 &  +7.23 & -79.68 &  -5.73 \\
+\begin{tabular}{lrrrrr}\toprule
+Model &Parameter &SQuAD-ID &TyDI-QA-ID &IDK-MRC \\\midrule
+IndoBERT-base &Baseline &\underline{0.09} &0.0 &\underline{0.86} \\
+IndoBERT-base &Entailment Only &0.04 &0.0 &0.10 \\
+IndoBERT-base &Entailment or Neutral &0.07 &0.0 &0.60 \\
 \hline
-IndoBERT-large &       Entailment Only & +1.24 & +17.18 & -82.23 & +25.95 \\
-IndoBERT-large & Entailment or Neutral &  -0.6 &  +6.09 & -78.59 &  +3.61 \\
+IndoBERT-large &Baseline &\underline{0.13} &0.0 &\underline{0.54} \\
+IndoBERT-large &Entailment Only &0.06 &0.0 &0.06 \\
+IndoBERT-large &Entailment or Neutral &0.09 &0.0 &0.36 \\
 \hline
-    XLMR-large &       Entailment Only & +0.94 &  +19.8 & -83.19 &  +34.2 \\
-    XLMR-large & Entailment or Neutral & -0.35 &  +6.99 & -79.13 &  +7.28 \\
+XLMR-large &Baseline &\underline{0.10} &0.0 &\underline{0.92} \\
+XLMR-large &Entailment Only &0.04 &0.0 &0.13 \\
+XLMR-large &Entailment or Neutral &0.06 &0.0 &0.63 \\
 \bottomrule
 \end{tabular}
-\caption{Tabel hubungan jawaban dengan label NLI, pada parameter tipe \emph{filtering} pada \emph{dataset} SQuAD-ID.}
+\caption{Tabel perbandingan skor \emph{exact match} dengan metode \emph{task recasting} sebagai verifikator dengan parameter tipe \emph{filtering} pada \emph{unanswerable set}.}
 \end{table}
 
-Pada sub-bab ini, penulis mencontohkan untuk \emph{dataset} SQuAD-ID, karena \emph{dataset} ini memberikan contoh yang penulis rasa lebih menarik, untuk kedua \emph{dataset} lainnya, penulis letakkan di bagian Lampiran \ref{Lampiran Terkait Tabel: 7.3}. Dapat dilihat pada contoh di atas, terlihat bahwa pada \emph{dataset} SQuAD-ID, untuk model \texttt{IndoBERT-base} dengan parameter \emph{entailment only}, setidaknya model berhasil meningkatkan penerimaan jawaban yang benar sekitar 1.31\%, dan meningkatkan meningkatkan penolakan  jawaban yang salah sekitar 20.63\%. Namun, model justru menerima jawaban yang salah sampai sebesar 19.83\%; dan menolak jawaban yang benar sampai sebesar 83.45\%. Oleh karena itu, hal ini dapat menjadi alasan generalisasi terkait menurunnya performa sistem tanya jawab yang sedang penulis uji. Kemudian, pada sub-bab selanjutnya akan dijelaskan mengenai perincian karakteristik pasangan konteks-pertanyaan-jawaban yang mengalami peningkatan atau penurunan performa setelah menggunakan metode \emph{task recasting} sebagai verifikator dengan parameter tipe \emph{filtering}.
+Dapat dilihat pada contoh tabel di atas, terlihat bahwa setiap model dan setiap \emph{dataset}, metode \emph{task recasting} sebagai verifikator dengan parameter tipe \emph{filtering} secara kecenderungan menurun skor \emph{exact match}-nya pada \emph{unanswerable set}. Maka, dapat disimpulkan bahwa, metode \emph{task recasting} sebagai verifikator dengan parameter tipe \emph{filtering} tidak dapat membantu meningkatkan performa terhadap jenis-jenis pertanyaan \emph{unanswerable} pada suatu \emph{dataset} sistem tanya jawab. Hasil \emph{dataset} TyDI-QA-ID selalu nol, karena pada \emph{dataset} TyDI-QA-ID tidak terdapat \emph{unanswerable set}. Kemudian, pada sub-bab selanjutnya akan dijelaskan mengenai perincian karakteristik pasangan konteks-pertanyaan-jawaban yang mengalami peningkatan atau penurunan performa setelah menggunakan metode \emph{task recasting} sebagai verifikator dengan parameter tipe \emph{filtering}.
 
 %-----------------------------------------------------------------------------%
 \subsection{\emph{Question Type}}
@@ -858,7 +877,7 @@ Secara pasti, metode \emph{task recasting} sebagai verifikator dengan parameter 
 \section{Hasil dan Analisis Performa Metode \emph{Task Recasting} dengan IndoNLI Sebagai Verifikator Dengan Eksperimen Tipe Perubahan Format Kalimat.}
 \label{5.5}
 %-----------------------------------------------------------------------------%
-Pada sub-bab ini, akan dijelaskan mengenai hasil dan analisis eksperimen metode \emph{task recasting} dengan IndoNLI sebagai verifikator dengan eksperimen tipe perubahan format kalimat yang penulis lakukan pada pada penelitian ini. Sebagai catatan, arti S-, T-, dan I- adalah singkatan dari SQuAD-ID, TyDI-QA-ID, dan IDK-MRC secara berurutan, hal tersebut dilakukan agar mempersingkat nama kolom pada tabel dan RB pada \texttt{Machine Generation With RB} artinya adalah \texttt{Rule Base}. Pada tabel di bawah ini, akan dipaparkan skor \emph{exact match} dan skor F1 pada metode \emph{task recasting} sebagai verifikator pada parameter tipe perubahan format kalimat.
+Pada sub-bab ini, akan dijelaskan mengenai hasil dan analisis eksperimen metode \emph{task recasting} dengan IndoNLI sebagai verifikator dengan eksperimen tipe perubahan format kalimat yang penulis lakukan pada pada penelitian ini. Sebagai catatan, RB pada \texttt{Machine Generation With RB} artinya adalah \texttt{Rule Base}. Pada tabel di bawah ini, akan dipaparkan skor \emph{exact match} dan skor F1 pada metode \emph{task recasting} sebagai verifikator pada parameter tipe perubahan format kalimat.
 
 \begin{table}[H]\centering
 \scriptsize
@@ -909,42 +928,43 @@ Secara kecenderungan, parameter \emph{just concat answer and question} dan param
 
 \begin{table}[H]\centering
 \scriptsize
-\begin{tabular}{llllll}
-\toprule
-         \multirow{2}{*}{Model} &\multirow{2}{*}{Parameter} &\multicolumn{4}{c}{SQuAD-ID} \\\cmidrule{3-6}
-& &Benar-Terima &Salah-Terima &Benar-Tolak &Salah-Tolak \\\midrule
- IndoBERT-base &                       Replace First &        -1.27 &        +7.39 &      -81.78 &        -2.3 \\
- IndoBERT-base &               Replace Question Word &        -0.74 &        +7.23 &      -79.68 &       -5.73 \\
- IndoBERT-base &                          Add Adalah &        -0.84 &        +7.46 &      -83.22 &       -5.99 \\
- IndoBERT-base &     Just Concat Answer and Question &        -0.98 &        +9.48 &      -82.69 &       +2.49 \\
- IndoBERT-base &                           Rule Base &        -0.74 &        +7.23 &      -79.68 &       -5.73 \\
- IndoBERT-base &          Machine Generation With RB &        -2.11 &       +10.76 &      -81.86 &      -18.43 \\
- IndoBERT-base &             Pure Machine Generation &        -3.53 &       +10.28 &      -78.46 &       -5.05 \\
- IndoBERT-base & Machine Generation With Translation &        -8.03 &       +17.81 &      -85.64 &      +19.16 \\
+\begin{tabular}{lrrrrr}\toprule
+Model &Parameter &SQuAD-ID &TyDI-QA-ID &IDK-MRC \\\midrule
+IndoBERT-base &Baseline &0.09 &0.0 &\underline{0.86} \\
+IndoBERT-base &Replace First &0.08 &0.0 &0.69 \\
+IndoBERT-base &Replace Question Word &0.07 &0.0 &0.68 \\
+IndoBERT-base &Add Adalah &0.08 &0.0 &0.60 \\
+IndoBERT-base &Just Concat Answer and Question &0.07 &0.0 &0.68 \\
+IndoBERT-base &Rule Base &0.07 &0.0 &0.60 \\
+IndoBERT-base &Machine Generation With RB &0.10 &0.0 &0.66 \\
+IndoBERT-base &Pure Machine Generation &0.10 &0.0 &0.79 \\
+IndoBERT-base &Machine Generation With Translation &\underline{0.13} &0.0 &0.72 \\
 \hline
-IndoBERT-large &                       Replace First &        -1.29 &        +6.78 &      -81.41 &       +2.97 \\
-IndoBERT-large &               Replace Question Word &         -0.7 &        +5.93 &      -79.86 &       +3.37 \\
-IndoBERT-large &                          Add Adalah &        -0.82 &        +6.14 &      -81.11 &       +5.89 \\
-IndoBERT-large &     Just Concat Answer and Question &        -1.02 &        +8.59 &      -83.31 &        +8.4 \\
-IndoBERT-large &                           Rule Base &         -0.6 &        +6.09 &      -78.59 &       +3.61 \\
-IndoBERT-large &          Machine Generation With RB &        -2.79 &        +10.3 &      -83.26 &      -10.47 \\
-IndoBERT-large &             Pure Machine Generation &        -3.51 &       +10.11 &      -80.12 &       -4.07 \\
-IndoBERT-large & Machine Generation With Translation &        -8.15 &        +16.2 &       -84.2 &      +22.13 \\
+IndoBERT-large &Baseline &0.13 &0.0 &\underline{0.54} \\
+IndoBERT-large &Replace First &0.11 &0.0 &0.40 \\
+IndoBERT-large &Replace Question Word &0.11 &0.0 &0.40 \\
+IndoBERT-large &Add Adalah &0.11 &0.0 &0.35 \\
+IndoBERT-large &Just Concat Answer and Question &0.10 &0.0 &0.41 \\
+IndoBERT-large &Rule Base &0.09 &0.0 &0.36 \\
+IndoBERT-large &Machine Generation With RB &0.13 &0.0 &0.34 \\
+IndoBERT-large &Pure Machine Generation &0.13 &0.0 &0.39 \\
+IndoBERT-large &Machine Generation With Translation &\underline{0.18} &0.0 &0.42 \\
 \hline
-    XLMR-large &                       Replace First &        -1.15 &        +7.48 &      -81.69 &      +12.42 \\
-    XLMR-large &               Replace Question Word &        -0.77 &        +7.13 &      -80.08 &       +9.95 \\
-    XLMR-large &                          Add Adalah &        -0.49 &        +7.23 &      -82.07 &       +8.21 \\
-    XLMR-large &     Just Concat Answer and Question &        -1.59 &       +10.24 &      -83.48 &      +16.29 \\
-    XLMR-large &                           Rule Base &        -0.35 &        +6.99 &      -79.13 &       +7.28 \\
-    XLMR-large &          Machine Generation With RB &        -2.42 &       +10.67 &       -86.5 &       -6.34 \\
-    XLMR-large &             Pure Machine Generation &        -3.08 &        +9.98 &      -84.62 &       -1.24 \\
-    XLMR-large & Machine Generation With Translation &        -8.01 &       +18.79 &      -86.58 &      +23.82 \\
+XLMR-large &Baseline &0.10 &0.0 &\underline{0.92} \\
+XLMR-large &Replace First &0.08 &0.0 &0.72 \\
+XLMR-large &Replace Question Word &0.08 &0.0 &0.71 \\
+XLMR-large &Add Adalah &0.08 &0.0 &0.64 \\
+XLMR-large &Just Concat Answer and Question &0.08 &0.0 &0.71 \\
+XLMR-large &Rule Base &0.06 &0.0 &0.63 \\
+XLMR-large &Machine Generation With RB &0.11 &0.0 &0.74 \\
+XLMR-large &Pure Machine Generation &0.12 &0.0 &0.85 \\
+XLMR-large &Machine Generation With Translation &\underline{0.16} &0.0 &0.77 \\
 \bottomrule
 \end{tabular}
-\caption{Tabel hubungan jawaban dengan label NLI, pada parameter tipe perubahan format kalimat pada \emph{dataset} SQuAD-ID.}
+\caption{Tabel perbandingan skor \emph{exact match} dengan metode \emph{task recasting} sebagai verifikator dengan parameter tipe perubahan format kalimat pada \emph{unanswerable set}.}
 \end{table}
 
-Pada sub-bab ini, penulis mencontohkan untuk \emph{dataset} SQuAD-ID, karena \emph{dataset} ini memberikan contoh yang penulis rasa lebih menarik, untuk kedua \emph{dataset} lainnya, penulis letakkan di bagian Lampiran \ref{Lampiran Terkait Tabel: 7.3}. Peningkatan pada tabel ini dibandingkan dengan model \emph{baseline}-nya. Dapat dilihat pada contoh di atas, terlihat bahwa pada \emph{dataset} SQuAD-ID, untuk model \texttt{IndoBERT-base} dengan parameter \emph{replace first}, model tidak berhasil meningkatkan penerimaan jawaban yang benar dan berkurang sekitar 1.27\%, dan tidak berhasil meningkatkan meningkatkan penolakan jawaban yang salah dan berkurang sekitar sekitar -2.3\%. Kemudian, model justru menerima jawaban yang salah sampai sebesar 7.39\%; dan menolak jawaban yang benar sampai sebesar 81.78\%. Oleh karena itu, hal ini dapat menjadi alasan generalisasi terkait menurunnya performa sistem tanya jawab yang sedang penulis uji. Kemudian, pada sub-bab selanjutnya akan dijelaskan mengenai perincian karakteristik pasangan konteks-pertanyaan-jawaban yang mengalami peningkatan atau penurunan performa setelah menggunakan metode \emph{task recasting} sebagai verifikator dengan parameter tipe perubahan format kalimat.
+Dapat dilihat pada contoh tabel di atas, terlihat bahwa pada \emph{dataset} SQuAD-ID setiap modelnya, parameter \emph{machine generation with translation} selalu lebih unggul dibandingkan parameter lainnya. Sedangkan pada \emph{dataset} IDK-MRC setiap modelnya, hasil \emph{baseline} selalu lebih unggul dibandingkan parameter lainnya. Maka, dapat disimpulkan bahwa, metode \emph{task recasting} sebagai verifikator dengan parameter tipe \emph{filtering} belum tentu dapat membantu meningkatkan performa terhadap jenis-jenis pertanyaan \emph{unanswerable} pada suatu \emph{dataset} sistem tanya jawab. Hasil \emph{dataset} TyDI-QA-ID selalu nol, karena pada \emph{dataset} TyDI-QA-ID tidak terdapat \emph{unanswerable set}. Kemudian, pada sub-bab selanjutnya akan dijelaskan mengenai perincian karakteristik pasangan konteks-pertanyaan-jawaban yang mengalami peningkatan atau penurunan performa setelah menggunakan metode \emph{task recasting} sebagai verifikator dengan parameter tipe perubahan format kalimat.
 
 %-----------------------------------------------------------------------------%
 \subsection{\emph{Question Type}}
