@@ -41,6 +41,16 @@ apt-get install -y git-lfs
 git lfs install
 ```
 
+Or if you had a Pod before, do it like this:
+```
+cd [YAML_FOLDER]" 
+kubectl apply -f [POD_NAME].yaml 
+kubectl get pods 
+kubectl exec -it [POD_NAME] -- /bin/bash
+jupyter notebook --allow-root
+kubectl port-forward [POD_NAME] 8888:8888
+```
+
 ## Running experiments for training IndoNLI
 
 Please, check the arguments that can be passed to this code; the datatype, arguments choice, and default value.
